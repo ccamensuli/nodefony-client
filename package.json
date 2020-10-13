@@ -1,0 +1,52 @@
+{
+  "name": "nodefony-client",
+  "version": "6.0.0",
+  "description": "Client Side Nodefony Framework",
+  "main": "entry.es6",
+  "browser": "./dist/nodefony.min.js",
+  "author": "Christophe CAMENSULI <ccamensuli@gmail.com>",
+  "private": false,
+  "keywords": [
+    "nodefony",
+    "node-js",
+    "javascript",
+    "framework",
+    "webpack",
+    "cors",
+    "websocket"
+  ],
+  "contributors": [],
+  "scripts": {
+    "build": "webpack --env production --progress --config webpack.config.js ; webpack  --env development --progress --config webpack.config.js"
+  },
+  "dependencies": {
+    "axios": "^0.20.0",
+    "core-js": "^3.6.5",
+    "express-generator": "^4.16.1",
+    "lodash": "^4.17.20",
+    "lodash.isregexp": "^4.0.1",
+    "uuid": "^8.3.1",
+    "webrtc-adapter": "^7.7.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/plugin-transform-runtime": "^7.11.5",
+    "@babel/preset-env": "^7.11.5",
+    "babel-loader": "^8.1.0",
+    "babel-polyfill": "^6.26.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "terser-webpack-plugin": "^4.2.3",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^4.0.0",
+    "webpack-manifest-plugin": "^2.2.0",
+    "webpack-merge": "^5.2.0"
+  },
+  "license": "CECILL-B",
+  "licenses": [
+    {
+      "type": "CECILL-B",
+      "url": "http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html"
+    }
+  ],
+  "readmeFilename": "README.md"
+}

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    {% block body %}{% endblock %}
+    {% block javascript %}
+    <script type="text/javascript" src="/nodefony/nodefony.min.js"></script>
+    {% endblock %}
+  </body>
+</html>
