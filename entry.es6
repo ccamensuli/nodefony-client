@@ -37,36 +37,45 @@
  */
 // CORE
 //import "regenerator-runtime/runtime";
-import "core-js/stable";
+//import "core-js/stable";
 import nodefony from './src/nodefony.es6';
 
-//import events from './src/core/events.es6';
-//events(nodefony);
+import events from './src/core/events.es6';
+events(nodefony);
 
-import('./src/core/events.es6')
-.then((events) => {
-    return events.default(nodefony);
-});
+import syslog from './src/syslog/syslog.es6';
+syslog(nodefony);
 
-import('./src/syslog/syslog.es6')
-.then((syslog) => {
-    return syslog.default(nodefony);
-});
+import container from './src/core/container.es6';
+container(nodefony);
 
-import('./src/core/container.es6')
-.then((container) => {
-    return container.default(nodefony);
-});
-
-import('./src/core/service.es6')
-.then((service) => {
-    return service.default(nodefony);
-});
-
+import service from './src/core/service.es6';
+service(nodefony);
 
 // medias
-//import medias from './src/medias/medias.es6';
-//nodefony.medias = medias(nodefony);
+import(/* webpackPrefetch: true , webpackChunkName: "medias" */'./src/medias/medias.es6')
+.then((medias) => {
+  return medias.default(nodefony);
+});
+// medias webaudio
+import(/* webpackPrefetch: true , webpackChunkName: "webAudio" */'./src/medias/webAudio/webAudio.es6')
+.then((audio) => {
+  return audio.default(nodefony);
+});
+import(/* webpackPrefetch: true , webpackChunkName: "audioBus" */'./src/medias/webAudio/audioBus.es6')
+.then((audioBus) => {
+  return audioBus.default(nodefony);
+});
+import(/* webpackPrefetch: true , webpackChunkName: "track" */'./src/medias/webAudio/track.es6')
+.then((track) => {
+  return track.default(nodefony);
+});
+import(/* webpackPrefetch: true , webpackChunkName: "mixer"*/'./src/medias/webAudio/mixer.es6')
+.then((mixer) => {
+  return mixer.default(nodefony);
+});
+
+// medias
 
 //import webrtc from './src/medias/webrtc/webrtc.es6';
 //nodefony.medias.webrtc = webrtc(nodefony);
@@ -74,18 +83,6 @@ import('./src/core/service.es6')
 //nodefony.medias.webrtcTransaction = transaction(nodefony);
 //import user from './src/medias/webrtc/user.es6';
 //nodefony.medias.userMedia = user(nodefony);
-// medias webaudio
-//import audio from './src/medias/webAudio/webAudio.es6';
-//nodefony.medias.webAudioApi = audio(nodefony);
-//import mixer from './src/medias/webAudio/mixer.es6';
-//nodefony.medias.webAudioApi.MediaMix = mixer(nodefony);
-//import bus from './src/medias/webAudio/audioBus.es6';
-//nodefony.medias.webAudioApi.AudioBus = bus(nodefony);
-//import track from './src/medias/webAudio/track.es6';
-//nodefony.medias.webAudioApi.Track = track(nodefony);
-
-
-
 
 
 export default nodefony;

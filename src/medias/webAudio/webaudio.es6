@@ -1,5 +1,4 @@
-export default function (nodefony) {
-
+export default (nodefony) => {
   let audioContext = null;
   const webAudioApi = function () {
     audioContext = window.AudioContext || window.webkitAudioContext;
@@ -8,8 +7,8 @@ export default function (nodefony) {
     }
     return false;
   }();
-
+  nodefony.medias.audioContext = audioContext ;
   return {
-    audioContext:audioContext
+    audioContext
   };
 }

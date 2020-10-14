@@ -1,6 +1,7 @@
-import adapter from 'webrtc-adapter';
+//import adapter from 'webrtc-adapter';
+// medias
 
-export default function (nodefony) {
+export default (nodefony) => {
 
   /*
    *	MEDIA STREAM
@@ -20,8 +21,8 @@ export default function (nodefony) {
 
   class MediaStream extends nodefony.Service {
 
-    constructor(mediaElement, settings, container = null) {
-      super("MediaStream", container);
+    constructor(mediaElement, settings, service = null) {
+      super("MediaStream", service ? service.container : null);
       this.settings = nodefony.extend({}, defaultSettingsStream, settings);
       this.urlStream = null;
       //this.stream = this.settings.stream ? this.setStream(this.settings.stream) : null;
@@ -38,6 +39,13 @@ export default function (nodefony) {
 
     set stream(value) {
       return this.setStream(value);
+    }
+
+    static async getAdapter() {
+      return await import( /* webpackPreload: true , webpackChunkName: "adapter" */ 'webrtc-adapter')
+        .then((module) => {
+          return module.default;
+        })
     }
 
     getUserMedia(settings = {}) {
@@ -62,20 +70,20 @@ export default function (nodefony) {
 
     // todo  https://webrtc.github.io/samples/src/content/getusermedia/getdisplaymedia/
     // https://github.com/webrtc/samples/tree/gh-pages/src/content/getusermedia/getdisplaymedia
-    getUserScreen(settings ={}) {
+    getUserScreen(settings = {}) {
       return new Promise((resolve, reject) => {
         this.settings = nodefony.extend({}, defaultSettingsStreamScreen, settings);
         this.settingsToListen(settings);
-        return navigator.mediaDevices.getDisplayMedia( this.settings)
-        .then((stream) => {
-          this.stream = stream;
-          this.fire("onSucces", this.stream, this);
-          return resolve(this.stream);
-        })
-        .catch((e) => {
-          this.fire("onError", e, this);
-          return reject(e);
-        });
+        return navigator.mediaDevices.getDisplayMedia(this.settings)
+          .then((stream) => {
+            this.stream = stream;
+            this.fire("onSucces", this.stream, this);
+            return resolve(this.stream);
+          })
+          .catch((e) => {
+            this.fire("onError", e, this);
+            return reject(e);
+          });
       });
     }
 
@@ -184,9 +192,11 @@ export default function (nodefony) {
     }
 
   }
-
-  return {
-    MediaStream: MediaStream,
-    webrtcAdapter: adapter
-  };
+  nodefony.medias.MediaStream = MediaStream;
+  nodefony.medias.adapter = MediaStream.getAdapter()
+    .then((ele) => {
+      nodefony.medias.adapter = ele;
+      return ele;
+    });
+  return MediaStream;
 }

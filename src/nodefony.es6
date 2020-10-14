@@ -12,6 +12,7 @@ class Nodefony {
     this.environment = env;
     //this.api = api;
     this.isRegExp = isregexp;
+    this.medias = {};
     /*window.addEventListener("load", () => {
       this.load();
     }, false);*/
@@ -36,9 +37,6 @@ class Nodefony {
 
       if (value === null) {
         return null;
-      }
-      if (Buffer.isBuffer(value)) {
-        return "buffer";
       }
       if (this.isArray(value)) {
         return "array";

@@ -11,8 +11,11 @@ export default (nodefony) => {
     defaultSeverity: "INFO"
   };
 
-  let defaultOptions = {};
-
+  const defaultOptions = {
+    events: {
+      nbListeners: 20
+    }
+  };
 
   class Service {
 
@@ -21,18 +24,38 @@ export default (nodefony) => {
       if (name) {
         this.name = name;
       }
-      this.options = nodefony.extend(true, {}, options);
-
+      if (options) {
+        if (notificationsCenter === false) {
+          this.options = nodefony.extend(true, {}, options);
+        } else {
+          this.options = nodefony.extend(true, {}, defaultOptions, options);
+        }
+      } else {
+        if (notificationsCenter === false) {
+          this.options = {};
+        } else {
+          //optimize
+          this.options = nodefony.extend(true, {}, defaultOptions);
+        }
+      }
       if (container instanceof nodefony.Container) {
         this.container = container;
       } else {
         if (container) {
-          throw new Error("Service nodefony container not valid must be instance of nodefony.Container");
+          if (nodefony.isContainer(container)) {
+            this.container = container;
+          } else {
+            throw new Error("Service nodefony container not valid must be instance of nodefony.Container");
+          }
+        } else {
+          this.container = new nodefony.Container();
+          this.container.set("container", this.container);
         }
-        this.container = new nodefony.Container();
-        this.container.set("container", this.container);
       }
-      this.kernel = this.container.get("kernel");
+      let kernel = this.container.get("kernel");
+      if (kernel) {
+        this.kernel = kernel;
+      }
       this.syslog = this.container.get("syslog");
       if (!this.syslog) {
         this.settingsSyslog = nodefony.extend({}, settingsSyslog, {
@@ -43,15 +66,25 @@ export default (nodefony) => {
       } else {
         this.settingsSyslog = this.syslog.settings;
       }
+
       if (notificationsCenter instanceof nodefony.Events) {
         this.notificationsCenter = notificationsCenter;
+        if (options) {
+          this.notificationsCenter.settingsToListen(options, this);
+          if (options.nbListeners) {
+            this.notificationsCenter.setMaxListeners(options.nbListeners);
+          }
+        }
       } else {
         if (notificationsCenter) {
-          throw new Error("Service nodefony notificationsCenter not valid must be instance of nodefony.notificationsCenter.notification");
+          throw new Error("Service nodefony notificationsCenter not valid must be instance of nodefony.Events");
         }
-        this.notificationsCenter = this.container.get("notificationsCenter");
-        if (!this.notificationsCenter) {
-          this.notificationsCenter = new nodefony.Events(this.options, this);
+        if (notificationsCenter !== false) {
+          this.notificationsCenter = new nodefony.Events(this.options, this, this.options.events);
+          this.notificationsCenter.on('error', (err) => {
+            this.logger(err, "ERROR", "Error events");
+          });
+
           if (!this.kernel) {
             this.set("notificationsCenter", this.notificationsCenter);
           } else {
@@ -115,7 +148,7 @@ export default (nodefony) => {
       delete this.kernel;
     }
 
-    logger(pci, severity, msgid, msg) {
+    log(pci, severity, msgid, msg) {
       try {
         if (!msgid) {
           msgid = "SERVICE " + this.name + " ";
@@ -126,62 +159,111 @@ export default (nodefony) => {
       }
     }
 
-    log() {
-      return this.logger.apply(this, arguments);
+    logger(...args) {
+      return this.log(...args);
     }
 
-    settingsToListen(){
+    debug(...args){
+      this.log("DEBUG", "DEBUG")
+      console.log(...args)
+    }
+
+    eventNames(...args) {
+      return this.notificationsCenter.eventNames(...args);
+    }
+    fire(...args) {
+      return this.notificationsCenter.emit(...args);
+    }
+    fireAsync(...args) {
+      return this.notificationsCenter.emitAsync(...args);
+    }
+    emit(...args) {
+      return this.notificationsCenter.emit(...args);
+    }
+    emitAsync(...args) {
+      return this.notificationsCenter.emitAsync(...args);
+    }
+    addListener(...args) {
+      this.notificationsCenter.addListener(...args);
+    }
+    listen(...args) {
+      return this.notificationsCenter.listen(...args);
+    }
+    on(...args) {
+      return this.notificationsCenter.on(...args);
+    }
+    once(...args) {
+      return this.notificationsCenter.once(...args);
+    }
+    off(...args) {
+      return this.notificationsCenter.off(...args);
+    }
+
+    settingsToListen() {
       return this.notificationsCenter.settingsToListen.apply(this, arguments);
     }
 
     /**
-     *	@method fire
-     *	@param {String} event name
-     *	@param {Arguments} ... arguments to inject
+     *  @method setMaxListeners
+     *  @param nb
      */
-    fire(...args) {
-      //this.logger(ev, "DEBUG", "EVENT KERNEL")
-      return this.notificationsCenter.fire( ...args);
+    setMaxListeners(...args) {
+      return this.notificationsCenter.setMaxListeners(...args);
+    }
+
+    removeListener(...args) {
+      return this.notificationsCenter.unListen(...args);
     }
 
     /**
-     *	@method listen
-     *	@param {Oject} context
-     *	@param {String} eventName
-     *	@param {Function} listener
+     *  @method removeAllListeners
      */
-    listen() {
-      return this.notificationsCenter.listen.apply(this.notificationsCenter, arguments);
-    }
-
-    on(...args) {
-      return this.notificationsCenter.on(...args);
+    removeAllListeners(...args) {
+      return this.notificationsCenter.removeAllListeners(...args);
     }
 
     /**
-     *	@method removeListener
-     *	@param {Oject} eventName
-     *	@param {String} listener
+     *  @method prependOnceListener
      */
-    removeListener() {
-      return this.notificationsCenter.unListen.apply(this.notificationsCenter, arguments);
-    }
-
-    unListen() {
-      return this.notificationsCenter.unListen.apply(this.notificationsCenter, arguments);
-    }
-
-
-    /**
-     *	@method removeAllListeners
-     */
-    removeAllListeners() {
-      return this.notificationsCenter.clearNotifications.apply(this.notificationsCenter, arguments);
+    prependOnceListener(...args) {
+      return this.notificationsCenter.prependOnceListener(...args);
     }
 
     /**
-     *	@method get
-     *	@param {String} name of service
+     *  @method prependListener
+     */
+    prependListener(...args) {
+      return this.notificationsCenter.prependListener(...args)
+    }
+
+    /**
+     *  @method getMaxListeners
+     */
+    getMaxListeners(...args) {
+      return this.notificationsCenter.getMaxListeners(...args);
+    }
+
+    /**
+     *  @method listenerCount
+     */
+    listenerCount(...args) {
+      return this.notificationsCenter.listenerCount(...args);
+    }
+
+    /**
+     *  @method listeners
+     */
+    listeners(...args) {
+      return this.notificationsCenter.listeners(...args);
+    }
+
+    rawListeners(...args) {
+      return this.notificationsCenter.rawListeners(...args);
+    }
+
+    /**
+     *  @method get
+     *  @param {String} name of service
      */
     get(name) {
       if (this.container) {
@@ -191,9 +273,9 @@ export default (nodefony) => {
     }
 
     /**
-     *	@method set
-     *	@param {String} name of service
-     *	@param {Object} instance of service
+     *  @method set
+     *  @param {String} name of service
+     *  @param {Object} instance of service
      */
     set(name, obj) {
       if (this.container) {
@@ -202,18 +284,30 @@ export default (nodefony) => {
       return null;
     }
 
-    getParameters() {
-      return this.container.getParameters.apply(this.container, arguments);
+    remove(name) {
+      if (this.container) {
+        let ele = this.get(name);
+        if (ele) {
+          if (ele instanceof nodefony.Service) {
+            ele.clean();
+          }
+          this.container.remove(name);
+        }
+      }
+      return false;
     }
 
-    setParameters() {
-      return this.container.setParameters.apply(this.container, arguments);
+    getParameters(...args) {
+      return this.container.getParameters(...args);
     }
 
-    has() {
-      return this.container.has.apply(this.container, arguments);
+    setParameters(...args) {
+      return this.container.setParameters(...args);
+    }
+
+    has(...args) {
+      return this.container.has(...args);
     }
   }
-  nodefony.Service = Service;
-  return Service;
+  return nodefony.Service = Service;
 };

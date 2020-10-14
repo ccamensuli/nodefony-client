@@ -1,7 +1,6 @@
 export default (nodefony) => {
 
   'use strict';
-
   /*
    * default settings
    * <pre>
@@ -713,7 +712,6 @@ export default (nodefony) => {
       return this.logger(data, "NOTICE");
     }
   }
-
   nodefony.Syslog = Syslog;
   nodefony.PDU = PDU;
   return {

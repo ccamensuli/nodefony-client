@@ -1,4 +1,4 @@
-export default function (nodefony) {
+export default  (nodefony) => {
   /*
    *
    *
@@ -8,21 +8,23 @@ export default function (nodefony) {
    */
   const mixSettings = {};
 
-  class MediaMix {
+  class MediaMix extends nodefony.Service{
 
-    constructor(settings) {
-
+    constructor( name = "Mixer" , settings= {}, service = null) {
+      if (service){
+        super(name, service.container)
+      }else{
+        super(name)
+      }
       this.audioBus = {};
       this.nbBus = 0;
       this.settings = nodefony.extend({}, mixSettings, settings);
-      this.eventsManager = new nodefony.notificationsCenter.create(this.settings, this);
 
       this.createAudioBus("MASTER", {
         panner: true,
         analyser: true
       });
       this.masterBus = this.audioBus.MASTER;
-
       this.tracks = this.masterBus.tracks;
       this.audioContext = this.masterBus.audioContext;
       this.muted = this.masterBus.muted;
@@ -34,25 +36,14 @@ export default function (nodefony) {
       this.connect(this.audioContext.destination);
     }
 
-    listen() {
-      return this.eventsManager.listen.apply(this.eventsManager, arguments);
-    }
-
-    unListen() {
-      return this.eventsManager.unListen.apply(this.eventsManager, arguments);
-    }
-
-    fire() {
-      return this.eventsManager.fire.apply(this.eventsManager, arguments);
-    }
-
     createAudioBus(name, settings) {
       let bus = null;
       try {
-        bus = new nodefony.webAudioApi.AudioBus(name, this, settings);
+        bus = new nodefony.medias.AudioBus(name, this, settings);
       } catch (e) {
         throw e;
       }
+      this.log(`Create audio Bus : ${bus.name}`,"DEBUG");
       this.audioBus[name] = bus;
       this.nbBus++;
       bus.listen(this, "onCreateTrack", function (track, bus) {
@@ -67,7 +58,7 @@ export default function (nodefony) {
     removeAudioBus(bus) {
       var ele = null;
       switch (true) {
-      case bus instanceof nodefony.webAudioApi.AudioBus:
+      case bus instanceof nodefony.medias.AudioBus:
 
         break;
       case typeof track === "number":
@@ -161,6 +152,8 @@ export default function (nodefony) {
       return this.audioContext.createOscillator();
     }
   }
+
+  nodefony.medias.Mixer = MediaMix ;
 
   return MediaMix;
 }

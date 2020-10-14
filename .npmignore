@@ -1,0 +1,36 @@
+#Ignore vin backup
+*.swp
+*.swn
+*.swo
+#emacs
+*~
+# macos
+.DS_Store
+
+*.[oa]
+
+# Eclipse file
+/.project
+/.settings
+/nbproject/private/
+
+
+.github
+.git
+.travis
+.travis.yml
+.gitmodules
+.bithoundrc
+.grenrc.json
+.core
+
+npm-debug.log
+yarn-error.log
+
+node_modules
+node_modules/**
+**/node_modules/**
+/node_modules
+
+/demo
+/tests

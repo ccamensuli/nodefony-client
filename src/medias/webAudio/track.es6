@@ -1,4 +1,4 @@
-export default function (nodefony) {
+export default  (nodefony) => {
 
   /*
    *
@@ -14,9 +14,10 @@ export default function (nodefony) {
     connect: true,
   };
 
-  class Track {
+  class Track extends nodefony.Service{
 
     constructor(media, bus, settings) {
+      super("Track", bus.container)
       this.media = media;
       this.bus = bus;
       this.settings = nodefony.extend({}, trackSettings, settings);
@@ -38,7 +39,6 @@ export default function (nodefony) {
       this.ready = false;
       this.muted = false;
       this.currentTime = 0;
-      this.eventsManager = nodefony.notificationsCenter.create(this.settings, this);
       this.createNodes();
 
       if (this.settings.connect) {
@@ -104,18 +104,6 @@ export default function (nodefony) {
 
     setName(name) {
       this.name = name;
-    }
-
-    listen() {
-      return this.eventsManager.listen.apply(this.eventsManager, arguments);
-    }
-
-    unListen() {
-      return this.eventsManager.unListen.apply(this.eventsManager, arguments);
-    }
-
-    fire() {
-      return this.eventsManager.fire.apply(this.eventsManager, arguments);
     }
 
     createNodes() {
@@ -259,7 +247,7 @@ export default function (nodefony) {
             this.fire("onReady", this);
           },
           (error) => {
-            this.eventsManager.fire("onError", this, error);
+            this.fire("onError", this, error);
             // only on error attempt to sync on frame boundary
             //if(this.syncStream()) this.createSource(type, buffer);
           }
@@ -326,6 +314,8 @@ export default function (nodefony) {
       this.transport.send();
     }
   }
+
+  nodefony.medias.Track = Track;
 
   return Track;
 }

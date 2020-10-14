@@ -1,4 +1,4 @@
-export default function (nodefony) {
+export default  (nodefony) => {
 
   /*
    *
@@ -10,14 +10,13 @@ export default function (nodefony) {
     analyser: false
   };
 
-  class AudioBus {
+  class AudioBus extends nodefony.Service{
 
     constructor(name, mixer, settings) {
-      this.name = name;
+      super(name, mixer.container);
       this.mixer = mixer;
       this.settings = nodefony.extend({}, defaultAudioBusSettings, settings);
-      this.eventsManager = nodefony.notificationsCenter.create(this.settings, this);
-      this.audioContext = new nodefony.medias.webAudioApi.audioContext();
+      this.audioContext = new nodefony.medias.audioContext();
       this.tracks = [];
       this.nbTracks = 0;
       this.audioNodes = {};
@@ -26,18 +25,6 @@ export default function (nodefony) {
       this.destination = null;
       this.muted = false;
       this.createNodes();
-    }
-
-    listen() {
-      return this.eventsManager.listen.apply(this.eventsManager, arguments);
-    }
-
-    unListen() {
-      return this.eventsManager.unListen.apply(this.eventsManager, arguments);
-    }
-
-    fire() {
-      return this.eventsManager.fire.apply(this.eventsManager, arguments);
     }
 
     createNodes() {
@@ -153,7 +140,7 @@ export default function (nodefony) {
     }
 
     createTrack(media, settings) {
-      var track = new nodefony.medias.webAudioApi.Track(media, this, settings);
+      var track = new nodefony.medias.Track(media, this, settings);
       this.tracks.push(track);
       this.nbTracks++;
       this.fire("onCreateTrack", track, this);
@@ -164,7 +151,7 @@ export default function (nodefony) {
       let ele = null;
       let name = null;
       switch (true) {
-      case track instanceof nodefony.medias.webAudioApi.Track:
+      case track instanceof nodefony.medias.Track:
         for (let i = 0; i < this.tracks.length; i++) {
           if (this.tracks[i] === track) {
             name = track.name;
@@ -202,5 +189,6 @@ export default function (nodefony) {
       return true;
     }
   }
+  nodefony.medias.AudioBus = AudioBus ;
   return AudioBus;
 }
