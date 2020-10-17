@@ -4,9 +4,6 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
-  output: {
-    filename: '[name].min.js',
-  },
   optimization: {
     minimizer: [
       new TerserPlugin({
@@ -15,7 +12,6 @@ module.exports = merge(common, {
           compress: true
         },
         extractComments: true,
-        cache: true,
         parallel: true
       })
     ]

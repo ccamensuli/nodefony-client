@@ -5,6 +5,12 @@
 //const version = require("../package.json").version;
 import Package from '../package.json';
 import isregexp from 'lodash.isregexp';
+const nativeWebSocket = window.WebSocket ? true : false;
+import querystring from 'querystring';
+import url from 'url';
+import {
+  v4 as uuidv4
+} from 'uuid';
 
 class Nodefony {
   constructor(env) {
@@ -13,9 +19,111 @@ class Nodefony {
     //this.api = api;
     this.isRegExp = isregexp;
     this.medias = {};
+    this.protocols = {};
+    this.nativeWebSocket = nativeWebSocket;
+    this.query = this.getQuery();
+
     /*window.addEventListener("load", () => {
       this.load();
     }, false);*/
+  }
+  getQuery() {
+    try {
+      if (document.currentScript) {
+        let myurl = url.parse(document.currentScript.src);
+        if (myurl.query) {
+          return querystring.parse(myurl.query);
+        }
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async load(obj = this.query) {
+    for (let lib in obj) {
+      if( lib === "medias" && obj[lib] ){
+        console.debug(`Nodefony Preload module ${lib} `)
+        await this.preloadMedias();
+      }
+      if(lib === "socket" && obj[lib]){
+        console.debug(`Nodefony Preload module ${lib} `)
+        await this.preloadSocket();
+        break;
+      }
+    }
+  }
+
+  getUuid() {
+    return uuidv4();
+  }
+
+  async prefetchMedias() {
+    // medias
+    await import( /* webpackPrefetch: true , webpackChunkName: "medias" */ './medias/medias.es6')
+    .then((medias) => {
+      return medias.default(this);
+    });
+    // medias webaudio
+    await import( /* webpackPrefetch: true , webpackChunkName: "webAudio" */ './medias/webAudio/webAudio.es6')
+    .then((audio) => {
+      return audio.default(this);
+    });
+    await import( /* webpackPrefetch: true , webpackChunkName: "audioBus" */ './medias/webAudio/audioBus.es6')
+    .then((audioBus) => {
+      return audioBus.default(this);
+    });
+    await import( /* webpackPrefetch: true , webpackChunkName: "track" */ './medias/webAudio/track.es6')
+    .then((track) => {
+      return track.default(this);
+    });
+    await import( /* webpackPrefetch: true , webpackChunkName: "mixer"*/ './medias/webAudio/mixer.es6')
+    .then((mixer) => {
+      return mixer.default(this);
+    });
+  }
+
+  async preloadMedias() {
+    // medias
+    let ret = await import( /* webpackPreload: true , webpackChunkName: "medias" */ './medias/medias.es6')
+      .then((medias) => {
+        return medias.default(this);
+      });
+    // medias webaudio
+    await import( /* webpackPreload: true , webpackChunkName: "webAudio" */ './medias/webAudio/webAudio.es6')
+    .then((audio) => {
+      return audio.default(this);
+    });
+    await import( /* webpackPreload: true , webpackChunkName: "audioBus" */ './medias/webAudio/audioBus.es6')
+    .then((audioBus) => {
+      return audioBus.default(this);
+    });
+    await import( /* webpackPreload: true , webpackChunkName: "track" */ './medias/webAudio/track.es6')
+    .then((track) => {
+      return track.default(this);
+    });
+    await import( /* webpackPreload: true , webpackChunkName: "mixer"*/ './medias/webAudio/mixer.es6')
+    .then((mixer) => {
+      return mixer.default(this);
+    });
+    return ret;
+  }
+
+  async preloadSocket() {
+    // socket
+    return await import( /* webpackPreload: true , webpackChunkName: "socket" */ './transports/socket.es6')
+      .then((socket) => {
+        return socket.default(this);
+      });
+  }
+
+  async prefetchSocket() {
+    // socket
+    return await import( /* webpackPrefetch: true , webpackChunkName: "socket" */ './transports/socket.es6')
+      .then((socket) => {
+        return socket.default(this);
+      });
   }
 
   basename(path) {
@@ -24,6 +132,10 @@ class Nodefony {
 
   dirname(path) {
     return path.replace(/\\/g, '/').replace(/\/[^\/]*$/, '');
+  }
+
+  url(href){
+      return url.parse(href);
   }
 
   /**
@@ -146,6 +258,20 @@ class Nodefony {
     default:
       return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
     }
+  }
+
+  isSameOrigin(Url) {
+    const loc = window.location;
+    const a = url.parse(Url);
+    return a.hostname === loc.hostname &&
+      a.port == loc.port &&
+      a.protocol === loc.protocol;
+  }
+
+  isSecure(Url) {
+    const loc = window.location;
+    const a = url.parse(Url);
+    return a.protocol === "https:";
   }
 
 }

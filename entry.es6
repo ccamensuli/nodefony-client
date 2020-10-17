@@ -43,7 +43,7 @@ import nodefony from './src/nodefony.es6';
 import events from './src/core/events.es6';
 events(nodefony);
 
-import syslog from './src/syslog/syslog.es6';
+import syslog from './src/core/syslog/syslog.es6';
 syslog(nodefony);
 
 import container from './src/core/container.es6';
@@ -52,30 +52,40 @@ container(nodefony);
 import service from './src/core/service.es6';
 service(nodefony);
 
-// medias
-import(/* webpackPrefetch: true , webpackChunkName: "medias" */'./src/medias/medias.es6')
-.then((medias) => {
-  return medias.default(nodefony);
-});
-// medias webaudio
-import(/* webpackPrefetch: true , webpackChunkName: "webAudio" */'./src/medias/webAudio/webAudio.es6')
-.then((audio) => {
-  return audio.default(nodefony);
-});
-import(/* webpackPrefetch: true , webpackChunkName: "audioBus" */'./src/medias/webAudio/audioBus.es6')
-.then((audioBus) => {
-  return audioBus.default(nodefony);
-});
-import(/* webpackPrefetch: true , webpackChunkName: "track" */'./src/medias/webAudio/track.es6')
-.then((track) => {
-  return track.default(nodefony);
-});
-import(/* webpackPrefetch: true , webpackChunkName: "mixer"*/'./src/medias/webAudio/mixer.es6')
-.then((mixer) => {
-  return mixer.default(nodefony);
-});
+import websocket from './src/transports/websocket/websocket.es6';
+websocket(nodefony);
+nodefony.load();
 
-// medias
+
+// socket
+// import(/* webpackPrefetch: true , webpackChunkName: "socket" */'./src/transports/socket.es6')
+// .then((socket) => {
+//   return socket.default(nodefony);
+// });
+
+// // medias
+// import(/* webpackPrefetch: true , webpackChunkName: "medias" */'./src/medias/medias.es6')
+// .then((medias) => {
+//   return medias.default(nodefony);
+// });
+// // medias webaudio
+// import(/* webpackPrefetch: true , webpackChunkName: "webAudio" */'./src/medias/webAudio/webAudio.es6')
+// .then((audio) => {
+//   return audio.default(nodefony);
+// });
+// import(/* webpackPrefetch: true , webpackChunkName: "audioBus" */'./src/medias/webAudio/audioBus.es6')
+// .then((audioBus) => {
+//   return audioBus.default(nodefony);
+// });
+// import(/* webpackPrefetch: true , webpackChunkName: "track" */'./src/medias/webAudio/track.es6')
+// .then((track) => {
+//   return track.default(nodefony);
+// });
+// import(/* webpackPrefetch: true , webpackChunkName: "mixer"*/'./src/medias/webAudio/mixer.es6')
+// .then((mixer) => {
+//   return mixer.default(nodefony);
+// });
+
 
 //import webrtc from './src/medias/webrtc/webrtc.es6';
 //nodefony.medias.webrtc = webrtc(nodefony);

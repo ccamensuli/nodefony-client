@@ -1,12 +1,17 @@
-const { merge } = require('webpack-merge');
+const {
+  merge
+} = require('webpack-merge');
 const common = require('./webpack.common.js'); // the settings that are common to prod and dev
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = merge(common, {
   mode: 'development',
-  output: {
-    filename: '[name].js',
-  },
+  devtool: 'source-map',
+  watch: true,
   module: {
     rules: []
-  }
+  },
+  plugins: [
+   new BundleAnalyzerPlugin()
+  ]
 });

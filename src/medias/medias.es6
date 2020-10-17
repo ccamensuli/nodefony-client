@@ -1,6 +1,3 @@
-//import adapter from 'webrtc-adapter';
-// medias
-
 export default (nodefony) => {
 
   /*

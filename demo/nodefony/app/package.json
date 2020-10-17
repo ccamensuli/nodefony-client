@@ -13,12 +13,12 @@
   ],
   "repository": {},
   "dependencies": {
-    "@babel/core": "^7.11.6",
-    "@babel/preset-env": "^7.11.5",
+    "@babel/core": "^7.12.0",
+    "@babel/preset-env": "^7.12.0",
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "css-hot-loader": "^1.4.4",
-    "css-loader": "^4.3.0",
+    "css-loader": "^5.0.0",
     "expose-loader": "^1.0.1",
     "file-loader": "^6.1.1",
     "html-webpack-plugin": "^4.5.0",
@@ -35,12 +35,12 @@
     "resolve-url-loader": "^3.1.1",
     "sass-loader": "^10.0.3",
     "style-loader": "^2.0.0",
-    "terser-webpack-plugin": "^4.2.3",
-    "webpack": "^5.0.0",
+    "terser-webpack-plugin": "^5.0.0",
+    "webpack": "^5.1.2",
     "webpack-merge": "^5.2.0"
   },
   "devDependencies": {
-    "node-gyp": "^7.1.0",
+    "node-gyp": "^7.1.1",
     "node-pre-gyp": "^0.15.0"
   },
   "license": "",

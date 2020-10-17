@@ -1,3 +1,6 @@
+//nodefony.preloadMedias();
+//nodefony.preloadSocket();
+
 let kernel = new nodefony.Service("kernel");
 kernel.initSyslog();
 kernel.once("start", (mix)=>{

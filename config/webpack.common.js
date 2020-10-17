@@ -15,9 +15,8 @@ module.exports = {
     nodefony: path.resolve(__dirname, "..", "entry.es6")
   },
   target: 'web',
-  //watch: true,
-  devtool: 'source-map',
   output: {
+    filename: '[name].js',
     path: path.resolve(__dirname, "../dist"),
     library: {
       name: "nodefony",
@@ -41,7 +40,9 @@ module.exports = {
     // An array of directory names to be resolved to the current directory
     modules: [path.resolve(__dirname, "..", "node_modules")],
     fallback: {
-      "events": require.resolve("events/")
+      "events": require.resolve("events"),
+      "querystring": require.resolve("querystring-es3"),
+      "url": require.resolve("url")
     }
   },
   /*
@@ -61,6 +62,10 @@ module.exports = {
           plugins: ['@babel/plugin-transform-runtime']
         }
         }]
+      },{
+        test: /\.json$/i,
+        loader: 'json5-loader',
+        type: 'javascript/auto',
       }]
   },
   /*
