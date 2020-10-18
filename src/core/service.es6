@@ -17,57 +17,45 @@ export default (nodefony) => {
     }
   };
 
-  /*const normalizeLog = function(pdu) {
-    //console.log(pdu)
+  const normalizeLog = function (pdu) {
     let date = new Date(pdu.timeStamp);
     if (pdu.payload === "" || pdu.payload === undefined) {
-      console.error(date.toDateString() + " " + date.toLocaleTimeString() + " " + nodefony.Service.logSeverity(pdu.severityName) + " " + green(pdu.msgid) + " " + " : " + "logger message empty !!!!");
+      console.warning(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : logger message empty !!!!`);
       console.trace(pdu);
       return;
     }
     let message = pdu.payload;
-    switch (typeof message) {
-    case "object":
-      switch (true) {
-      case (message instanceof nodefony.Error):
-        break;
-      case (message instanceof Error):
-
-          message = new nodefony.Error(message);
-
-        break;
-      default:
-        message = util.inspect(message);
-      }
-      break;
-    default:
+    switch (true) {
+    case nodefony.isObject(message):
+      try {
+        message = `\n${nodefony.inspect(message)}`;
+      } catch (e) {}
     }
+    let wrapperLog = null;
     switch (pdu.severity) {
     case 0:
     case 1:
     case 2:
     case 3:
-      this.wrapperLog = console.error;
+      wrapperLog = console.error;
       break;
     case 4:
-      this.wrapperLog = console.warn;
+      wrapperLog = console.warn;
       break;
     case 5:
-      this.wrapperLog = console.log;
+      wrapperLog = console.log;
       break;
     case 6:
-      this.wrapperLog = console.info;
+      wrapperLog = console.info;
       break;
     case 7:
-      this.wrapperLog = console.debug;
+      wrapperLog = console.debug;
       break;
     default:
-      this.wrapperLog = console.log;
+      wrapperLog = console.log;
     }
-
-    return this.wrapperLog(`${this.pid} ${date.toDateString()} ${date.toLocaleTimeString()} ${nodefony.Service.logSeverity(pdu.severityName)} ${green(pdu.msgid)} : ${message}`);
-  }*/
-
+    return wrapperLog(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
+  }
 
   class Service {
 
@@ -86,7 +74,7 @@ export default (nodefony) => {
           this.options = options;
         } else {
           //optimize
-          this.options = nodefony.extend(true, {}, defaultOptions, options );
+          this.options = nodefony.extend(true, {}, defaultOptions, options);
         }
       }
       if (container instanceof nodefony.Container) {
@@ -145,7 +133,7 @@ export default (nodefony) => {
           }
         }
       }
-      delete this.options.events ;
+      delete this.options.events;
     }
 
     static logSeverity(severity) {
@@ -175,15 +163,9 @@ export default (nodefony) => {
       };
       return this.syslog.listenWithConditions(this, options || defaultOptions,
         (pdu) => {
-          let message = pdu.payload;
-          let date = new Date(pdu.timeStamp);
-          let wrapper = nodefony.Service.logSeverity(pdu.severityName);
-          wrapper(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
+          normalizeLog(pdu);
         });
     }
-
-
-
 
     getName() {
       return this.name;
@@ -218,7 +200,7 @@ export default (nodefony) => {
       return this.log(...args);
     }
 
-    debug(...args){
+    debug(...args) {
       this.log("DEBUG", "DEBUG")
       console.log(...args)
     }

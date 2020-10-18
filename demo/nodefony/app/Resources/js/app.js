@@ -26,17 +26,17 @@ class App extends nodefony.Service {
     this.log("LOG DEMO ERROR", "ERROR");
     this.log("LOG DEMO WARNING", "WARNING");
     this.log("LOG DEMO DEBUG", "DEBUG");
+    let error = new Error("my error");
+    this.log(error,"ERROR");
   }
 
   createApi() {
     this.api = new nodefony.Api("api", "/", {}, this);
-    //console.log(this.api)
     this.api2 = new nodefony.Api("api2", "https://localhost:5152/api/", {
       storage: {
         type: "local"
       }
     }, this);
-    //console.log(this.api2)
   }
 
   initialize() {
