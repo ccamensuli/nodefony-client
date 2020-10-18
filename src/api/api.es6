@@ -33,7 +33,6 @@ export default (nodefony) => {
         }
       }
       this.defaultOptions = this.options.fetch;
-      console.log(this)
     }
 
     get token() {
