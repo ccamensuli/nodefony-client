@@ -202,7 +202,7 @@ export default (nodefony) => {
 
     debug(...args) {
       this.log("DEBUG", "DEBUG")
-      console.log(...args)
+      console.debug(...args)
     }
 
     eventNames(...args) {
