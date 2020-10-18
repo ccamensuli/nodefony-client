@@ -1,7 +1,8 @@
 const events = require('events');
 const regListenOn = /^on(.*)$/;
 const defaultNbListeners = 20;
-const _ = require('lodash');
+//const _ = require('lodash');
+//import { get, isEmpty} from 'lodash';
 
 export default (nodefony) => {
 
@@ -48,8 +49,10 @@ export default (nodefony) => {
     }
 
     async emitAsync(type, ...args) {
-      const handler = _.get(this._events, type);
-      if (_.isEmpty(handler) && !_.isFunction(handler)) {
+      const handler = this._events[type];
+      //const handler = _.get(this._events, type);
+      //if (_.isEmpty(handler) && !nodefony.isFunction(handler)) {
+      if ( !nodefony.isFunction(handler) && handler.length === 0 ) {
         return false;
       }
       let tab = [];
@@ -103,11 +106,5 @@ export default (nodefony) => {
     }
   }
 
-  /*nodefony.notificationsCenter = {
-    notification: Notification,
-    create: function (settings, context) {
-      return new Notification(settings, context);
-    }
-  };*/
   return nodefony.Events = Notification;
 };

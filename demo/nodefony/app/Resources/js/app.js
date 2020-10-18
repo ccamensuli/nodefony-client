@@ -7,8 +7,8 @@
 import "../css/app.css";
 
 import nodefony from "../../../../../entry.es6?medias=true&socket=true";
-nodefony.preloadMedias();
-nodefony.preloadSocket();
+nodefony.prefetchMedias();
+nodefony.prefetchSocket();
 //console.log(nodefony)
 
 /*
@@ -18,25 +18,56 @@ class App extends nodefony.Service {
   constructor() {
     super("kernel");
     this.initSyslog();
-    this.once("start", (mix) => {
-      //this.debug(this, mix)
-      this.createWebsocket();
-      this.createSocket();
+    this.createApi();
+    window.addEventListener("load", () => {
+      this.initialize();
     });
-    setTimeout(() => {
-      let Mixer = new nodefony.medias.Mixer(this);
-      this.emit("start", Mixer)
-      let md = new nodefony.medias.MediaStream(document.getElementById("myvideo"), {}, this);
-      md.getUserMedia({})
-        .then((stream) => {
-          md.attachMediaStream();
-          //media.getVideoTracks();
-        });
-    }, 2000)
     this.log("LOG DEMO INFO", "INFO");
     this.log("LOG DEMO ERROR", "ERROR");
     this.log("LOG DEMO WARNING", "WARNING");
     this.log("LOG DEMO DEBUG", "DEBUG");
+  }
+
+  createApi() {
+    this.api = new nodefony.Api("api", "/", {}, this);
+    //console.log(this.api)
+    this.api2 = new nodefony.Api("api2", "https://localhost:5152/api/", {
+      storage: {
+        type: "local"
+      }
+    }, this);
+    //console.log(this.api2)
+  }
+
+  initialize() {
+    this.once("start", (mix) => {
+      //this.debug(this, mix)
+      this.api.login("api/jwt/login", "admin", "admin")
+        .then((response) => {
+          return response;
+        })
+        .catch(e => {
+          console.log(e)
+          this.log(e, "ERROR")
+        });
+      this.api2.login(undefined, "1000", "1234")
+        .then((response) => {
+          return response;
+        })
+        .catch(e => {
+          this.log(e, "ERROR")
+        });
+      this.createWebsocket();
+      this.createSocket();
+    });
+    let Mixer = new nodefony.medias.Mixer(this);
+    this.emit("start", Mixer)
+    let md = new nodefony.medias.MediaStream(document.getElementById("myvideo"), {}, this);
+    md.getUserMedia({})
+      .then((stream) => {
+        md.attachMediaStream();
+        //media.getVideoTracks();
+      });
   }
 
   createWebsocket() {
@@ -54,12 +85,12 @@ class App extends nodefony.Service {
     })
     setTimeout(async () => {
       let res = await sock.sendAsync(JSON.stringify({
-        foo: "bar"
-      }))
-      .catch((error)=>{
-        console.error(error);
-      })
-      if (res){
+          foo: "bar"
+        }))
+        .catch((error) => {
+          console.error(error);
+        })
+      if (res) {
         console.log(res);
       }
     }, 1000);

@@ -1,13 +1,14 @@
 //import "core-js/stable";
 //import "regenerator-runtime/runtime";
 
-//import api from "./api/api.js";
 //const version = require("../package.json").version;
 import Package from '../package.json';
-import isregexp from 'lodash.isregexp';
+//import isregexp from 'lodash.isregexp';
 const nativeWebSocket = window.WebSocket ? true : false;
 import querystring from 'querystring';
+import browser from './core/browser.es6';
 import url from 'url';
+import util from "util";
 import {
   v4 as uuidv4
 } from 'uuid';
@@ -16,17 +17,40 @@ class Nodefony {
   constructor(env) {
     this.version = Package.version;
     this.environment = env;
-    //this.api = api;
-    this.isRegExp = isregexp;
-    this.medias = {};
+    this.isRegExp = util.isRegExp;
+    this.isObject = util.isObject;
+    this.isFunction = util.isFunction;
+    this.isNullOrUndefined = util.isNullOrUndefined;
+    this.isUndefined = util.isUndefined;
+    this.isArray = util.isArray;
+    this.inspect = util.inspect;
+    this.browser = browser;
     this.protocols = {};
     this.nativeWebSocket = nativeWebSocket;
-    this.query = this.getQuery();
-
-    /*window.addEventListener("load", () => {
-      this.load();
-    }, false);*/
+    this.URL = url;
+    this.util = util;
   }
+
+  async load(obj = null) {
+    if (!obj) {
+      obj = this.getQuery();
+    }
+    if(obj){
+      console.debug(`load query for Prefetch module : `, obj)
+      for (let lib in obj) {
+        if (lib === "medias" && obj[lib]) {
+          console.debug(`Nodefony Prefetch module ${lib} `)
+          await this.prefetchMedias();
+        }
+        if (lib === "socket" && obj[lib]) {
+          console.debug(`Nodefony Prefetch module ${lib} `)
+          await this.prefetchSocket();
+          break;
+        }
+      }
+    }
+  }
+
   getQuery() {
     try {
       if (document.currentScript) {
@@ -41,18 +65,8 @@ class Nodefony {
     }
   }
 
-  async load(obj = this.query) {
-    for (let lib in obj) {
-      if( lib === "medias" && obj[lib] ){
-        console.debug(`Nodefony Preload module ${lib} `)
-        await this.preloadMedias();
-      }
-      if(lib === "socket" && obj[lib]){
-        console.debug(`Nodefony Preload module ${lib} `)
-        await this.preloadSocket();
-        break;
-      }
-    }
+  querystring(query) {
+    return querystring.parse(query);
   }
 
   getUuid() {
@@ -62,67 +76,38 @@ class Nodefony {
   async prefetchMedias() {
     // medias
     await import( /* webpackPrefetch: true , webpackChunkName: "medias" */ './medias/medias.es6')
-    .then((medias) => {
-      return medias.default(this);
+    .then((module) => {
+      return module.default(this);
     });
+    await import( /* webpackPrefetch: true , webpackChunkName: "adapter" */ 'webrtc-adapter')
+    .then((module) => {
+      this.medias.adapter = module.default;
+      return module.default;
+    })
     // medias webaudio
     await import( /* webpackPrefetch: true , webpackChunkName: "webAudio" */ './medias/webAudio/webAudio.es6')
-    .then((audio) => {
-      return audio.default(this);
+    .then((module) => {
+      return module.default(this);
     });
     await import( /* webpackPrefetch: true , webpackChunkName: "audioBus" */ './medias/webAudio/audioBus.es6')
-    .then((audioBus) => {
-      return audioBus.default(this);
+    .then((module) => {
+      return module.default(this);
     });
     await import( /* webpackPrefetch: true , webpackChunkName: "track" */ './medias/webAudio/track.es6')
-    .then((track) => {
-      return track.default(this);
+    .then((module) => {
+      return module.default(this);
     });
     await import( /* webpackPrefetch: true , webpackChunkName: "mixer"*/ './medias/webAudio/mixer.es6')
-    .then((mixer) => {
-      return mixer.default(this);
+    .then((module) => {
+      return module.default(this);
     });
-  }
-
-  async preloadMedias() {
-    // medias
-    let ret = await import( /* webpackPreload: true , webpackChunkName: "medias" */ './medias/medias.es6')
-      .then((medias) => {
-        return medias.default(this);
-      });
-    // medias webaudio
-    await import( /* webpackPreload: true , webpackChunkName: "webAudio" */ './medias/webAudio/webAudio.es6')
-    .then((audio) => {
-      return audio.default(this);
-    });
-    await import( /* webpackPreload: true , webpackChunkName: "audioBus" */ './medias/webAudio/audioBus.es6')
-    .then((audioBus) => {
-      return audioBus.default(this);
-    });
-    await import( /* webpackPreload: true , webpackChunkName: "track" */ './medias/webAudio/track.es6')
-    .then((track) => {
-      return track.default(this);
-    });
-    await import( /* webpackPreload: true , webpackChunkName: "mixer"*/ './medias/webAudio/mixer.es6')
-    .then((mixer) => {
-      return mixer.default(this);
-    });
-    return ret;
-  }
-
-  async preloadSocket() {
-    // socket
-    return await import( /* webpackPreload: true , webpackChunkName: "socket" */ './transports/socket.es6')
-      .then((socket) => {
-        return socket.default(this);
-      });
   }
 
   async prefetchSocket() {
     // socket
     return await import( /* webpackPrefetch: true , webpackChunkName: "socket" */ './transports/socket.es6')
-      .then((socket) => {
-        return socket.default(this);
+      .then((module) => {
+        return module.default(this);
       });
   }
 
@@ -134,8 +119,8 @@ class Nodefony {
     return path.replace(/\\/g, '/').replace(/\/[^\/]*$/, '');
   }
 
-  url(href){
-      return url.parse(href);
+  url(href) {
+    return url.parse(href);
   }
 
   /**
@@ -236,13 +221,18 @@ class Nodefony {
     return target;
   }
 
-  isFunction(it) {
-    return Object.prototype.toString.call(it) === '[object Function]';
+  /*isFunction(...args) {
+    return util.isFunction(...args)
+    //return Object.prototype.toString.call(it) === '[object Function]';
   }
 
-  isArray(it) {
-    return Object.prototype.toString.call(it) === '[object Array]';
+  isArray(...args) {
+    return util.isArray(...args)
+    //return Object.prototype.toString.call(it) === '[object Array]';
   }
+  isRegExp(){
+
+  }*/
 
   isContainer(container) {
     if (container && container.protoService && container.protoParameters) {
@@ -271,7 +261,7 @@ class Nodefony {
   isSecure(Url) {
     const loc = window.location;
     const a = url.parse(Url);
-    return a.protocol === "https:";
+    return a.protocol === "https:" || a.protocol === "wss:";
   }
 
 }

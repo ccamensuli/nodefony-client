@@ -55,19 +55,19 @@ export default (nodefony) => {
         this.initBayeux(this.options);
         break;
       default:
-        this.initBayeux( this.options);
+        this.initBayeux(this.options);
       }
       if (url) {
         this.connect(url, this.options);
       }
     }
 
-    initBayeux( options) {
+    initBayeux(options) {
       try {
-        if (options.protocol instanceof nodefony.protocols.Bayeux){
+        if (options.protocol instanceof nodefony.protocols.Bayeux) {
           this.protocol = options.protocol
-        }else{
-          this.protocol = new nodefony.protocols.Bayeux(this, options, this );
+        } else {
+          this.protocol = new nodefony.protocols.Bayeux(this, options, this);
         }
         this.protocol.on("onMessage", (message) => {
           if (message.error) {
@@ -135,7 +135,7 @@ export default (nodefony) => {
             delete this.subscribedService[service];
           }
         });
-        this.on("onopen", ()=>{
+        this.on("onopen", () => {
           this.protocol.handshake(this.url.href);
         });
       } catch (e) {
@@ -161,7 +161,7 @@ export default (nodefony) => {
       return this.socket;
     }
 
-    start(){
+    start() {
       if (this.connected) {
         let error = new Error(`Connection already started`);
         this.fire("onerror", 500, error);
@@ -227,10 +227,8 @@ export default (nodefony) => {
       this.transport = null;
       this.removeAllListeners();
     }
-
   };
 
   nodefony.Socket = Socket;
-
   return Socket;
 };

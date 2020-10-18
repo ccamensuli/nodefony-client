@@ -17,10 +17,61 @@ export default (nodefony) => {
     }
   };
 
+  /*const normalizeLog = function(pdu) {
+    //console.log(pdu)
+    let date = new Date(pdu.timeStamp);
+    if (pdu.payload === "" || pdu.payload === undefined) {
+      console.error(date.toDateString() + " " + date.toLocaleTimeString() + " " + nodefony.Service.logSeverity(pdu.severityName) + " " + green(pdu.msgid) + " " + " : " + "logger message empty !!!!");
+      console.trace(pdu);
+      return;
+    }
+    let message = pdu.payload;
+    switch (typeof message) {
+    case "object":
+      switch (true) {
+      case (message instanceof nodefony.Error):
+        break;
+      case (message instanceof Error):
+
+          message = new nodefony.Error(message);
+
+        break;
+      default:
+        message = util.inspect(message);
+      }
+      break;
+    default:
+    }
+    switch (pdu.severity) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      this.wrapperLog = console.error;
+      break;
+    case 4:
+      this.wrapperLog = console.warn;
+      break;
+    case 5:
+      this.wrapperLog = console.log;
+      break;
+    case 6:
+      this.wrapperLog = console.info;
+      break;
+    case 7:
+      this.wrapperLog = console.debug;
+      break;
+    default:
+      this.wrapperLog = console.log;
+    }
+
+    return this.wrapperLog(`${this.pid} ${date.toDateString()} ${date.toLocaleTimeString()} ${nodefony.Service.logSeverity(pdu.severityName)} ${green(pdu.msgid)} : ${message}`);
+  }*/
+
+
   class Service {
 
     constructor(name, container, notificationsCenter, options = {}) {
-
       if (name) {
         this.name = name;
       }
@@ -32,10 +83,10 @@ export default (nodefony) => {
         }
       } else {
         if (notificationsCenter === false) {
-          this.options = {};
+          this.options = options;
         } else {
           //optimize
-          this.options = nodefony.extend(true, {}, defaultOptions);
+          this.options = nodefony.extend(true, {}, defaultOptions, options );
         }
       }
       if (container instanceof nodefony.Container) {
@@ -94,6 +145,7 @@ export default (nodefony) => {
           }
         }
       }
+      delete this.options.events ;
     }
 
     static logSeverity(severity) {
@@ -129,6 +181,9 @@ export default (nodefony) => {
           wrapper(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
         });
     }
+
+
+
 
     getName() {
       return this.name;

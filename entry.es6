@@ -43,6 +43,9 @@ import nodefony from './src/nodefony.es6';
 import events from './src/core/events.es6';
 events(nodefony);
 
+import error from './src/core/error.es6';
+error(nodefony);
+
 import syslog from './src/core/syslog/syslog.es6';
 syslog(nodefony);
 
@@ -52,8 +55,15 @@ container(nodefony);
 import service from './src/core/service.es6';
 service(nodefony);
 
+import storage from './src/core/storage/storage.es6';
+storage(nodefony);
+
 import websocket from './src/transports/websocket/websocket.es6';
 websocket(nodefony);
+
+import api from './src/api/api.es6';
+api(nodefony);
+
 nodefony.load();
 
 

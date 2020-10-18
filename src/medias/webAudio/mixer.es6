@@ -6,7 +6,10 @@ export default  (nodefony) => {
    *
    *
    */
-  const mixSettings = {};
+  const mixSettings = {
+    panner: true,
+    analyser: true
+  };
 
   class MediaMix extends nodefony.Service{
 
@@ -19,10 +22,9 @@ export default  (nodefony) => {
       this.audioBus = {};
       this.nbBus = 0;
       this.settings = nodefony.extend({}, mixSettings, settings);
-
       this.createAudioBus("MASTER", {
-        panner: true,
-        analyser: true
+        panner: this.settings.panner,
+        analyser: this.settings.analyser
       });
       this.masterBus = this.audioBus.MASTER;
       this.tracks = this.masterBus.tracks;
@@ -32,7 +34,6 @@ export default  (nodefony) => {
       this.analyserLeft = this.masterBus.audioNodes.analyserLeft;
       this.analyserRight = this.masterBus.audioNodes.analyserRight;
       this.gain = this.masterBus.audioNodes.gain;
-
       this.connect(this.audioContext.destination);
     }
 

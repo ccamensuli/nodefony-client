@@ -15,7 +15,6 @@ export default (nodefony) => {
     audio: false,
   };
 
-
   class MediaStream extends nodefony.Service {
 
     constructor(mediaElement, settings, service = null) {
@@ -36,13 +35,6 @@ export default (nodefony) => {
 
     set stream(value) {
       return this.setStream(value);
-    }
-
-    static async getAdapter() {
-      return await import( /* webpackPreload: true , webpackChunkName: "adapter" */ 'webrtc-adapter')
-        .then((module) => {
-          return module.default;
-        })
     }
 
     getUserMedia(settings = {}) {
@@ -187,13 +179,72 @@ export default (nodefony) => {
       this.fire("onError", error);
       throw error;
     }
-
   }
-  nodefony.medias.MediaStream = MediaStream;
-  nodefony.medias.adapter = MediaStream.getAdapter()
-    .then((ele) => {
-      nodefony.medias.adapter = ele;
-      return ele;
-    });
-  return MediaStream;
+
+  class Medias {
+
+    constructor() {
+      this.MediaStream = MediaStream;
+      this.adapter = null;
+    }
+
+    async getDevices() {
+      this.devices = new Map();
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      if (devices) {
+        for (const device of devices) {
+          if (device.kind === 'audioinput') {
+            if (device.deviceId === "default") {
+              this.defaultAudio = device;
+            }
+          }
+          if (device.kind === 'videoinput') {
+            if (device.deviceId === "default") {
+              this.defaultWebcam = device;
+            }
+          }
+          this.devices.set(device.deviceId, device);
+        }
+      }
+    }
+
+    async getAudioDevices() {
+      this.audioDevices = new Map();
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      if (devices) {
+        for (const device of devices) {
+          if (device.kind !== 'audioinput') {
+            continue;
+          }
+          this.audioDevices.set(device.deviceId, device);
+        }
+      }
+      return this.audioDevices;
+    }
+
+    async getWebcams() {
+      this.webcams = new Map();
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      if (devices) {
+        for (const device of devices) {
+          if (device.kind !== 'videoinput') {
+            continue;
+          }
+          this.webcams.set(device.deviceId, device);
+        }
+      }
+      return this.webcams;
+    }
+    
+    getWebcamType(device) {
+      if (/(back|rear)/i.test(device.label)) {
+        return 'back';
+      } else {
+        return 'front';
+      }
+    }
+  }
+
+  nodefony.medias = new Medias();
+  return nodefony.medias;
 }
