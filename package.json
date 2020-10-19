@@ -1,6 +1,6 @@
 {
   "name": "nodefony-client",
-  "version": "6.0.0-beta.1",
+  "version": "6.0.0-beta.2",
   "description": "Client Side Nodefony Framework",
   "browser": "./dist/nodefony.js",
   "author": "Christophe CAMENSULI <ccamensuli@gmail.com>",
@@ -64,5 +64,11 @@
     "type": "git",
     "url": "git@github.com:nodefony/nodefony-client.git"
   },
+  "jsdelivr": "dist/nodefony.js",
+  "module": "entry.es6",
+  "unpkg": "dist/nodefony.js",
+  "files": [
+    "dist/*.js"
+  ],
   "readmeFilename": "README.md"
 }
