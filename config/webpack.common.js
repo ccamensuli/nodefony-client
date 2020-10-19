@@ -18,6 +18,7 @@ module.exports = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, "../dist"),
+    publicPath:"nodefony-client/dist/",
     library: {
       name: "nodefony",
       type: 'window'
