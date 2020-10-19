@@ -85,11 +85,11 @@ class Nodefony {
       return module.default;
     })
     // medias webaudio
-    await import( /* webpackPrefetch: true , webpackChunkName: "webAudio" */ './medias/webAudio/webAudio.es6')
+    await import( /* webpackPrefetch: true , webpackChunkName: "webAudio" */ './medias/webAudio/webaudio.es6')
     .then((module) => {
       return module.default(this);
     });
-    await import( /* webpackPrefetch: true , webpackChunkName: "audioBus" */ './medias/webAudio/audioBus.es6')
+    await import( /* webpackPrefetch: true , webpackChunkName: "audioBus" */ './medias/webAudio/audiobus.es6')
     .then((module) => {
       return module.default(this);
     });
