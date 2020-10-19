@@ -2,7 +2,6 @@
   "name": "nodefony-client",
   "version": "6.0.0-beta.0",
   "description": "Client Side Nodefony Framework",
-  "main": "entry.es6",
   "browser": "./dist/nodefony.js",
   "author": "Christophe CAMENSULI <ccamensuli@gmail.com>",
   "private": false,
@@ -24,14 +23,7 @@
     "demo": "npm start --prefix ./demo/nodefony"
   },
   "dependencies": {
-    "axios": "^0.20.0",
-    "babel-preset-env": "^1.7.0",
     "bowser": "^2.11.0",
-    "chai": "^4.2.0",
-    "core-js": "^3.6.5",
-    "express-generator": "^4.16.1",
-    "lodash": "^4.17.20",
-    "lodash.isregexp": "^4.0.1",
     "querystring-es3": "^0.2.1",
     "url": "^0.11.0",
     "util": "^0.12.3",
@@ -46,7 +38,10 @@
     "@babel/register": "^7.12.1",
     "babel-loader": "^8.1.0",
     "babel-polyfill": "^6.26.0",
+    "chai": "^4.2.0",
     "clean-webpack-plugin": "^3.0.0",
+    "core-js": "^3.6.5",
+    "express-generator": "^4.16.1",
     "jsdom": "^16.4.0",
     "jsdom-global": "^3.0.2",
     "json5-loader": "^4.0.1",
@@ -65,5 +60,9 @@
       "url": "http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:nodefony/nodefony-client.git"
+  },
   "readmeFilename": "README.md"
 }
