@@ -3,9 +3,9 @@ export default (nodefony) => {
   const json = {
     configurable: true,
     writable: true,
-    value: function () {
+    value: function() {
       let alt = {};
-      const storeKey = function (key) {
+      const storeKey = function(key) {
         alt[key] = this[key];
       };
       Object.getOwnPropertyNames(this).forEach(storeKey, this);
@@ -15,19 +15,19 @@ export default (nodefony) => {
   Object.defineProperty(Error.prototype, 'toJSON', json);
 
   const exclude = {
-    context:true,
-    resolver:true,
-    container:true,
-    secure:true
+    context: true,
+    resolver: true,
+    container: true,
+    secure: true
   };
   const jsonNodefony = {
     configurable: true,
     writable: true,
-    value: function () {
+    value: function() {
       let alt = {};
-      const storeKey = function (key) {
-        if (key in exclude){
-          return ;
+      const storeKey = function(key) {
+        if (key in exclude) {
+          return;
         }
         alt[key] = this[key];
       };
@@ -52,34 +52,34 @@ export default (nodefony) => {
     }
     static isError(error) {
       switch (true) {
-      case error instanceof ReferenceError:
-        return "ReferenceError";
-      case error instanceof TypeError:
-        return "TypeError";
-      case error instanceof SyntaxError:
-        return "SyntaxError";
-      case error instanceof Error:
-        if (error.errno) {
-          return "SystemError";
-        }
-        if (error.bytesParsed) {
-          return "ClientError";
-        }
-        try {
-          return error.constructor.name || "Error";
-        } catch (e) {
-          return "Error";
-        }
+        case error instanceof ReferenceError:
+          return "ReferenceError";
+        case error instanceof TypeError:
+          return "TypeError";
+        case error instanceof SyntaxError:
+          return "SyntaxError";
+        case error instanceof Error:
+          if (error.errno) {
+            return "SystemError";
+          }
+          if (error.bytesParsed) {
+            return "ClientError";
+          }
+          try {
+            return error.constructor.name || "Error";
+          } catch (e) {
+            return "Error";
+          }
       }
       return false;
     }
 
     parseMessage(message) {
-      this.message = message ;
+      this.message = message;
     }
 
   }
 
   Object.defineProperty(nodefonyError.prototype, 'toJSON', jsonNodefony);
-  return nodefony.Error = nodefonyError
-}
+  return nodefony.Error = nodefonyError;
+};

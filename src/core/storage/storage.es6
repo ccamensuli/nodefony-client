@@ -1,19 +1,19 @@
 export default (nodefony) => {
 
   const defaultStorage = {
-    storage : {
+    storage: {
       type: "session", // local
       tokenName: "token",
       refreshTokenNane: "refresh-token"
     }
-  }
+  };
 
-  class Storage extends nodefony.Service{
-    constructor(name, options = {}, service= null) {
-      if(service){
-        super(name, service.container, false , nodefony.extend(true, {}, defaultStorage, options ));
-      }else{
-        super(name, null, false, nodefony.extend(true,  {}, defaultStorage, options ));
+  class Storage extends nodefony.Service {
+    constructor(name, options = {}, service = null) {
+      if (service) {
+        super(name, service.container, false, nodefony.extend(true, {}, defaultStorage, options));
+      } else {
+        super(name, null, false, nodefony.extend(true, {}, defaultStorage, options));
       }
       if (this.options.storage.type === "local") {
         this.storage = window.localStorage;
@@ -53,4 +53,4 @@ export default (nodefony) => {
     }
   }
   return nodefony.Storage = Storage;
-}
+};

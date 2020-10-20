@@ -1,6 +1,6 @@
 //import "core-js/stable";
 //import "regenerator-runtime/runtime";
-
+'use strict';
 //const version = require("../package.json").version;
 import Package from '../package.json';
 //import isregexp from 'lodash.isregexp';
@@ -35,20 +35,47 @@ class Nodefony {
     if (!obj) {
       obj = this.getQuery();
     }
-    if(obj){
-      console.debug(`load query for Prefetch module : `, obj)
+    if (obj) {
+      console.debug(`load query for Prefetch module : `, obj);
       for (let lib in obj) {
-        if (lib === "medias" && obj[lib]) {
-          console.debug(`Nodefony Prefetch module ${lib} `)
+        if (lib === "medias") {
+          console.debug(`Nodefony Prefetch module ${lib}`);
           await this.prefetchMedias();
         }
-        if (lib === "socket" && obj[lib]) {
-          console.debug(`Nodefony Prefetch module ${lib} `)
+        if (lib === "socket") {
+          console.debug(`Nodefony Prefetch module ${lib}`);
           await this.prefetchSocket();
-          break;
+        }
+        if (lib === "webaudio") {
+          console.debug(`Nodefony Prefetch module ${lib}`);
+          await this.prefetchWebAudio();
         }
       }
     }
+  }
+
+  async prefetchMedias() {
+    // medias
+    await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-medias" */ './medias/medias.es6')
+      .then((module) => {
+        return module.default(this);
+      });
+  }
+
+  async prefetchWebAudio() {
+    // medias webaudio
+    await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-webaudio" */ './medias/webaudio/webaudio.es6')
+      .then((module) => {
+        return module.default(this);
+      });
+  }
+
+  async prefetchSocket() {
+    // socket
+    return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-socket" */ './transports/socket.es6')
+      .then((module) => {
+        return module.default(this);
+      });
   }
 
   getQuery() {
@@ -71,44 +98,6 @@ class Nodefony {
 
   getUuid() {
     return uuidv4();
-  }
-
-  async prefetchMedias() {
-    // medias
-    await import( /* webpackPrefetch: true , webpackChunkName: "medias" */ './medias/medias.es6')
-    .then((module) => {
-      return module.default(this);
-    });
-    await import( /* webpackPrefetch: true , webpackChunkName: "adapter" */ 'webrtc-adapter')
-    .then((module) => {
-      this.medias.adapter = module.default;
-      return module.default;
-    })
-    // medias webaudio
-    await import( /* webpackPrefetch: true , webpackChunkName: "webAudio" */ './medias/webAudio/webaudio.es6')
-    .then((module) => {
-      return module.default(this);
-    });
-    await import( /* webpackPrefetch: true , webpackChunkName: "audioBus" */ './medias/webAudio/audiobus.es6')
-    .then((module) => {
-      return module.default(this);
-    });
-    await import( /* webpackPrefetch: true , webpackChunkName: "track" */ './medias/webAudio/track.es6')
-    .then((module) => {
-      return module.default(this);
-    });
-    await import( /* webpackPrefetch: true , webpackChunkName: "mixer"*/ './medias/webAudio/mixer.es6')
-    .then((module) => {
-      return module.default(this);
-    });
-  }
-
-  async prefetchSocket() {
-    // socket
-    return await import( /* webpackPrefetch: true , webpackChunkName: "socket" */ './transports/socket.es6')
-      .then((module) => {
-        return module.default(this);
-      });
   }
 
   basename(path) {
@@ -221,19 +210,6 @@ class Nodefony {
     return target;
   }
 
-  /*isFunction(...args) {
-    return util.isFunction(...args)
-    //return Object.prototype.toString.call(it) === '[object Function]';
-  }
-
-  isArray(...args) {
-    return util.isArray(...args)
-    //return Object.prototype.toString.call(it) === '[object Array]';
-  }
-  isRegExp(){
-
-  }*/
-
   isContainer(container) {
     if (container && container.protoService && container.protoParameters) {
       return true;
@@ -243,10 +219,10 @@ class Nodefony {
 
   isPromise(obj) {
     switch (true) {
-    case obj instanceof Promise:
-      return true;
-    default:
-      return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
+      case obj instanceof Promise:
+        return true;
+      default:
+        return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
     }
   }
 
@@ -258,9 +234,8 @@ class Nodefony {
       a.protocol === loc.protocol;
   }
 
-  isSecure(Url) {
-    const loc = window.location;
-    const a = url.parse(Url);
+  isSecure(Url = null) {
+    const a = Url ? url.parse(Url) : window.location.href;
     return a.protocol === "https:" || a.protocol === "wss:";
   }
 

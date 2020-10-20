@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+const path = require("path");
+let cli = null;
+try {
+  cli = require(path.resolve( "cli", "cli.es6"));
+} catch (e) {
+  throw e;
+}
+module.exports = cli;

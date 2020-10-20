@@ -2,8 +2,6 @@
 
 export default (nodefony) => {
 
-  'use strict';
-
   let settingsSyslog = {
     //rateLimit:100,
     //burstLimit:10,
@@ -17,7 +15,7 @@ export default (nodefony) => {
     }
   };
 
-  const normalizeLog = function (pdu) {
+  const normalizeLog = function(pdu) {
     let date = new Date(pdu.timeStamp);
     if (pdu.payload === "" || pdu.payload === undefined) {
       console.warning(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : logger message empty !!!!`);
@@ -26,36 +24,36 @@ export default (nodefony) => {
     }
     let message = pdu.payload;
     switch (true) {
-    case nodefony.isObject(message):
-      try {
-        message = `\n${nodefony.inspect(message)}`;
-      } catch (e) {}
+      case nodefony.isObject(message):
+        try {
+          message = `\n${nodefony.inspect(message)}`;
+        } catch (e) {}
     }
     let wrapperLog = null;
     switch (pdu.severity) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-      wrapperLog = console.error;
-      break;
-    case 4:
-      wrapperLog = console.warn;
-      break;
-    case 5:
-      wrapperLog = console.log;
-      break;
-    case 6:
-      wrapperLog = console.info;
-      break;
-    case 7:
-      wrapperLog = console.debug;
-      break;
-    default:
-      wrapperLog = console.log;
+      case 0:
+      case 1:
+      case 2:
+      case 3:
+        wrapperLog = console.error;
+        break;
+      case 4:
+        wrapperLog = console.warn;
+        break;
+      case 5:
+        wrapperLog = console.log;
+        break;
+      case 6:
+        wrapperLog = console.info;
+        break;
+      case 7:
+        wrapperLog = console.debug;
+        break;
+      default:
+        wrapperLog = console.log;
     }
     return wrapperLog(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
-  }
+  };
 
   class Service {
 
@@ -138,19 +136,19 @@ export default (nodefony) => {
 
     static logSeverity(severity) {
       switch (severity) {
-      case "DEBUG":
-        return console.debug;
-      case "INFO":
-        return console.info;
-      case "WARNING":
-        return console.warn;
-      case "ERROR":
-      case "CRITIC":
-      case "ALERT":
-      case "EMERGENCY":
-        return console.error;
-      default:
-        return console.log;
+        case "DEBUG":
+          return console.debug;
+        case "INFO":
+          return console.info;
+        case "WARNING":
+          return console.warn;
+        case "ERROR":
+        case "CRITIC":
+        case "ALERT":
+        case "EMERGENCY":
+          return console.error;
+        default:
+          return console.log;
       }
     }
 
@@ -201,8 +199,8 @@ export default (nodefony) => {
     }
 
     debug(...args) {
-      this.log("DEBUG", "DEBUG")
-      console.debug(...args)
+      this.log("DEBUG", "DEBUG");
+      console.debug(...args);
     }
 
     eventNames(...args) {
@@ -270,7 +268,7 @@ export default (nodefony) => {
      *  @method prependListener
      */
     prependListener(...args) {
-      return this.notificationsCenter.prependListener(...args)
+      return this.notificationsCenter.prependListener(...args);
     }
 
     /**

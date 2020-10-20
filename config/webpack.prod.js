@@ -26,9 +26,9 @@ module.exports = merge(common, {
     rules: []
   },
   plugins: [
-    new SriPlugin({
+    /*new SriPlugin({
       hashFuncNames: ['sha256', 'sha384'],
       enabled: true
-    })
+    })*/
   ]
 });

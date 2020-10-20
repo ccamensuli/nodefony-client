@@ -1,0 +1,14 @@
+{% extends 'layoutcdn2.twig' %}
+
+{% block body %}
+  <h1>{{title}}</h1>
+  <p>Welcome to {{title}}</p>
+  <p>
+    <video id="myvideo" width="300px" height="300px" controls />
+  </p>
+{% endblock %}
+
+{% block javascript %}
+  {{ parent() }}
+  <script type="text/javascript" src="/javascripts/demo.js"></script>
+{% endblock %}

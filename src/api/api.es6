@@ -1,4 +1,4 @@
-import 'whatwg-fetch'
+import 'whatwg-fetch';
 
 export default (nodefony) => {
 
@@ -13,7 +13,7 @@ export default (nodefony) => {
     },
     tokenName: "jwt",
     storage: {}
-  }
+  };
 
   class Api extends nodefony.Storage {
 
@@ -150,7 +150,7 @@ export default (nodefony) => {
         });
     }
 
-    getToken(url = "/api/jwt/token", options) {
+    getToken(url = "/api/jwt/token", options = {}) {
       let opt = nodefony.extend({}, options, {
         body: JSON.stringify({
           refreshToken: this.refreshToken
@@ -168,4 +168,4 @@ export default (nodefony) => {
     }
   }
   return nodefony.Api = Api;
-}
+};

@@ -9,6 +9,7 @@ import "../css/app.css";
 import nodefony from "../../../../../entry.es6?medias=true&socket=true";
 nodefony.prefetchMedias();
 nodefony.prefetchSocket();
+nodefony.prefetchWebAudio();
 //console.log(nodefony)
 
 /*
@@ -42,6 +43,7 @@ class App extends nodefony.Service {
   initialize() {
     this.once("start", (mix) => {
       //this.debug(this, mix)
+      console.log(nodefony)
       this.api.login("api/jwt/login", "admin", "admin")
         .then((response) => {
           return response;

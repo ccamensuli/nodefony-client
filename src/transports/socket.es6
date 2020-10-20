@@ -1,16 +1,18 @@
-export default (nodefony) => {
+import bayeux from '../protocols/bayeux/bayeux.es6';
 
+export default (nodefony) => {
+  bayeux(nodefony);
   const defaultSettings = {
     type: "websocket", //   websocket | poll | longPoll
     protocol: "bayeux"
   };
 
-  const getDependencies = function () {
-    return import( /* webpackPreload: true , webpackChunkName: "bayeux" */ '../protocols/bayeux/bayeux.es6')
-      .then((bayeux) => {
-        return bayeux.default(nodefony);
-      });
-  }();
+  //const getDependencies = function () {
+  //  return import( /* webpackPreload: true , webpackChunkName: "bayeux" */ '../protocols/bayeux/bayeux.es6')
+  //    .then((bayeux) => {
+  //      return bayeux.default(nodefony);
+  //    });
+  //}();
 
   /*
    *

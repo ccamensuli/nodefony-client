@@ -27,10 +27,10 @@ export default (nodefony) => {
     listen(context, eventName, callback) {
       let event = arguments[1];
       let ContextClosure = this;
-      if (typeof (callback) === 'function' || callback instanceof Function) {
+      if (typeof(callback) === 'function' || callback instanceof Function) {
         this.addListener(eventName, callback.bind(context));
       }
-      return function () {
+      return function() {
         Array.prototype.unshift.call(arguments, event);
         return ContextClosure.fire.apply(ContextClosure, arguments);
       };
@@ -52,7 +52,7 @@ export default (nodefony) => {
       const handler = this._events[type];
       //const handler = _.get(this._events, type);
       //if (_.isEmpty(handler) && !nodefony.isFunction(handler)) {
-      if ( !nodefony.isFunction(handler) && handler.length === 0 ) {
+      if (!nodefony.isFunction(handler) && handler.length === 0) {
         return false;
       }
       let tab = [];

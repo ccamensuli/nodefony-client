@@ -12,6 +12,7 @@
   "shelljs": true,
   "globals": {
     "nodefony": true,
+    "import": true,
     "kernel": true,
     "process": true,
     "require": true,

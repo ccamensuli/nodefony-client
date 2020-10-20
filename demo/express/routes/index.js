@@ -8,7 +8,12 @@ router.get('/', function(req, res, next) {
 
 /* GET home page. */
 router.get('/cdn', function(req, res, next) {
-  res.render('cdn', { title: 'Nodefony Client CDN' });
+  res.render('cdn', { title: 'Nodefony Client CDN jsdelivr.net' });
+});
+
+/* GET home page. */
+router.get('/cdn2', function(req, res, next) {
+  res.render('cdn2', { title: 'Nodefony Client CDN unpkg.com' });
 });
 
 module.exports = router;

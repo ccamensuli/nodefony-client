@@ -114,3 +114,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+demo/express/package-lock.json
+demo/nodefony/app/package-lock.json
+demo/nodefony/package-lock.json
+demo/nodefony/src/bundles/users-bundle/package-lock.json
+yarn.lock

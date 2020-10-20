@@ -12,16 +12,31 @@ module.exports = {
    * See: http://webpack.github.io/docs/configuration.html#entry
    */
   entry: {
-    nodefony: path.resolve(__dirname, "..", "entry.es6")
+    nodefony: path.resolve(__dirname, "..", "entry.es6"),
+    medias: {
+      import: path.resolve(__dirname, "..", 'src', 'medias', "medias.es6"),
+      dependOn: 'nodefony'
+    },
+    //medias: path.resolve(__dirname, "..", 'src','medias',"medias.es6"),
+    socket: {
+      import: path.resolve(__dirname, "..", 'src', 'transports', "socket.es6"),
+      dependOn: 'nodefony'
+    },
+    //socket: path.resolve(__dirname, "..", 'src','transports',"socket.es6"),
+    webaudio: {
+      import: path.resolve(__dirname, "..", 'src', 'medias', 'webaudio', "webaudio.es6"),
+      dependOn: 'nodefony'
+    }
+    //webaudio: path.resolve(__dirname, "..", 'src','medias','webaudio',"webaudio.es6")
   },
   target: 'web',
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, "../dist"),
-    publicPath:"nodefony-client/dist/",
+    //publicPath:"nodefony-client/dist/",
     library: {
       name: "nodefony",
-      type: 'window'
+      type: 'umd'
     },
     libraryExport: "default"
   },
@@ -62,12 +77,12 @@ module.exports = {
           presets: ['@babel/preset-env'],
           plugins: ['@babel/plugin-transform-runtime']
         }
-        }]
-      },{
-        test: /\.json$/i,
-        loader: 'json5-loader',
-        type: 'javascript/auto',
       }]
+    }, {
+      test: /\.json$/i,
+      loader: 'json5-loader',
+      type: 'javascript/auto',
+    }]
   },
   /*
    * Add additional plugins to the compiler.
@@ -75,9 +90,9 @@ module.exports = {
    * See: http://webpack.github.io/docs/configuration.html#plugins
    */
   plugins: [
-      new CleanWebpackPlugin(),
-      //new ManifestPlugin(),
-      new webpack.DefinePlugin({
+    new CleanWebpackPlugin(),
+    //new ManifestPlugin(),
+    new webpack.DefinePlugin({
       'process.env': {
         'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
       }
