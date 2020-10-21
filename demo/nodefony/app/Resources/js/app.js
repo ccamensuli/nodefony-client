@@ -6,11 +6,18 @@
  */
 import "../css/app.css";
 
-import nodefony from "../../../../../entry.es6?medias=true&socket=true";
-nodefony.prefetchMedias();
-nodefony.prefetchSocket();
-nodefony.prefetchWebAudio();
-//console.log(nodefony)
+//import nodefony from "../../../../../";
+import nodefony from "nodefony-client";
+//nodefony.prefetchMedias();
+//nodefony.prefetchWebAudio();
+//import medias from "nodefony-client/dist/medias.js"
+import webaudio from "nodefony-client/dist/webaudio.js"
+//console.log(medias)
+//console.log(webaudio)
+//nodefony.prefetchMedias();
+//nodefony.prefetchSocket();
+//nodefony.prefetchWebAudio();
+console.log(nodefony)
 
 /*
  *	Class Bundle App
@@ -62,7 +69,7 @@ class App extends nodefony.Service {
       this.createWebsocket();
       this.createSocket();
     });
-    let Mixer = new nodefony.medias.Mixer(this);
+    let Mixer = new nodefony.webAudio.Mixer("Mixer", {}, this);
     this.emit("start", Mixer)
     let md = new nodefony.medias.MediaStream(document.getElementById("myvideo"), {}, this);
     md.getUserMedia({})

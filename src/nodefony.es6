@@ -58,7 +58,8 @@ class Nodefony {
     // medias
     await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-medias" */ './medias/medias.es6')
       .then((module) => {
-        return module.default(this);
+        this.medias = module.default;
+        return module.default;
       });
   }
 
@@ -66,7 +67,8 @@ class Nodefony {
     // medias webaudio
     await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-webaudio" */ './medias/webaudio/webaudio.es6')
       .then((module) => {
-        return module.default(this);
+        this.webAudio = module.default;
+        return module.default;
       });
   }
 
@@ -74,7 +76,8 @@ class Nodefony {
     // socket
     return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-socket" */ './transports/socket.es6')
       .then((module) => {
-        return module.default(this);
+        this.Socket = module.default;
+        return module.default;
       });
   }
 

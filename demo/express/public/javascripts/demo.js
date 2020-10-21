@@ -6,7 +6,7 @@ window.addEventListener("load", () => {
   let kernel = new nodefony.Service("kernel");
   kernel.initSyslog();
   kernel.once("start", (mix)=>{
-    //kernel.debug(kernel, mix)
+    kernel.debug(mix)
     kernel.log(document.getElementById("myvideo"))
     let md = new nodefony.medias.MediaStream(document.getElementById("myvideo"), {}, kernel);
     md.getUserMedia({})
@@ -16,13 +16,12 @@ window.addEventListener("load", () => {
     });
   });
   //setTimeout(()=>{
-  let Mixer = new nodefony.medias.Mixer(kernel);
+  let Mixer = new nodefony.webAudio.Mixer("Mixer", {}, kernel);
   kernel.emit("start", Mixer)
   //},2000)
   kernel.log("LOG DEMO INFO", "INFO");
   kernel.log("LOG DEMO ERROR", "ERROR");
   kernel.log("LOG DEMO WARNING", "WARNING");
   kernel.log("LOG DEMO DEBUG", "DEBUG");
-
 
 }, false);

@@ -73,12 +73,13 @@
     "url": "git@github.com:nodefony/nodefony-client.git"
   },
   "jsdelivr": "dist/nodefony.js",
-  "module": "entry.es6",
   "unpkg": "dist/nodefony.js",
   "files": [
     "dist/*",
     "src/*",
-    "entry.es6"
+    "entry.es6",
+    "bin/*",
+    "cli/*"
   ],
   "readmeFilename": "README.md"
 }

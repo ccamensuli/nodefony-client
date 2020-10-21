@@ -50,7 +50,7 @@
        this.socket.close(code, reason);
      }
 
-     send(data){
+     send(data) {
        return this.socket.send(data);
      }
 

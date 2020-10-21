@@ -37,8 +37,13 @@ module.exports = merge(wpconfig, {
     library: "[name]",
     libraryExport: "default"
   },
-  externals: {},
-  resolve: {},
+  externals: {
+    nodefony: 'nodefony'
+  },
+  resolve: {
+    //modules: [path.resolve(__dirname, "..", "node_modules")]
+    modules: [path.resolve(__dirname, "..", 'node_modules'), path.resolve(__dirname, "..", "..", 'node_modules')]
+  },
   module: {
     rules: [{
         // BABEL TRANSCODE

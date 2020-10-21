@@ -34,13 +34,19 @@ module.exports = {
     filename: '[name].js',
     path: path.resolve(__dirname, "../dist"),
     //publicPath:"nodefony-client/dist/",
+    //globalObject: 'this',
+    //library: "nodefony",
     library: {
-      name: "nodefony",
+      name: "[name]",
       type: 'umd'
     },
     libraryExport: "default"
   },
-  externals: {},
+
+  externals: {
+    nodefony: 'nodefony'
+  },
+
   /*
    * Options affecting the resolving of modules.
    *
