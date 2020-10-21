@@ -30,7 +30,7 @@ $ yarn add nodefony-client
 ### latest library + chunks
 ```html
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/nodefony-client/dist/nodefony.js?medias=true&socket=true"></script>
-```html
+```
 ### version library + chunks
 ```html
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/nodefony-client@6.0.0-beta.2/dist/nodefony.js?medias=true&socket=true"></script>
@@ -45,7 +45,7 @@ $ yarn add nodefony-client
 ### latest library + chunks
 ```html
 <script type="text/javascript" src="https://unpkg.com/nodefony-client@6.0.0-beta.2/dist/nodefony.js?medias=true&socket=true"></script>
-```html
+```
 ### version library + chunks
 ```html
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/nodefony-client@6.0.0-beta.0/dist/nodefony.js?medias=true&socket=true"></script>
