@@ -136,6 +136,16 @@ class myService extends nodefony.Service {
   }
 }
 const instance = new myService();
+
+console.log(instance)
+{
+  container: Container {scope: {…}, services: C…r.protoService, parameters: C…r.protoParameters, protoService: ƒ, protoParameters: ƒ}
+  name: "myService"
+  notificationsCenter: Events {_events: {…}, _eventsCount: 1, _maxListeners: 20}
+  options: {}
+  settingsSyslog: {moduleName: "myService", defaultSeverity: "INFO"}
+  syslog: Syslog {_events: {…}, _eventsCount: 0, _maxListeners: undefined, settings: {…}, ringStack: Array(0), …}
+}
 ```
 ## Containers
 ```
