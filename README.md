@@ -16,9 +16,11 @@ $ yarn add nodefony-client
 <p align="center">
   <img src="https://github.com/nodefony/nodefony-client/raw/main/tools/img/webpack.png">
 </p>
+
 ```js
+
 console.log(nodefony)
-Nodefony {
+{
   version: "6.0.0-beta.4",
   environment: "development",
   isRegExp: ƒ,
@@ -126,7 +128,8 @@ const notificationsCenter = new nodefony.Events();
 ```
 ## services
 ```js
-// nodefony.Service(name, container= null, events= null, settings ={} )
+// nodefony.Service => (name, container = null, events = null, settings = {})
+
 class myService extends nodefony.Service {
   constructor(){
     super("myService");
