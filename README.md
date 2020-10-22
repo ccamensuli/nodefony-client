@@ -121,12 +121,20 @@ webaudio
 ```js
 const notificationsCenter = new nodefony.Events();
 
-```
-## Syslog
+notificationsCenter.on("myEvent", (count, args) => {
+  console.log(count, args)
+});
+
+const obj = {foo:"bar"};
+let i = 0;
+notificationsCenter.emit("myEvent", i, obj);
+notificationsCenter.emit("myEvent", ++i, obj);
+
+// 0 {foo: "bar"}
+// 1 {foo: "bar"}
 ```
 
-```
-## services
+## Service
 ```js
 // nodefony.Service => (name, container = null, events = null, settings = {})
 
@@ -149,4 +157,9 @@ console.log(instance)
 ```
 ## Containers
 ```
+```
+
+## Syslog
+```
+
 ```
