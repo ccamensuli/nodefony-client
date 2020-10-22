@@ -5,6 +5,7 @@
   "description": "Client Side Nodefony Framework",
   "browser": "./dist/nodefony.js",
   "main": "./dist/nodefony.js",
+  "module": "entry.es6",
   "author": "Christophe CAMENSULI <ccamensuli@gmail.com>",
   "private": false,
   "keywords": [

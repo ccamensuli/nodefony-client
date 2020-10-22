@@ -34,17 +34,30 @@ module.exports = {
     filename: '[name].js',
     path: path.resolve(__dirname, "../dist"),
     //publicPath:"nodefony-client/dist/",
-    //globalObject: 'this',
-    //library: "nodefony",
+    globalObject: 'self',
     library: {
       name: "[name]",
       type: 'umd'
     },
-    libraryExport: "default"
+    umdNamedDefine: true,
+    libraryExport: "default",
+    pathinfo: true,
+    //iife: true
   },
-
+  experiments: {
+    //outputModule: true,
+    //syncWebAssembly: true,
+    //topLevelAwait: true,
+    //asyncWebAssembly: true,
+  },
+  optimization: {
+    //runtimeChunk: "single",
+    /*splitChunks: {
+      chunks: "all",
+    }*/
+  },
   externals: {
-    nodefony: 'nodefony'
+    //nodefony: 'nodefony'
   },
 
   /*
@@ -102,6 +115,9 @@ module.exports = {
       'process.env': {
         'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
       }
+    }),
+    new webpack.ProvidePlugin({
+      nodeofny: 'nodeofny',
     }),
   ],
   /*stats: {

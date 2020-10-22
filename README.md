@@ -62,9 +62,22 @@ webaudio
 # Use With Webpack
 
 ```js
-  import nodefony from 'nodefony-client';
-  or
-  import {medias, Events, Service} from 'nodefony-client';
+
+  // import base library
+  import nodefony from "nodefony-client";
+
+  // import chunk medias
+  import media from "nodefony-client/dist/medias";
+  media(nodefony);
+
+  // import chunk webaudio
+  import webaudio from "nodefony-client/dist/webaudio";
+  webaudio(nodefony);
+
+  // import chunk socket
+  import socket from "nodefony-client/dist/socket";
+  socket(nodefony);
+
 ```
 
 # Base Library

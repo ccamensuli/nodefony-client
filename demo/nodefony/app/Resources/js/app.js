@@ -8,16 +8,24 @@ import "../css/app.css";
 
 //import nodefony from "../../../../../";
 import nodefony from "nodefony-client";
-//nodefony.prefetchMedias();
+import media from "nodefony-client/dist/medias";
+console.log( media(nodefony) );
+import webaudio from "nodefony-client/dist/webaudio";
+webaudio(nodefony);
+import socket from "nodefony-client/dist/socket";
+socket(nodefony);
+
+
 //nodefony.prefetchWebAudio();
 //import medias from "nodefony-client/dist/medias.js"
-import webaudio from "nodefony-client/dist/webaudio.js"
+//import webaudio from "nodefony-client/dist/webaudio.js"
 //console.log(medias)
-console.log(webaudio)
+//console.log(webaudio)
 //nodefony.prefetchMedias();
 //nodefony.prefetchSocket();
 //nodefony.prefetchWebAudio();
-console.log(nodefony)
+console.log(nodefony.webAudio)
+console.log(nodefony.medias)
 
 /*
  *	Class Bundle App

@@ -2,11 +2,14 @@ import AudioBus from './audiobus.es6';
 import Track from './track.es6';
 import Mixer from './mixer.es6';
 
-const audioContext = window.AudioContext || window.webkitAudioContext;
+export default (nodefony)=>{
 
-export default {
-  audioContext,
-  Mixer,
-  AudioBus,
-  Track
+  const audioContext = window.AudioContext || window.webkitAudioContext;
+
+   return nodefony.webAudio = {
+    audioContext,
+    Mixer: Mixer(nodefony),
+    AudioBus : AudioBus(nodefony),
+    Track: Track(nodefony)
+  };
 };
