@@ -10,6 +10,7 @@ export default (nodefony) => {
    *   burstLimit:      3
    *   defaultSeverity: "DEBUG"
    *   checkConditions: "&&"
+   *   async:         false
    *
    * </pre>
    */
@@ -20,7 +21,8 @@ export default (nodefony) => {
     rateLimit: false,
     burstLimit: 3,
     defaultSeverity: "DEBUG",
-    checkConditions: "&&"
+    checkConditions: "&&",
+    async: false
   };
 
   /*
@@ -64,13 +66,13 @@ export default (nodefony) => {
    */
   let guid = 0;
   class PDU {
-    constructor(pci, severity, moduleName, msgid, msg, date) {
+    constructor(pci, severity, moduleName = "nodefony", msgid = "", msg = "", date = null) {
       /* timeStamp @type Date*/
       this.timeStamp = new Date(date).getTime() || new Date().getTime();
       /* uid */
       this.uid = ++guid;
       /* severity */
-      this.severity = translateSeverity(severity) || translateSeverity("INFO");
+      this.severity = translateSeverity(severity);
       /* severityName */
       this.severityName = sysLogSeverity[this.severity];
       /* typePayload */
@@ -81,11 +83,13 @@ export default (nodefony) => {
        */
       this.payload = pci;
       /* moduleName */
-      this.moduleName = moduleName || "nodefony";
+      this.moduleName = moduleName;
       /* msgid */
-      this.msgid = msgid || "";
+      this.msgid = msgid;
       /* msg */
-      this.msg = msg || "";
+      this.msg = msg;
+      /* staus */
+      this.status = "NOTDEFINED";
     }
 
     /**
@@ -129,50 +133,44 @@ export default (nodefony) => {
   }
 
   const operators = {
-    "<": function(ele1, ele2) {
+    "<": function (ele1, ele2) {
       return ele1 < ele2;
     },
-    ">": function(ele1, ele2) {
+    ">": function (ele1, ele2) {
       return ele1 > ele2;
     },
-    "<=": function(ele1, ele2) {
+    "<=": function (ele1, ele2) {
       return ele1 <= ele2;
     },
-    ">=": function(ele1, ele2) {
+    ">=": function (ele1, ele2) {
       return ele1 >= ele2;
     },
-    "==": function(ele1, ele2) {
+    "==": function (ele1, ele2) {
       return ele1 === ele2;
     },
-    "!=": function(ele1, ele2) {
+    "!=": function (ele1, ele2) {
       return ele1 !== ele2;
     },
-    "RegExp": function(ele1, ele2) {
+    "RegExp": function (ele1, ele2) {
       return (ele2.test(ele1));
     }
   };
 
   const conditionsObj = {
     severity: (pdu, condition) => {
-      if (condition.operator !== "==") {
-        return operators[condition.operator](pdu.severity, condition.data);
-      } else {
-        for (let sev in condition.data) {
-          if (sev === pdu.severityName) {
-            return true;
-          }
+      for (let sev in condition.data) {
+        let res = operators[condition.operator](pdu.severity, condition.data[sev]);
+        if( res ){
+          return true;
         }
       }
       return false;
     },
     msgid: (pdu, condition) => {
-      if (condition.operator !== "==") {
-        return operators[condition.operator](pdu.msgid, condition.data);
-      } else {
-        for (let sev in condition.data) {
-          if (sev === pdu.msgid) {
-            return true;
-          }
+      for (let sev in condition.data) {
+        let res = operators[condition.operator](pdu.msgid, sev);
+        if( res ){
+          return true;
         }
       }
       return false;
@@ -208,54 +206,59 @@ export default (nodefony) => {
   const checkFormatSeverity = (ele) => {
     let res = false;
     switch (nodefony.typeOf(ele)) {
-      case "string":
-        res = ele.split(/,| /);
-        break;
-      case "number":
-        res = ele;
-        break;
-      default:
-        throw new Error("checkFormatSeverity bad format " + nodefony.typeOf(ele) + " : " + ele);
+    case "array":
+      res = ele;
+      break;
+    case "string":
+      res = ele.split(/,| /);
+      break;
+    case "number":
+      res = [ele];
+      break;
+    default:
+      console.trace(ele)
+      let error = `checkFormatSeverity bad format type : ${nodefony.typeOf(ele)}`;
+      throw new Error(error);
     }
     return res;
   };
 
-  const checkFormatDate = function(ele) {
+  const checkFormatDate = function (ele) {
     let res = false;
     switch (nodefony.typeOf(ele)) {
-      case "date":
-        res = ele.getTime();
-        break;
-      case "string":
-        res = new Date(ele);
-        break;
-      default:
-        throw new Error("checkFormatDate bad format " + nodefony.typeOf(ele) + " : " + ele);
+    case "date":
+      res = ele.getTime();
+      break;
+    case "string":
+      res = new Date(ele);
+      break;
+    default:
+      throw new Error("checkFormatDate bad format " + nodefony.typeOf(ele) + " : " + ele);
     }
     return res;
   };
 
-  const checkFormatMsgId = function(ele) {
+  const checkFormatMsgId = function (ele) {
     let res = false;
     switch (nodefony.typeOf(ele)) {
-      case "string":
-        res = ele.split(/,| /);
-        break;
-      case "number":
+    case "string":
+      res = ele.split(/,| /);
+      break;
+    case "number":
+      res = ele;
+      break;
+    case "object":
+      if (ele instanceof RegExp) {
         res = ele;
-        break;
-      case "object":
-        if (ele instanceof RegExp) {
-          res = ele;
-        }
-        break;
-      default:
-        throw new Error("checkFormatMsgId bad format " + nodefony.typeOf(ele) + " : " + ele);
+      }
+      break;
+    default:
+      throw new Error("checkFormatMsgId bad format " + nodefony.typeOf(ele) + " : " + ele);
     }
     return res;
   };
 
-  const severityToString = function(severity) {
+  const severityToString = function (severity) {
     let myint = parseInt(severity, 10);
     let ele = null;
     if (!isNaN(myint)) {
@@ -269,7 +272,7 @@ export default (nodefony) => {
     return false;
   };
 
-  const wrapperCondition = function(conditions, callback, context = null) {
+  const wrapperCondition = function (conditions, callback, context = null) {
     let myFuncCondition = null;
     let Conditions = null;
     try {
@@ -280,36 +283,37 @@ export default (nodefony) => {
         myFuncCondition = logicCondition[this.settings.checkConditions];
       }
       Conditions = sanitizeConditions(conditions);
+      //console.log("Sanitize : ", conditions)
       switch (nodefony.typeOf(callback)) {
-        case "function":
-          return (pdu) => {
-            let res = myFuncCondition(Conditions, pdu);
-            if (res) {
-              if (context) {
-                callback.call(context, pdu);
-              } else {
-                callback(pdu);
-              }
-            }
-          };
-        case "array":
-          let tab = [];
-          for (let i = 0; i < callback.length; i++) {
-            let res = myFuncCondition(Conditions, callback[i]);
-            if (res) {
-              tab.push(callback[i]);
+      case "function":
+        return (pdu) => {
+          let res = myFuncCondition(Conditions, pdu);
+          if (res) {
+            if (context) {
+              callback.call(context, pdu);
+            } else {
+              callback(pdu);
             }
           }
-          return tab;
-        default:
-          throw new Error("");
+        };
+      case "array":
+        let tab = [];
+        for (let i = 0; i < callback.length; i++) {
+          let res = myFuncCondition(Conditions, callback[i]);
+          if (res) {
+            tab.push(callback[i]);
+          }
+        }
+        return tab;
+      default:
+        throw new Error("");
       }
     } catch (e) {
       throw e;
     }
   };
 
-  const sanitizeConditions = function(settingsCondition) {
+  const sanitizeConditions = function (settingsCondition) {
     let res = true;
     if (nodefony.typeOf(settingsCondition) !== "object") {
       return false;
@@ -319,70 +323,61 @@ export default (nodefony) => {
         return false;
       }
       let condi = settingsCondition[ele];
+      //console.log("condi ready : ",condi)
 
       if (condi.operator && !(condi.operator in operators)) {
         throw new Error("Contitions bad operator : " + condi.operator);
       }
       if (condi.data) {
         switch (ele) {
-          case "severity":
-            if (condi.operator) {
-              res = checkFormatSeverity(condi.data);
-              if (res !== false) {
-                condi.data = sysLogSeverity[severityToString(res[0])];
-              } else {
-                return false;
-              }
-            } else {
-              condi.operator = "==";
-              res = checkFormatSeverity(condi.data);
-              if (res !== false) {
-                condi.data = {};
-                if (nodefony.typeOf(res) === "array") {
-                  for (let i = 0; i < res.length; i++) {
-                    let mySeverity = severityToString(res[i]);
-                    if (mySeverity) {
-                      condi.data[mySeverity] = sysLogSeverity[mySeverity];
-                    } else {
-                      return false;
-                    }
-                  }
-                } else {
-                  return false;
-                }
+        case "severity":
+          if (!condi.operator) {
+            condi.operator = "==";
+          }
+          res = checkFormatSeverity(condi.data);
+          //console.log(`checkFormatSeverity : `, condi.data, "==>" , res)
+          if (res !== false) {
+            condi.data = {};
+            for (let i = 0; i < res.length; i++) {
+              let mySeverity = severityToString(res[i]);
+              if (mySeverity) {
+                condi.data[mySeverity] = sysLogSeverity[mySeverity];
               } else {
                 return false;
               }
             }
-            break;
-          case "msgid":
-            if (!condi.operator) {
-              condi.operator = "==";
-            }
-            res = checkFormatMsgId(condi.data);
-            if (res !== false) {
-              if (nodefony.typeOf(res) === "array") {
-                condi.data = {};
-                for (let i = 0; i < res.length; i++) {
-                  condi.data[res[i]] = "||";
-                }
-              } else {
-                condi.data = res;
-              }
-            } else {
-              return false;
-            }
-            break;
-          case "date":
-            res = checkFormatDate(condi.data);
-            if (res) {
-              condi.data = res;
-            } else {
-              return false;
-            }
-            break;
-          default:
+          } else {
             return false;
+          }
+          break;
+        case "msgid":
+          if (!condi.operator) {
+            condi.operator = "==";
+          }
+          res = checkFormatMsgId(condi.data);
+          if (res !== false) {
+            if (nodefony.typeOf(res) === "array") {
+              condi.data = {};
+              for (let i = 0; i < res.length; i++) {
+                condi.data[res[i]] = "||";
+              }
+            } else {
+              condi.data = res;
+            }
+          } else {
+            return false;
+          }
+          break;
+        case "date":
+          res = checkFormatDate(condi.data);
+          if (res) {
+            condi.data = res;
+          } else {
+            return false;
+          }
+          break;
+        default:
+          return false;
         }
       } else {
         return false;
@@ -393,7 +388,7 @@ export default (nodefony) => {
   };
 
 
-  const translateSeverity = function(severity) {
+  const translateSeverity = function (severity = "INFO") {
     let myseverity = null;
     if (severity in sysLogSeverity) {
       if (typeof severity === 'number') {
@@ -403,7 +398,7 @@ export default (nodefony) => {
       }
     } else {
       if (!severity) {
-        return null;
+        return translateSeverity["INFO"];
       } else {
         throw new Error("not nodefony syslog severity :" + severity);
       }
@@ -411,14 +406,14 @@ export default (nodefony) => {
     return myseverity;
   };
 
-  const createPDU = function(payload, severity, moduleName, msgid, msg) {
+  const createPDU = function (payload, severity, moduleName, msgid, msg) {
     let myseverity = null;
     if (!severity) {
       myseverity = sysLogSeverity[this.settings.defaultSeverity];
     } else {
       myseverity = severity;
     }
-    return new nodefony.PDU(payload, myseverity,
+    return new PDU(payload, myseverity,
       moduleName,
       msgid,
       msg);
@@ -426,6 +421,48 @@ export default (nodefony) => {
 
   /**
    * A class for product log in nodefony.
+   * @example
+   *
+   *    var ERROR_DEFINE = {
+   *       '-101': 'I18N string'
+   *    };
+   *
+   *    var settings = {
+   *        rateLimit:100,
+   *        burstLimit:10,
+   *        moduleName:"LIVE",
+   *        defaultSeverity:"ERROR"
+   *    };
+   *
+   *    var logIntance = new nodefony.Syslog(settings);
+   *
+   *
+   *
+   *    controller.logIntance.listenWithConditions(context,{
+   *        checkConditions: "&&",
+   *        severity:{
+   *            data:"CRITIC,ERROR"
+   *            //data:"1,7"
+   *        },
+   *        date:{
+   *            operator:">=",
+   *            data:new Date()
+   *        },
+   *        msgid:{
+   *            data:"myFunction"
+   *        }
+   *
+   *
+   *    },function(pdu){
+   *        logView(pdu)
+   *    } )
+   *
+   *
+   *    var myFunction = function(error){
+   *        controller.logIntance.logger(error, "ERROR", "myFunction", ERROR_DEFINE[error] );
+   *    }
+   *
+   *
    *
    *    @class syslog
    *    @module library
@@ -483,6 +520,27 @@ export default (nodefony) => {
        * @type Number
        */
       this.start = 0;
+      this.fire = this.settings.async ? super.fireAsync : super.fire;
+    }
+
+    clean(){
+      return this.reset();
+    }
+
+    reset(){
+      this.ringStack.length = 0;
+      this.removeAllListeners();
+    }
+    /**
+     * Clear stack of logs
+     *
+     * @method clearLogStack
+     *
+     *
+     *
+     */
+    clearLogStack() {
+      this.ringStack.length = 0;
     }
 
     pushStack(pdu) {
@@ -514,23 +572,26 @@ export default (nodefony) => {
         }
         if (this.settings.burstLimit && this.settings.burstLimit > this.burstPrinted) {
           try {
-            if (payload instanceof nodefony.PDU) {
+            if (payload instanceof PDU) {
               pdu = payload;
             } else {
               pdu = createPDU.call(this, payload, severity, this.settings.moduleName, msgid || this.settings.msgid, msg);
             }
           } catch (e) {
-            console.trace(e);
+            console.error(e);
             this.invalid++;
-            return "INVALID";
+            pdu.status = "INVALID";
+            return pdu;
           }
           this.pushStack(pdu);
           this.fire("onLog", pdu);
           this.burstPrinted++;
-          return "ACCEPTED";
+          pdu.status = "ACCEPTED";
+          return pdu;
         }
         this.missed++;
-        return "DROPPED";
+        pdu.status = "DROPPED";
+        return pdu;
       } else {
         try {
           if (payload instanceof nodefony.PDU) {
@@ -539,28 +600,16 @@ export default (nodefony) => {
             pdu = createPDU.call(this, payload, severity, this.settings.moduleName, msgid || this.settings.msgid, msg);
           }
         } catch (e) {
-          console.trace(e);
+          console.error(e);
           this.invalid++;
-          return "INVALID";
+          pdu.status = "INVALID";
+          return pdu;
         }
         this.pushStack(pdu);
+        pdu.status = "ACCEPTED";
         this.fire("onLog", pdu);
-        return "ACCEPTED";
+        return pdu;
       }
-    }
-
-
-
-    /**
-     * Clear stack of logs
-     *
-     * @method clearLogStack
-     *
-     *
-     *
-     */
-    clearLogStack() {
-      this.ringStack.length = 0;
     }
 
     /**
@@ -572,7 +621,12 @@ export default (nodefony) => {
      * @return {PDU} pdu
      */
     getLogStack(start, end, contition) {
-      let stack = this.getLogs(contition);
+      let stack = null;
+      if (contition) {
+        stack = this.getLogs(contition);
+      } else {
+        stack = this.ringStack;
+      }
       if (arguments.length === 0) {
         return stack[stack.length - 1];
       }
@@ -627,34 +681,34 @@ export default (nodefony) => {
         throw new Error("syslog loadStack : not stack in arguments ");
       }
       switch (nodefony.typeOf(stack)) {
-        case "string":
-          try {
-            //console.log(stack);
-            st = JSON.parse(stack);
-            return this.loadStack(st, doEvent, beforeConditions);
-          } catch (e) {
-            throw e;
-          }
-          break;
-        case "array":
-        case "object":
-          try {
-            for (let i = 0; i < stack.length; i++) {
-              let pdu = new nodefony.PDU(stack[i].payload, stack[i].severity, stack[i].moduleName || this.settings.moduleName, stack[i].msgid, stack[i].msg, stack[i].timeStamp);
-              this.pushStack(pdu);
-              if (doEvent) {
-                if (beforeConditions && typeof beforeConditions === "function") {
-                  beforeConditions.call(this, pdu, stack[i]);
-                }
-                this.fire("onLog", pdu);
+      case "string":
+        try {
+          //console.log(stack);
+          st = JSON.parse(stack);
+          return this.loadStack(st, doEvent, beforeConditions);
+        } catch (e) {
+          throw e;
+        }
+        break;
+      case "array":
+      case "object":
+        try {
+          for (let i = 0; i < stack.length; i++) {
+            let pdu = new nodefony.PDU(stack[i].payload, stack[i].severity, stack[i].moduleName || this.settings.moduleName, stack[i].msgid, stack[i].msg, stack[i].timeStamp);
+            this.pushStack(pdu);
+            if (doEvent) {
+              if (beforeConditions && typeof beforeConditions === "function") {
+                beforeConditions.call(this, pdu, stack[i]);
               }
+              this.fire("onLog", pdu);
             }
-          } catch (e) {
-            throw e;
           }
-          break;
-        default:
-          throw new Error("syslog loadStack : bad stack in arguments type");
+        } catch (e) {
+          throw e;
+        }
+        break;
+      default:
+        throw new Error("syslog loadStack : bad stack in arguments type");
       }
       return st || stack;
     }
@@ -665,10 +719,12 @@ export default (nodefony) => {
      *
      */
     filter(conditions = null, callback = null, context = null) {
+
       if (!conditions) {
         throw new Error("filter conditions not found ");
       }
       try {
+        conditions = nodefony.extend(true, {}, conditions);
         let wrapper = wrapperCondition.call(this, conditions, callback, context);
         if (wrapper) {
           return super.on("onLog", wrapper);
@@ -696,7 +752,11 @@ export default (nodefony) => {
       return this.logger(data, "ERROR");
     }
 
-    warning(data) {
+    warn(data) {
+      return this.logger(data, "WARNING");
+    }
+    
+    warnning(data) {
       return this.logger(data, "WARNING");
     }
 
@@ -711,6 +771,46 @@ export default (nodefony) => {
     trace(data) {
       return this.logger(data, "NOTICE");
     }
+
+    static normalizeLog (pdu) {
+      let date = new Date(pdu.timeStamp);
+      if (pdu.payload === "" || pdu.payload === undefined) {
+        console.warn(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : logger message empty !!!!`);
+        console.trace(pdu);
+        return;
+      }
+      let message = pdu.payload;
+      switch (true) {
+        case nodefony.isObject(message):
+          try {
+            message = `\n${nodefony.inspect(message)}`;
+          } catch (e) {}
+      }
+      let wrapperLog = null;
+      switch (pdu.severity) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+          wrapperLog = console.error;
+          break;
+        case 4:
+          wrapperLog = console.warn;
+          break;
+        case 5:
+          wrapperLog = console.log;
+          break;
+        case 6:
+          wrapperLog = console.info;
+          break;
+        case 7:
+          wrapperLog = console.debug;
+          break;
+        default:
+          wrapperLog = console.log;
+      }
+      return wrapperLog(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
+    };
   }
   nodefony.Syslog = Syslog;
   nodefony.PDU = PDU;

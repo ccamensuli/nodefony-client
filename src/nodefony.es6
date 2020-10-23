@@ -57,17 +57,17 @@ class Nodefony {
   async prefetchMedias() {
     // medias
     await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-medias" */ './medias/medias.es6')
-      .then((module) => {
-        return module.default(this);
-      });
+    .then((module) => {
+      return module.default(this);
+    });
   }
 
   async prefetchWebAudio() {
     // medias webaudio
     await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-webaudio" */ './medias/webaudio/webaudio.es6')
-      .then((module) => {
-        return module.default(this);
-      });
+    .then((module) => {
+      return module.default(this);
+    });
   }
 
   async prefetchSocket() {
@@ -211,18 +211,24 @@ class Nodefony {
   }
 
   isContainer(container) {
-    if (container && container.protoService && container.protoParameters) {
-      return true;
+    if (container) {
+      if (container instanceof nodefony.Container) {
+        return true;
+      }
+      if (container.protoService && container.protoParameters) {
+        return true;
+      }
+      return false;
     }
     return false;
   }
 
   isPromise(obj) {
     switch (true) {
-      case obj instanceof Promise:
-        return true;
-      default:
-        return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
+    case obj instanceof Promise:
+      return true;
+    default:
+      return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
     }
   }
 

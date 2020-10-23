@@ -2,7 +2,7 @@
 
 export default (nodefony) => {
 
-  let settingsSyslog = {
+  const settingsSyslog = {
     //rateLimit:100,
     //burstLimit:10,
     moduleName: "SERVICE ",
@@ -15,44 +15,11 @@ export default (nodefony) => {
     }
   };
 
-  const normalizeLog = function(pdu) {
-    let date = new Date(pdu.timeStamp);
-    if (pdu.payload === "" || pdu.payload === undefined) {
-      console.warning(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : logger message empty !!!!`);
-      console.trace(pdu);
-      return;
+  const conditionOptions = {
+    severity: {
+      operator: "<=",
+      data: "7"
     }
-    let message = pdu.payload;
-    switch (true) {
-      case nodefony.isObject(message):
-        try {
-          message = `\n${nodefony.inspect(message)}`;
-        } catch (e) {}
-    }
-    let wrapperLog = null;
-    switch (pdu.severity) {
-      case 0:
-      case 1:
-      case 2:
-      case 3:
-        wrapperLog = console.error;
-        break;
-      case 4:
-        wrapperLog = console.warn;
-        break;
-      case 5:
-        wrapperLog = console.log;
-        break;
-      case 6:
-        wrapperLog = console.info;
-        break;
-      case 7:
-        wrapperLog = console.debug;
-        break;
-      default:
-        wrapperLog = console.log;
-    }
-    return wrapperLog(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
   };
 
   class Service {
@@ -136,32 +103,26 @@ export default (nodefony) => {
 
     static logSeverity(severity) {
       switch (severity) {
-        case "DEBUG":
-          return console.debug;
-        case "INFO":
-          return console.info;
-        case "WARNING":
-          return console.warn;
-        case "ERROR":
-        case "CRITIC":
-        case "ALERT":
-        case "EMERGENCY":
-          return console.error;
-        default:
-          return console.log;
+      case "DEBUG":
+        return console.debug;
+      case "INFO":
+        return console.info;
+      case "WARNING":
+        return console.warn;
+      case "ERROR":
+      case "CRITIC":
+      case "ALERT":
+      case "EMERGENCY":
+        return console.error;
+      default:
+        return console.log;
       }
     }
 
-    initSyslog(options = null) {
-      let defaultOptions = {
-        severity: {
-          operator: "<=",
-          data: "7"
-        }
-      };
-      return this.syslog.listenWithConditions(this, options || defaultOptions,
+    initSyslog(environment = "production", debug = false, options = null) {
+      return this.syslog.listenWithConditions(this, options || conditionOptions,
         (pdu) => {
-          normalizeLog(pdu);
+          return nodefony.Syslog.normalizeLog(pdu);
         });
     }
 
@@ -172,6 +133,7 @@ export default (nodefony) => {
     clean() {
       this.settingsSyslog = null;
       delete this.settingsSyslog;
+      this.syslog.reset();
       this.syslog = null;
       delete this.syslog;
       this.removeAllListeners();
@@ -234,8 +196,8 @@ export default (nodefony) => {
       return this.notificationsCenter.off(...args);
     }
 
-    settingsToListen() {
-      return this.notificationsCenter.settingsToListen.apply(this, arguments);
+    settingsToListen(...args) {
+      return this.notificationsCenter.settingsToListen(...args);
     }
 
     /**
