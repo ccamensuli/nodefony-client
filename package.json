@@ -25,7 +25,8 @@
     "test": "mocha  --require babel-polyfill --require jsdom-global/register --require @babel/register --recursive ./tests",
     "install-demo": "npm install --prefix ./demo/nodefony ;npm run build --prefix ./demo/nodefony; npm install --prefix ./demo/express",
     "demo": "npm start --prefix ./demo/express",
-    "start": "npm start --prefix ./demo/nodefony"
+    "start": "npm start --prefix ./demo/nodefony",
+    "changelog": "gren changelog "
   },
   "bin": {
     "nodefony-client": "./bin/cli"

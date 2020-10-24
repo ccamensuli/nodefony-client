@@ -1,9 +1,12 @@
 {
   "dataSource": "commits",
+  "generate": "true",
   "username": "nodefony",
   "repo": "nodefony-client",
   "tags": "all",
   "action": "changelog",
+  "override":"true",
+  "includeMessages":"all",
   "template": {
     "commit": "- [{{message}}]({{url}})",
     "issue": "- {{labels}} {{name}} [{{text}}]({{url}})",
