@@ -121,3 +121,4 @@ demo/nodefony/app/package-lock.json
 demo/nodefony/package-lock.json
 demo/nodefony/src/bundles/users-bundle/package-lock.json
 yarn.lock
+demo/nodefony/src/bundles/users-bundle/yarn.lock

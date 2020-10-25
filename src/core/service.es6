@@ -157,11 +157,7 @@ export default (nodefony) => {
     }
 
     logger(...args) {
-      return this.log(...args);
-    }
-
-    debug(...args) {
-      this.log("DEBUG", "DEBUG");
+      this.log("LOGGER", "DEBUG");
       console.debug(...args);
     }
 

@@ -1,9 +1,16 @@
 const path = require("path");
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const { merge } = require('webpack-merge');
+const {
+  merge
+} = require('webpack-merge');
 const precss = require('precss');
 const autoprefixer = require('autoprefixer');
+try {
+  console.log(require.resolve("nodefony-client/dist/medias"));
+} catch (e) {
+  console.log(e)
+}
 
 
 // Default context <bundle base directory>
@@ -37,12 +44,15 @@ module.exports = merge(wpconfig, {
     library: "[name]",
     libraryExport: "default"
   },
-  externals: {
-    nodefony: 'nodefony'
-  },
+  externals: {},
   resolve: {
     //modules: [path.resolve(__dirname, "..", "node_modules")]
-    modules: [path.resolve(__dirname, "..", 'node_modules'), path.resolve(__dirname, "..", "..", 'node_modules')]
+    modules: [
+      path.resolve(__dirname, "..", 'node_modules'),
+      path.resolve(__dirname, "..", "..", 'node_modules'),
+      path.resolve(__dirname, "..", "..", "..", "..", 'node_modules'),
+    ],
+    extensions: ['.js', '.es6'],
   },
   module: {
     rules: [{
@@ -97,12 +107,12 @@ module.exports = merge(wpconfig, {
         // IMAGES
         test: /\.(gif|png|jpe?g|svg)$/i,
         use: [{
-            loader: "file-loader",
-            options: {
-              name: "[name].[ext]",
-              publicPath: `${publicPath}/images/`,
-              outputPath: "/images/"
-            }
+          loader: "file-loader",
+          options: {
+            name: "[name].[ext]",
+            publicPath: `${publicPath}/images/`,
+            outputPath: "/images/"
+          }
           }]
       }
     ]

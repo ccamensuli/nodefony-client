@@ -1,27 +1,22 @@
 //nodefony.preloadMedias();
 //nodefony.preloadSocket();
 
-window.addEventListener("load", () => {
+const kernel = new nodefony.Kernel();
+kernel.log("LOG DEMO INFO", "INFO");
+kernel.on("load", (event) => {
+  try {
+    kernel.log("CREATE webAudio Mixer", "DEBUG");
+    let Mixer = new nodefony.webAudio.Mixer("Mixer", {}, kernel);
 
-  let kernel = new nodefony.Service("kernel");
-  kernel.initSyslog();
-  kernel.once("start", (mix)=>{
-    kernel.debug(mix)
-    kernel.log(document.getElementById("myvideo"))
+    kernel.log("CREATE MediaStream", "DEBUG");
     let md = new nodefony.medias.MediaStream(document.getElementById("myvideo"), {}, kernel);
     md.getUserMedia({})
-    .then( (stream) => {
-      md.attachMediaStream();
-      //media.getVideoTracks();
-    });
-  });
-  //setTimeout(()=>{
-  let Mixer = new nodefony.webAudio.Mixer("Mixer", {}, kernel);
-  kernel.emit("start", Mixer)
-  //},2000)
-  kernel.log("LOG DEMO INFO", "INFO");
-  kernel.log("LOG DEMO ERROR", "ERROR");
-  kernel.log("LOG DEMO WARNING", "WARNING");
-  kernel.log("LOG DEMO DEBUG", "DEBUG");
-
-}, false);
+      .then((stream) => {
+        md.attachMediaStream();
+      });
+    kernel.logger(kernel, Mixer)
+  } catch (error) {
+    kernel.log(error, "ERROR");
+    throw error;
+  }
+});

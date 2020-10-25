@@ -38,31 +38,35 @@
 // CORE
 //import "regenerator-runtime/runtime";
 //import "core-js/stable";
-import nodefony from './src/nodefony.es6';
+import Nodefony from './src/nodefony.es6';
+const nodefony = new Nodefony(process.env.NODE_ENV);
 
-import events from './src/core/events.es6';
-events(nodefony);
+import Events from './src/core/events.es6';
+Events(nodefony);
 
 import error from './src/core/error.es6';
 error(nodefony);
 
-import syslog from './src/core/syslog/syslog.es6';
-syslog(nodefony);
+import Syslog from './src/core/syslog/syslog.es6';
+Syslog(nodefony);
 
-import container from './src/core/container.es6';
-container(nodefony);
+import Container from './src/core/container.es6';
+Container(nodefony);
 
-import service from './src/core/service.es6';
-service(nodefony);
+import Service from './src/core/service.es6';
+Service(nodefony);
 
-import storage from './src/core/storage/storage.es6';
-storage(nodefony);
+import Storage from './src/core/storage/storage.es6';
+Storage(nodefony);
 
-import websocket from './src/transports/websocket/websocket.es6';
-websocket(nodefony);
+import Websocket from './src/transports/websocket/websocket.es6';
+Websocket(nodefony);
 
-import api from './src/api/api.es6';
-api(nodefony);
+import Api from './src/api/api.es6';
+Api(nodefony);
+
+import Kernel from './src/kernel/kernel.es6';
+Kernel(nodefony);
 
 nodefony.load();
 

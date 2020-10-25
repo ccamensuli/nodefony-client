@@ -246,4 +246,4 @@ class Nodefony {
   }
 
 }
-export default new Nodefony(process.env.NODE_ENV);
+export default Nodefony;

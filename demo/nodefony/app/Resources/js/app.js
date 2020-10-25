@@ -5,23 +5,33 @@
  *  client side
  */
 import "../css/app.css";
-import nodefony from "nodefony-client";
-import media from "nodefony-client/dist/medias";
+// with release production
+
+/*import nodefony from "nodefony-client";
+import media from "nodefony-client/dist/medias.js";
 media(nodefony);
 import webaudio from "nodefony-client/dist/webaudio";
 webaudio(nodefony);
 import socket from "nodefony-client/dist/socket";
-socket(nodefony);
+socket(nodefony);*/
+
+// dev
+import nodefony from "../../../../../entry.es6";
+import Media from "../../../../../src/medias/medias.es6";
+Media(nodefony);
+import Socket from "../../../../../src/transports/socket.es6";
+Socket(nodefony);
+import Webaudio from "../../../../../src/medias/webaudio/webaudio.es6";
+Webaudio(nodefony);
+
 
 /*
  *	Class Bundle App
  */
-class App extends nodefony.Service {
+class App extends nodefony.Kernel {
   constructor() {
-    super("kernel");
-    this.initSyslog();
-    this.createApi();
-    window.addEventListener("load", () => {
+    super({});
+    this.on("load", () => {
       this.initialize();
     });
     this.log("LOG DEMO INFO", "INFO");
@@ -29,10 +39,20 @@ class App extends nodefony.Service {
     this.log("LOG DEMO WARNING", "WARNING");
     this.log("LOG DEMO DEBUG", "DEBUG");
     let error = new Error("my error");
-    this.log(error,"ERROR");
+    this.log(error, "ERROR");
+
   }
 
-  createApi() {
+  async initialize() {
+    this.createMixer();
+    await this.createMediaStream();
+    this.createWebsocket();
+    this.createSocket();
+    this.initializeApi();
+    this.login();
+  }
+
+  initializeApi() {
     this.api = new nodefony.Api("api", "/", {}, this);
     this.api2 = new nodefony.Api("api2", "https://localhost:5152/api/", {
       storage: {
@@ -41,35 +61,35 @@ class App extends nodefony.Service {
     }, this);
   }
 
-  initialize() {
-    this.once("start", (mix) => {
-      //this.debug(this, mix)
-      console.log(nodefony)
-      this.api.login("api/jwt/login", "admin", "admin")
-        .then((response) => {
-          return response;
-        })
-        .catch(e => {
-          console.log(e)
-          this.log(e, "ERROR")
-        });
-      this.api2.login(undefined, "1000", "1234")
-        .then((response) => {
-          return response;
-        })
-        .catch(e => {
-          this.log(e, "ERROR")
-        });
-      this.createWebsocket();
-      this.createSocket();
-    });
+  login() {
+    this.api.login("api/jwt/login", "admin", "admin")
+      .then((response) => {
+        return response;
+      })
+      .catch(e => {
+        console.log(e)
+        this.log(e, "ERROR")
+      });
+    this.api2.login(undefined, "1000", "1234")
+      .then((response) => {
+        return response;
+      })
+      .catch(e => {
+        this.log(e, "ERROR")
+      });
+  }
+
+  createMixer() {
     let Mixer = new nodefony.webAudio.Mixer("Mixer", {}, this);
-    this.emit("start", Mixer)
-    let md = new nodefony.medias.MediaStream(document.getElementById("myvideo"), {}, this);
-    md.getUserMedia({})
+    return Mixer;
+  }
+
+  createMediaStream() {
+    const md = new nodefony.medias.MediaStream(document.getElementById("myvideo"), {}, this);
+    return md.getUserMedia({})
       .then((stream) => {
         md.attachMediaStream();
-        //media.getVideoTracks();
+        return stream;
       });
   }
 
@@ -78,13 +98,13 @@ class App extends nodefony.Service {
       protocol: "sip"
     }, this);
     sock.on("onopen", (event) => {
-      this.debug(`onopen`, event)
+      this.logger(`onopen`, event)
     })
     sock.on("onmessage", (event) => {
-      this.debug(`onmessage`, event)
+      this.logger(`onmessage`, event)
     })
     sock.on("onerror", (error) => {
-      this.debug(`onerror`, error)
+      this.logger(`onerror`, error)
     })
     setTimeout(async () => {
       let res = await sock.sendAsync(JSON.stringify({
@@ -98,16 +118,17 @@ class App extends nodefony.Service {
       }
     }, 1000);
   }
+
   createSocket() {
     let sock = new nodefony.Socket(`wss://localhost:5152/socket?foo=bar&bar=foo`, null, this);
     sock.on("onopen", (event) => {
-      this.debug(`onopen`, event)
+      this.logger(`onopen`, event)
     });
     sock.on("onmessage", (event) => {
-      this.debug(`onmessage`, event)
+      this.logger(`onmessage`, event)
     });
     sock.on("onerror", (error) => {
-      this.debug(`onerror`, error)
+      this.logger(`onerror`, error)
     });
   }
 }
