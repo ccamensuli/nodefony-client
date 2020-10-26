@@ -16,13 +16,17 @@ import socket from "nodefony-client/dist/socket";
 socket(nodefony);*/
 
 // dev
-import nodefony from "../../../../../entry.es6";
+import Nodefony from "../../../../../src/nodefony.es6";
+//console.log(process.env.NODE_ENV)
+const nodefony = new Nodefony(process.env.NODE_ENV);
 import Media from "../../../../../src/medias/medias.es6";
 Media(nodefony);
+console.log(nodefony)
 import Socket from "../../../../../src/transports/socket.es6";
 Socket(nodefony);
 import Webaudio from "../../../../../src/medias/webaudio/webaudio.es6";
 Webaudio(nodefony);
+console.log(nodefony)
 
 
 /*

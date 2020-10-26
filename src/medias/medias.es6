@@ -3,11 +3,12 @@
 import Stream from "./streams/stream.es6";
 
 export default (nodefony) => {
+   const stream = Stream(nodefony);
 
   class Medias {
 
     constructor() {
-      this.MediaStream = Stream(nodefony);
+      this.MediaStream = stream;
       //this.adapter = require('webrtc-adapter');
     }
 

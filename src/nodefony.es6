@@ -13,6 +13,22 @@ import {
   v4 as uuidv4
 } from 'uuid';
 
+import Events from './core/events.es6';
+import error from './core/error.es6';
+import Syslog from './core/syslog/syslog.es6';
+import Container from './core/container.es6';
+import Service from './core/service.es6';
+import Storage from './core/storage/storage.es6';
+import Websocket from './transports/websocket/websocket.es6';
+import Api from './api/api.es6';
+import Kernel from './kernel/kernel.es6';
+//import webrtc from './src/medias/webrtc/webrtc.es6';
+//nodefony.medias.webrtc = webrtc(nodefony);
+//import transaction from './src/medias/webrtc/transaction.es6';
+//nodefony.medias.webrtcTransaction = transaction(nodefony);
+//import user from './src/medias/webrtc/user.es6';
+//nodefony.medias.userMedia = user(nodefony);
+
 class Nodefony {
   constructor(env) {
     this.version = Package.version;
@@ -29,6 +45,15 @@ class Nodefony {
     this.nativeWebSocket = nativeWebSocket;
     this.URL = url;
     this.util = util;
+    Events(this);
+    error(this);
+    Syslog(this);
+    Container(this);
+    Service(this);
+    Storage(this);
+    Websocket(this);
+    Api(this);
+    Kernel(this);
   }
 
   async load(obj = null) {

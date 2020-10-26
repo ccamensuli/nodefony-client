@@ -12,7 +12,8 @@
 const assert = require('assert');
 //console.log(assert)
 const chai = require('chai');
-const nodefony = require('../../entry.es6').default;
+const Nodefony = require('../../src/nodefony.es6').default;
+const nodefony = new Nodefony(process.env.NODE_ENV);
 
 const defaultOptions = {
   severity: {
@@ -30,6 +31,16 @@ describe("NODEFONY SYSLOG", function () {
         //nodefony.Syslog.normalizeLog(pdu);
         return true
       });
+    global.logger = () => {
+      global.syslog.log('info', "INFO");
+      global.syslog.log('debug', "DEBUG");
+      global.syslog.log('notice', "NOTICE");
+      global.syslog.log('warning', "WARNING");
+      global.syslog.log('error', "ERROR");
+      global.syslog.log('alert', "ALERT");
+      global.syslog.log('critic', "CRITIC");
+      global.syslog.log('emergency', "EMERGENCY");
+    }
   });
 
   describe('CONTRUSTROR ', function () {
@@ -132,7 +143,7 @@ describe("NODEFONY SYSLOG", function () {
     it("reload 1000  entries ", function (done) {
       let res = global.syslog.getLogStack();
       assert.strict.equal(res.payload, 999);
-      res = global.syslog.getLogStack(0,10);
+      res = global.syslog.getLogStack(0, 10);
       assert.strict.equal(res[0].payload, 900);
       assert.strict.equal(res[9].payload, 909);
       res = global.syslog.getLogStack(0);
@@ -141,7 +152,7 @@ describe("NODEFONY SYSLOG", function () {
       res = global.syslog.getLogStack(50);
       assert.strict.equal(res[0].payload, 950);
       assert.strict.equal(res[49].payload, 999);
-      res = global.syslog.getLogStack(10,10);
+      res = global.syslog.getLogStack(10, 10);
       assert.strict.equal(res.payload, 989);
       done()
     });
@@ -150,9 +161,9 @@ describe("NODEFONY SYSLOG", function () {
   describe('getLogs conditions ', function () {
     it("getLogs 1000  entries ", function (done) {
       let res = global.syslog.getLogs({
-          severity:{
-            data:"INFO"
-          }
+        severity: {
+          data: "INFO"
+        }
       });
       assert.strict.equal(res.length, 50);
       done();
@@ -175,10 +186,10 @@ describe("NODEFONY SYSLOG", function () {
       });
       let i = 0;
       inst.listenWithConditions(this, {
-        severity:{
-          data:"INFO"
+        severity: {
+          data: "INFO"
         }
-      }, (pdu)=>{
+      }, (pdu) => {
         i++;
         //nodefony.Syslog.normalizeLog(pdu);
       });
@@ -193,14 +204,14 @@ describe("NODEFONY SYSLOG", function () {
       });
       let i = 0;
       inst.listenWithConditions(this, {
-        severity:{
-          data:"INFO"
+        severity: {
+          data: "INFO"
         }
-      }, (pdu)=>{
+      }, (pdu) => {
         i++;
         //nodefony.Syslog.normalizeLog(pdu);
       });
-      inst.loadStack(global.syslog.ringStack, true, (pdu)=>{
+      inst.loadStack(global.syslog.ringStack, true, (pdu) => {
         pdu.before = "add";
       });
       assert.strict.equal(inst.ringStack.length, 100);
@@ -390,6 +401,131 @@ describe("NODEFONY SYSLOG", function () {
         let pdu = global.syslog.log(i, i % 2 ? "INFO" : "DEBUG");
       }
       assert.strict.equal(i, 5);
+      done();
+    });
+    it("listener condition severity listerner1 ", function (done) {
+      let i = 0;
+      global.syslog.listenWithConditions(this, {
+          severity: {
+            data: "INFO,DEBUG,WARNING"
+          }
+        },
+        (pdu) => {
+          //nodefony.Syslog.normalizeLog(pdu);
+          return i++
+        });
+      global.logger();
+      assert.strict.equal(i, 3);
+      done();
+    });
+    it("listener condition severity listerner tab", function (done) {
+      let i = 0;
+      global.syslog.listenWithConditions(this, {
+          severity: {
+            data: ["INFO", "WARNING", "DEBUG"]
+          }
+        },
+        (pdu) => {
+          //nodefony.Syslog.normalizeLog(pdu);
+          return i++
+        });
+      global.logger();
+      assert.strict.equal(i, 3);
+      done();
+    });
+    it("listener condition severity listerner tab string", function (done) {
+      let i = 0;
+      global.syslog.listenWithConditions(this, {
+          severity: {
+            data: ["6", "4", "7"]
+          }
+        },
+        (pdu) => {
+          //nodefony.Syslog.normalizeLog(pdu);
+          return i++
+        });
+      global.logger();
+      assert.strict.equal(i, 3);
+      done();
+    });
+    it("listener condition severity listerner tab integer", function (done) {
+      let i = 0;
+      global.syslog.listenWithConditions(this, {
+          severity: {
+            data: [6, 4, 7]
+          }
+        },
+        (pdu) => {
+          //nodefony.Syslog.normalizeLog(pdu);
+          return i++
+        });
+      global.logger();
+      assert.strict.equal(i, 3);
+      done();
+    });
+
+    it("listener condition severity listerner >=", function (done) {
+      let i = 0;
+      global.syslog.listenWithConditions(this, {
+          severity: {
+            operator: ">=",
+            data: 4
+          }
+        },
+        (pdu) => {
+          //nodefony.Syslog.normalizeLog(pdu);
+          return i++
+        });
+      global.logger();
+      assert.strict.equal(i, 4);
+      done();
+    });
+    it("listener condition severity listerner >", function (done) {
+      let i = 0;
+      global.syslog.listenWithConditions(this, {
+          severity: {
+            operator: ">",
+            data: 4
+          }
+        },
+        (pdu) => {
+          //nodefony.Syslog.normalizeLog(pdu);
+          return i++
+        });
+      global.logger();
+      assert.strict.equal(i, 3);
+      done();
+    });
+    it("listener condition severity listerner <", function (done) {
+      let i = 0;
+      global.syslog.listenWithConditions(this, {
+          severity: {
+            operator: "<",
+            data: 4
+          }
+        },
+        (pdu) => {
+          //nodefony.Syslog.normalizeLog(pdu);
+          return i++
+        });
+      global.logger();
+      assert.strict.equal(i, 4);
+      done();
+    });
+    it("listener condition severity listerner < string", function (done) {
+      let i = 0;
+      global.syslog.listenWithConditions(this, {
+          severity: {
+            operator: "<",
+            data: "WARNING"
+          }
+        },
+        (pdu) => {
+          //nodefony.Syslog.normalizeLog(pdu);
+          return i++
+        });
+      global.logger();
+      assert.strict.equal(i, 4);
       done();
     });
 

@@ -1,11 +1,10 @@
-
-
-
 const assert = require('assert');
-const nodefony = require('../../entry.es6').default;
+//console.log(assert)
+const chai = require('chai');
+const Nodefony = require('../../src/nodefony.es6').default;
+const nodefony = new Nodefony(process.env.NODE_ENV);
 
 var myObject = {
-
   foo: "bar",
   bar: "foo"
 };

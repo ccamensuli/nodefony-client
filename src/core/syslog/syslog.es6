@@ -755,7 +755,7 @@ export default (nodefony) => {
     warn(data) {
       return this.logger(data, "WARNING");
     }
-    
+
     warnning(data) {
       return this.logger(data, "WARNING");
     }
@@ -772,6 +772,38 @@ export default (nodefony) => {
       return this.logger(data, "NOTICE");
     }
 
+    static wrapper(pdu){
+      switch (pdu.severity) {
+      case 0:
+      case 1:
+      case 2:
+      case 3:
+        return {
+          logger: console.error
+        }
+      case 4:
+        return {
+          logger: console.warn
+        }
+      case 5:
+        return {
+          logger: console.log
+        }
+      case 6:
+        return {
+          logger: console.info
+        }
+      case 7:
+        return {
+          logger: console.debug
+        }
+      default:
+        return {
+          logger: console.log
+        }
+      }
+    }
+
     static normalizeLog (pdu) {
       let date = new Date(pdu.timeStamp);
       if (pdu.payload === "" || pdu.payload === undefined) {
@@ -786,30 +818,8 @@ export default (nodefony) => {
             message = `\n${nodefony.inspect(message)}`;
           } catch (e) {}
       }
-      let wrapperLog = null;
-      switch (pdu.severity) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-          wrapperLog = console.error;
-          break;
-        case 4:
-          wrapperLog = console.warn;
-          break;
-        case 5:
-          wrapperLog = console.log;
-          break;
-        case 6:
-          wrapperLog = console.info;
-          break;
-        case 7:
-          wrapperLog = console.debug;
-          break;
-        default:
-          wrapperLog = console.log;
-      }
-      return wrapperLog(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
+      let wrapper = nodefony.Syslog.wrapper(pdu);
+      return wrapper.logger(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
     };
   }
   nodefony.Syslog = Syslog;

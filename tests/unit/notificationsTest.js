@@ -1,16 +1,9 @@
-/*
- *   MODEFONY FRAMEWORK UNIT TEST
- *
- *   MOCHA STYLE
- *
- *   In the global context you can find :
- *
- *  nodefony : namespace to get library
- *  kernel :   instance of kernel who launch the test
- *
- */
 const assert = require('assert');
-const nodefony = require('../../entry.es6').default;
+//console.log(assert)
+const chai = require('chai');
+const Nodefony = require('../../src/nodefony.es6').default;
+const nodefony = new Nodefony(process.env.NODE_ENV);
+
 
 
 describe("NODEFONY Notifications Center", () => {

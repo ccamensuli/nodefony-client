@@ -101,24 +101,6 @@ export default (nodefony) => {
       delete this.options.events;
     }
 
-    static logSeverity(severity) {
-      switch (severity) {
-      case "DEBUG":
-        return console.debug;
-      case "INFO":
-        return console.info;
-      case "WARNING":
-        return console.warn;
-      case "ERROR":
-      case "CRITIC":
-      case "ALERT":
-      case "EMERGENCY":
-        return console.error;
-      default:
-        return console.log;
-      }
-    }
-
     initSyslog(environment = "production", debug = false, options = null) {
       return this.syslog.listenWithConditions(this, options || conditionOptions,
         (pdu) => {
@@ -130,10 +112,12 @@ export default (nodefony) => {
       return this.name;
     }
 
-    clean() {
+    clean(syslog = false) {
       this.settingsSyslog = null;
       delete this.settingsSyslog;
-      this.syslog.reset();
+      if (syslog){
+        this.syslog.reset();
+      }
       this.syslog = null;
       delete this.syslog;
       this.removeAllListeners();
