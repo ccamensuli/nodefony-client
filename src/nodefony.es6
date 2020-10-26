@@ -42,6 +42,7 @@ class Nodefony {
     this.inspect = util.inspect;
     this.browser = browser;
     this.protocols = {};
+    this.crypto = {};
     this.nativeWebSocket = nativeWebSocket;
     this.URL = url;
     this.util = util;
@@ -75,6 +76,14 @@ class Nodefony {
           console.debug(`Nodefony Prefetch module ${lib}`);
           await this.prefetchWebAudio();
         }
+        if (lib === "webrtc") {
+          console.debug(`Nodefony Prefetch module ${lib}`);
+          await this.prefetchWebRtc();
+        }
+        if (lib === "sip") {
+          console.debug(`Nodefony Prefetch module ${lib}`);
+          await this.prefetchSip();
+        }
       }
     }
   }
@@ -98,6 +107,20 @@ class Nodefony {
   async prefetchSocket() {
     // socket
     return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-socket" */ './transports/socket.es6')
+      .then((module) => {
+        return module.default(this);
+      });
+  }
+  async prefetchWebRtc(){
+    // webrtc
+    return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-webrtc" */ './medias/webrtc/webrtc.es6')
+      .then((module) => {
+        return module.default(this);
+      });
+  }
+  async prefetchSip(){
+    // sip
+    return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-sip" */ './protocols/sip/sip.es6')
       .then((module) => {
         return module.default(this);
       });

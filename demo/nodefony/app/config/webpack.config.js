@@ -53,6 +53,11 @@ module.exports = merge(wpconfig, {
       path.resolve(__dirname, "..", "..", "..", "..", 'node_modules'),
     ],
     extensions: ['.js', '.es6'],
+    fallback: {
+      //"events": require.resolve("events"),
+      //"querystring": require.resolve("querystring-es3"),
+      //"url": require.resolve("url")
+    }
   },
   module: {
     rules: [{

@@ -33,9 +33,12 @@ let documentation = true;
 let unitTest = true;
 let domainCheck = false;
 if (process.env && process.env.NODE_ENV === "production") {
-  certificats.key = path.resolve("config", "certificates", "server", "privkey.pem");
-  certificats.cert = path.resolve("config", "certificates", "server", "fullchain.pem");
-  certificats.ca = path.resolve("config", "certificates", "ca", "demo-root-ca.crt.pem");
+  //certificats.key = path.resolve("config", "certificates", "server", "privkey.pem");
+  certificats.key = path.resolve("docker", "asterisk", "conf","keys", "asterisk.key");
+  certificats.cert = path.resolve("docker", "asterisk", "conf","keys", "asterisk.crt");
+  certificats.ca = path.resolve("docker", "asterisk", "conf","keys", "ca.crt");
+  //certificats.cert = path.resolve("config", "certificates", "server", "fullchain.pem");
+  //certificats.ca = path.resolve("config", "certificates", "ca", "demo-root-ca.crt.pem");
   CDN = null;
   statics = true;
   documentation = false;
@@ -43,9 +46,12 @@ if (process.env && process.env.NODE_ENV === "production") {
   unitTest = false;
   domainCheck = true;
 } else {
-  certificats.key = path.resolve("config", "certificates", "server", "privkey.pem");
-  certificats.cert = path.resolve("config", "certificates", "server", "fullchain.pem");
-  certificats.ca = path.resolve("config", "certificates", "ca", "demo-root-ca.crt.pem");
+  certificats.key = path.resolve("docker", "asterisk", "conf","keys", "asterisk.key");
+  certificats.cert = path.resolve("docker", "asterisk", "conf","keys", "asterisk.crt");
+  certificats.ca = path.resolve("docker", "asterisk", "conf","keys", "ca.crt");
+  //certificats.key = path.resolve("config", "certificates", "server", "privkey.pem");
+  //certificats.cert = path.resolve("config", "certificates", "server", "fullchain.pem");
+  //certificats.ca = path.resolve("config", "certificates", "ca", "demo-root-ca.crt.pem");
 }
 
 module.exports = {

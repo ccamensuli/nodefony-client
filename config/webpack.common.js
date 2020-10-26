@@ -17,17 +17,22 @@ module.exports = {
       import: path.resolve(__dirname, "..", 'src', 'medias', "medias.es6"),
       dependOn: 'nodefony'
     },
-    //medias: path.resolve(__dirname, "..", 'src','medias',"medias.es6"),
     socket: {
       import: path.resolve(__dirname, "..", 'src', 'transports', "socket.es6"),
       dependOn: 'nodefony'
     },
-    //socket: path.resolve(__dirname, "..", 'src','transports',"socket.es6"),
     webaudio: {
       import: path.resolve(__dirname, "..", 'src', 'medias', 'webaudio', "webaudio.es6"),
       dependOn: 'nodefony'
+    },
+    webrtc: {
+      import: path.resolve(__dirname, "..", 'src', 'medias', 'webrtc', "webrtc.es6"),
+      dependOn: 'nodefony'
+    },
+    sip: {
+      import: path.resolve(__dirname, "..", 'src', 'protocols', 'sip', "sip.es6"),
+      dependOn: 'nodefony'
     }
-    //webaudio: path.resolve(__dirname, "..", 'src','medias','webaudio',"webaudio.es6")
   },
   target: 'web',
   output: {
@@ -78,6 +83,9 @@ module.exports = {
       "events": require.resolve("events"),
       "querystring": require.resolve("querystring-es3"),
       "url": require.resolve("url")
+      //"crypto": require.resolve("crypto-browserify"),
+      //"buffer": require.resolve("buffer"),
+      //"stream": false // require.resolve("stream-browserify")
     }
   },
   /*

@@ -26,6 +26,9 @@ import Socket from "../../../../../src/transports/socket.es6";
 Socket(nodefony);
 import Webaudio from "../../../../../src/medias/webaudio/webaudio.es6";
 Webaudio(nodefony);
+
+import Sip from "../../../../../src/protocols/sip/sip.es6";
+Sip(nodefony);
 console.log(nodefony)
 
 
@@ -50,10 +53,11 @@ class App extends nodefony.Kernel {
   async initialize() {
     this.createMixer();
     await this.createMediaStream();
-    this.createWebsocket();
-    this.createSocket();
-    this.initializeApi();
-    this.login();
+    //this.createWebsocket();
+    //this.createSocket();
+    //this.initializeApi();
+    //this.login();
+    this.createSip();
   }
 
   initializeApi() {
@@ -126,13 +130,30 @@ class App extends nodefony.Kernel {
   createSocket() {
     let sock = new nodefony.Socket(`wss://localhost:5152/socket?foo=bar&bar=foo`, null, this);
     sock.on("onopen", (event) => {
-      this.logger(`onopen`, event)
+      this.logger(`onopen`, event);
     });
     sock.on("onmessage", (event) => {
-      this.logger(`onmessage`, event)
+      this.logger(`onmessage`, event);
     });
     sock.on("onerror", (error) => {
-      this.logger(`onerror`, error)
+      this.logger(`onerror`, error);
+    });
+  }
+
+  createSip() {
+    let user = "1003";
+    let passwd = "1234";
+    const transport = new nodefony.WebSocket(`wss://localhost:8090/ws`, {
+      protocol: "sip"
+    }, this);
+    const sip = new nodefony.protocols.Sip("localhost", transport, {}, this);
+    sip.on("onConnect" ,()=>{
+      this.log("connect asterisk")
+      sip.register(user, passwd);
+    })
+
+    sip.on("onRegister" ,()=>{
+      this.log(`Register User ${user} asterisk`);
     });
   }
 }

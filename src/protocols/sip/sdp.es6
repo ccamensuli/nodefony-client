@@ -1,4 +1,4 @@
-module.exports = function (stage) {
+export default (nodefony) =>{
 
   'use strict';
 
@@ -48,7 +48,7 @@ module.exports = function (stage) {
     return null;
   };
 
-  var candidateParser = function (value, block) {
+  const candidateParser = function (value, block) {
     /* a=candidate:0 1 UDP 2122252543 169.254.105.57 65488 typ host
      * a=candidate:6glsxoSzDfHGkyMz 1 UDP 2130706431 93.20.94.1 35796 typ host
      * a=candidate:2 1 UDP 1694498815 192.0.2.3 45664 typ srflx raddr 10.0.1.1 rport 8998
@@ -71,8 +71,7 @@ module.exports = function (stage) {
      *               extension-att-value)
      */
     if (value) {
-
-      var obj = {
+      const obj = {
         foundation: null,
         componentId: null,
         transport: null,
@@ -169,7 +168,7 @@ module.exports = function (stage) {
    *	SDP PROTOCOL
    *
    */
-  const parserSdp = class parserSdp {
+  class Sdp {
 
     constructor(body) {
       if (!body) {
@@ -188,14 +187,14 @@ module.exports = function (stage) {
     }
 
     detectBlocks() {
-      var line = this.raw.split("\n");
-      var nbLines = line.length;
-      var first = 0;
-      var m = null;
-      for (var i = 0; i < nbLines; i++) {
-        var res = line[i].split("=");
-        var key = res[0].replace(/ |\n|\r/g, "");
-        var value = res[1];
+      const line = this.raw.split("\n");
+      const nbLines = line.length;
+      let first = 0;
+      let m = null;
+      for (let i = 0; i < nbLines; i++) {
+        const res = line[i].split("=");
+        const key = res[0].replace(/ |\n|\r/g, "");
+        const value = res[1];
         let data = null;
         let size = null;
         let media = null;
@@ -237,11 +236,11 @@ module.exports = function (stage) {
           break;
         }
       }
-      var data = line.slice(first + 1, nbLines);
-      var size = data.length;
-      var media = null;
-      var type = null;
-      var parseM = this.parseMline(m);
+      const data = line.slice(first + 1, nbLines);
+      const size = data.length;
+      let media = null;
+      let type = null;
+      const parseM = this.parseMline(m);
       if (parseM) {
         media = parseM;
         type = parseM.media;
@@ -325,7 +324,7 @@ module.exports = function (stage) {
           break;
         default:
           if (aAttributeDirection[attribute]) {
-            var ele = aAttributeDirection[attribute](attribute, block);
+            const ele = aAttributeDirection[attribute](attribute, block);
             obj[attribute] = ele;
             block.direction = ele;
           } else {
@@ -339,14 +338,14 @@ module.exports = function (stage) {
     parseCline(data) {
       //c=<nettype> <addrtype> <connection-address>
       if (data) {
-        var obj = {
+        const obj = {
           nettype: null,
           addrtype: null,
           address: null,
           raw: data
         };
-        var res = data.split(" ");
-        for (var i = 0; i < res.length; i++) {
+        const res = data.split(" ");
+        for (let i = 0; i < res.length; i++) {
           switch (i) {
           case 0:
             obj.nettype = res[i];
@@ -412,13 +411,13 @@ module.exports = function (stage) {
     parseTline(data) {
       //t=<start-time> <stop-time>
       if (data) {
-        var obj = {
+        const obj = {
           start: null,
           stop: null,
           raw: data
         };
-        var res = data.split(" ");
-        for (var i = 0; i < res.length; i++) {
+        const res = data.split(" ");
+        for (let i = 0; i < res.length; i++) {
           switch (i) {
           case 0:
             obj.start = res[i];
@@ -436,14 +435,14 @@ module.exports = function (stage) {
     parseRline(data) {
       //r=<repeat interval> <active duration> <offsets from start-time>
       if (data) {
-        var obj = {
+        const obj = {
           interval: null,
           duration: null,
           offsets: null,
           raw: data
         };
-        var res = data.split(" ");
-        for (var i = 0; i < res.length; i++) {
+        const res = data.split(" ");
+        for (let i = 0; i < res.length; i++) {
           switch (i) {
           case 0:
             obj.interval = res[i];
@@ -473,10 +472,10 @@ module.exports = function (stage) {
      */
     blockMediaParser(block) {
       block.rtpmap = [];
-      for (var j = 0; j < block.data.length; j++) {
-        var res = block.data[j].split("=");
-        var key = res[0].replace(/ |\n|\r/g, "");
-        var value = res[1];
+      for (let j = 0; j < block.data.length; j++) {
+        const res = block.data[j].split("=");
+        const key = res[0].replace(/ |\n|\r/g, "");
+        const value = res[1];
         switch (key) {
         case "a":
           block.attributes.push(this.parseAline(value, block));
@@ -529,10 +528,10 @@ module.exports = function (stage) {
       block.timeDescription = null;
       block.timeRepeat = null;
 
-      for (var j = 0; j < block.data.length; j++) {
-        var res = block.data[j].split("=");
-        var key = res[0].replace(/ |\n|\r/g, "");
-        var value = res[1];
+      for (let j = 0; j < block.data.length; j++) {
+        const res = block.data[j].split("=");
+        const key = res[0].replace(/ |\n|\r/g, "");
+        const value = res[1];
         switch (key) {
         case "v":
           block.protocol = value;
@@ -583,7 +582,7 @@ module.exports = function (stage) {
     }
 
     parseBlocks() {
-      for (var i = 0; i < this.blocks.length; i++) {
+      for (let i = 0; i < this.blocks.length; i++) {
         switch (this.blocks[i].type) {
         case "session":
           this.sessionBlock = this.blockSessionParser(this.blocks[i]);
@@ -599,7 +598,7 @@ module.exports = function (stage) {
     }
   };
 
-  stage.io.protocols.sdp = parserSdp;
+  return nodefony.protocols.Sdp = Sdp ;
 
-  return parserSdp;
+
 };
