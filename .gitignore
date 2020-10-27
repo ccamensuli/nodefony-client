@@ -4,6 +4,7 @@
 
 /demo
 /dist
+/src
 
 node_modules/**
 **/node_modules/**
@@ -40,4 +41,3 @@ yarn.lock/**
 /.project
 /.settings
 /nbproject/private/
-
