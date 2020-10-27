@@ -111,9 +111,11 @@ export default (nodefony) => {
     }
 
     "setWWW-Authenticate"(value) {
-      if (this.message.sip.authenticateRegister){
+      //console.log("passsss", this.message , this.message.sip , this.message.sip.authenticateRegister)
+      this.message.authenticate = value ;
+      /*if (this.message.sip.authenticateRegister){
         this.message.authenticate = this.message.sip.authenticateRegister.parser(value);
-      }
+      }*/
       //this.message.authenticate = parserAuthenticate(value);
       /*var ele ={};
     		  	var res = value.split(",")

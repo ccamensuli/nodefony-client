@@ -57,7 +57,7 @@ export default (nodefony) => {
       message = new SipMessage(this.lastResponse, this);
       this.fragment = false;
     } catch (e) {
-      //console.log(e);
+      //console.trace(e);
       // bad split
       for (let i = 0; i < e.length; i++) {
         if (e[i]) {
@@ -156,7 +156,11 @@ export default (nodefony) => {
         let expires = message.header["contact-expires"] ||  this.settings.expires;
         expires = parseInt(expires, 10) * 900; // 10% (ms)
         this.registerInterval = setInterval(() => {
-          this.authenticateRegister.register(message);
+          if (! this.authenticateRegister){
+            this.diagRegister.register();
+          }else{
+            this.authenticateRegister.register(message);
+          }
           this.fire("onRenew", this, this.authenticateRegister, message);
         }, expires);
         break;

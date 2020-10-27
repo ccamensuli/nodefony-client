@@ -141,12 +141,12 @@ class App extends nodefony.Kernel {
   }
 
   createSip() {
-    let user = "1003";
-    let passwd = "1234";
+    let user = "1002";
+    let passwd = "1002";
     const transport = new nodefony.WebSocket(`wss://localhost:8090/ws`, {
       protocol: "sip"
     }, this);
-    const sip = new nodefony.protocols.Sip("localhost", transport, {}, this);
+    const sip = new nodefony.protocols.Sip("127.0.0.1", transport, {}, this);
     sip.on("onConnect" ,()=>{
       this.log("connect asterisk")
       sip.register(user, passwd);

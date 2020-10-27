@@ -48,7 +48,6 @@ export default (nodefony) => {
           } catch (e) {
             throw e;
           }
-
           this.rawHeader = this.header.rawHeader;
           //console.log(this.rawHeader)
         }

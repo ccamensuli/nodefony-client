@@ -9,9 +9,22 @@ export default  (nodefony) => {
    *
    *
    */
-  const stringify = function (value) {
-    return '"' + value + '"';
+  const reg = /^([^=]+)=(.+)$/;
+  const parserAuthenticate = function (str) {
+    let ret = str.replace(/"/g, "");
+    ret = ret.replace(/Digest /g, "");
+    const head = ret.split(",");
+    let obj = [];
+    for (let i = 0; i < head.length; i++) {
+      let res = reg.exec(head[i]);
+      let key = res[1].replace(/ |\n|\r/g, "");
+      if (res && key) {
+        obj[key] = res[2];
+      }
+    }
+    return obj;
   };
+
   const Digest = digest(nodefony);
 
   class Authenticate  extends nodefony.Service {
@@ -20,39 +33,39 @@ export default  (nodefony) => {
       this.dialog = dialog;
       this.userName = username;
       this.password = password;
-      this.uri = "sip:" + this.dialog.sip.server;
-      this.realm = "nodefony.com";
-      this.nonce = null;
-      this.cnonce = null;
-      this.nonceCount = null;
-      this.qop = null;
       this.algorithm = null;
-      this.entity_body = null;
       this.timeout = null;
       this.unregisterSended = false;
     }
 
+    parser(data){
+      return parserAuthenticate(data);
+    }
+
     register(message, type) {
       //console.log("AUTH REGISTER")
-      //console.log(message);
-      var head = message.authenticate;
+      let head= null;
+      if (message.authenticate){
+        head = this.parser( message.authenticate );
+      }
+      //message.authenticate = head ;
       if (!head) {
         head = this.dialog.authenticate;
       } else {
         this.dialog.authenticate = head;
       }
-      this.realm = head.realm;
-      this.nonce = head.nonce;
-      this.cnonce = head.cnonce;
-      this.qop = head.qop;
+      //this.realm = head.realm;
+      //this.nonce = head.nonce;
+      //this.cnonce = head.cnonce;
+      //this.qop = head.qop;
       this.algorithmName = head.Digestalgorithm ? head.Digestalgorithm : "md5";
-      if (message.rawBody) {
-        this.entity_body = message.rawBody;
-      }
-      switch (this.algorithm.toLowerCase()) {
+
+      let line = "";
+      switch (this.algorithmName.toLowerCase()) {
       case "md5":
-        this.algorithm = new Digest(this);
+        this.algorithm = new Digest(head, message.rawBody, this);
         this.response = this.algorithm.generateResponse(message.method);
+        line = this.algorithm.getLine(this.response);
         break;
       }
 
@@ -66,9 +79,8 @@ export default  (nodefony) => {
           method = "Authorization: ";
         }
       }
-      let line = this.algorithm.name+" username=" + stringify(this.userName) + ", realm=" + stringify(this.realm) + ", nonce=" + stringify(this.nonce) + ", uri=" + stringify(this.uri) + ", algorithm=" + this.algorithmName + ", response=" + stringify(this.response);
+      //line = this.algorithm.name+" username=" + stringify(this.userName) + ", realm=" + stringify(this.realm) + ", nonce=" + stringify(this.nonce) + ", uri=" + stringify(this.uri) + ", algorithm=" + this.algorithmName + ", response=" + stringify(this.response);
       this.lineResponse = method + line;
-
       //var transac = message.transaction ;
       let transac = this.dialog.createTransaction(message.transaction.to);
       this.dialog.tagTo = null;

@@ -354,6 +354,9 @@ export default (nodefony) => {
     hex_md5_noUTF8: function (s) {
       return rstr2hex(rstr_md5(s));
     },
+    str_md5_noUTF8:function (s) {
+      return rstr_md5(s)
+    },
     str_md5: function (s) {
       return rstr_md5(str2rstr_utf8(s));
     },
