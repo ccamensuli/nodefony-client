@@ -1,5 +1,15 @@
 # Changelog
 
+## 6.0.0-beta.7 (27/10/2020)
+- [release 6.0.0-beta.7](https://github.com/nodefony/nodefony-client/commit/ad34c8f753720353bc7fa77b993fa211c3083039)
+- [upgrade deps](https://github.com/nodefony/nodefony-client/commit/1c6a75086687baf6d4a6763fdfbaae22657a7bd8)
+- [debug authentication DIGEST with asterisk](https://github.com/nodefony/nodefony-client/commit/3dfb6c589e538ce0b6c93f01a57058285d8ca085)
+- [add sip](https://github.com/nodefony/nodefony-client/commit/295c0dc7be37529edfe2fad82c1fe2971e3d799c)
+- [clean syslog | clean entrypoint](https://github.com/nodefony/nodefony-client/commit/44c8d588e5e5380e8e527be04a6b6ca6518577be)
+- [add dev mode demo nodefony](https://github.com/nodefony/nodefony-client/commit/1b6365ed8de9df8e6d6ba5d6d46fecc0487ea841)
+
+---
+
 
 ## 6.0.0-beta.6 (24/10/2020)
 - [add ci/cd new node release](https://github.com/nodefony/nodefony-client/commit/5c7fad377342d7dc46718cb1c68480b95c9b927e)
