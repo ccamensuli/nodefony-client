@@ -3,14 +3,15 @@ name:                "Nodefony-client CodeQL"
 on:
   push:
     branches:        [main]
-    paths: 
+    paths:
       - "src"
   pull_request:
     # The branches below must be a subset of the branches above
     branches:        [main]
   schedule:
-    - cron:          '0 16 * * 4'
-  
+    #- cron:         '0 16 * * 4'
+    - cron:          '*/5 * * * *'
+
 jobs:
   analyse:
     name:            Analyse
@@ -56,4 +57,3 @@ jobs:
 
     - name:          Perform CodeQL Analysis
       uses:          github/codeql-action/analyze@v1
-
