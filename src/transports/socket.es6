@@ -8,7 +8,7 @@ export default (nodefony) => {
     protocol: "bayeux"
   };
   const Bayeux = bayeux(nodefony);
-  
+
   /*
    *
    */
@@ -143,14 +143,16 @@ export default (nodefony) => {
     connect(url, settings = null) {
       let options = settings ? settings : this.options;
       //this.url = nodefony.urlToOject(url);
-      this.url = nodefony.url(url);
-      this.crossDomain = !nodefony.isSameOrigin(url);
+      //this.url = nodefony.url(url);
+      //this.crossDomain = !nodefony.isSameOrigin(url);
       try {
         this.socket = new this.transport(url, options, this);
       } catch (e) {
         this.fire("onError", e);
         throw e;
       }
+      this.url = this.socket.url;
+      this.crossDomain = !nodefony.isSameOrigin(this.url);
       this.socket.onmessage = this.listen(this, "onmessage");
       this.socket.onerror = this.listen(this, "onerror");
       this.socket.onopen = this.listen(this, "onopen");

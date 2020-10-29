@@ -321,10 +321,13 @@ export default (nodefony) => {
       this.settings = this.options // nodefony.extend({}, defaultSettings, settings);
       this.dialogs = {};
       this.version = this.settings.version;
-      //
-      this.server = server;
-      this.serverPort = this.settings.portServer;
 
+      //server
+      this.server = server || "127.0.0.1";
+      this.serverPort = this.settings.portServer;
+      this.publicAddress = this.server;
+
+      // authenticate
       this.authenticate = false;
       this.authenticateRegister = null;
 
@@ -339,16 +342,8 @@ export default (nodefony) => {
       if (this.transport) {
         this.initTransport();
       }
-      this.transportType = this.settings.transport.toLowerCase();
-
       this.contact = null;
       this.via = null;
-      // IDENTIFIANT
-      //  USER
-      //this.userName = this.settings.userName ;
-      //this.from = "<sip:"+this.userName+"@"+this.publicAddress+">" ;
-      //this.contact = this.generateContact();
-      //this["request-uri"] =  "sip:"+this.userName+"@"+this.publicAddress+";transport="+this.transportType ;
     }
 
     generateInvalid() {
@@ -423,16 +418,19 @@ export default (nodefony) => {
 
       // GET REMOTE IP
       if (this.transport.publicAddress) {
-        this.publicAddress = this.transport.domain.hostname;
-        this.publicAddress = this.server;
+        //this.publicAddress = this.transport.domain.hostname;
+        this.transportType = this.settings.transport.toLowerCase();
       } else {
-        this.publicAddress = this.server;
+        if( this.transport.url && this.transport.url.protocol){
+          this.transportType = this.transport.url.protocol.replace(/:/,"");
+        }else{
+          this.transportType = this.settings.transport.toLowerCase();
+        }
       }
-
-      switch (this.settings.transport) {
+      switch (this.transportType) {
         // realtime nodefony
-      case "TCP":
-      case "UDP":
+      case "tcp":
+      case "udp":
         this.transport.listen(this, "onSubscribe", function (service, message) {
           if (service === "SIP" || service === "OPENSIP") {
             onStart.call(this, message);
@@ -454,8 +452,8 @@ export default (nodefony) => {
           this.quit(message);
         });
         break;
-      case "WS":
-      case "WSS":
+      case "ws":
+      case "wss":
         this.transport.listen(this, "onmessage", function (message) {
           //this.fire("onMessage",message.data);
           onMessage.call(this, message.data);
@@ -483,7 +481,6 @@ export default (nodefony) => {
         this.clearDialogTimeout();
         delete this.registerTimeout;
       }
-      //TODO
       //clean all setinterval
       for (var dia in this.dialogs) {
         //this.dialogs[dia].unregister();

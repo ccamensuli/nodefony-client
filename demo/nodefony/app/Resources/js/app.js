@@ -13,7 +13,9 @@ media(nodefony);
 import webaudio from "nodefony-client/dist/webaudio";
 webaudio(nodefony);
 import socket from "nodefony-client/dist/socket";
-socket(nodefony);*/
+socket(nodefony);
+import sip from "nodefony-client/dist/sip";
+sip(nodefony);*/
 
 // dev
 import Nodefony from "../../../../../src/nodefony.es6";
@@ -21,7 +23,7 @@ import Nodefony from "../../../../../src/nodefony.es6";
 const nodefony = new Nodefony(process.env.NODE_ENV);
 import Media from "../../../../../src/medias/medias.es6";
 Media(nodefony);
-console.log(nodefony)
+//console.log(nodefony)
 import Socket from "../../../../../src/transports/socket.es6";
 Socket(nodefony);
 import Webaudio from "../../../../../src/medias/webaudio/webaudio.es6";
@@ -29,7 +31,7 @@ Webaudio(nodefony);
 
 import Sip from "../../../../../src/protocols/sip/sip.es6";
 Sip(nodefony);
-console.log(nodefony)
+//console.log(nodefony)
 
 
 /*
@@ -51,13 +53,13 @@ class App extends nodefony.Kernel {
   }
 
   async initialize() {
-    this.createMixer();
-    await this.createMediaStream();
+    //this.createMixer();
+    //await this.createMediaStream();
     //this.createWebsocket();
-    //this.createSocket();
+    this.createSocket();
     //this.initializeApi();
     //this.login();
-    this.createSip();
+    //this.createSip();
   }
 
   initializeApi() {
@@ -141,12 +143,27 @@ class App extends nodefony.Kernel {
   }
 
   createSip() {
-    let user = "1002";
-    let passwd = "1002";
-    const transport = new nodefony.WebSocket(`wss://localhost:8090/ws`, {
+    const user = "1002";
+    const passwd = "1002";
+    //const user = "5021";
+    //const passwd = "1234";
+
+    const url = `wss://localhost:8090/ws`;
+    //const url = `ws://localhost:8090/ws`;
+    //const url = `wss://pbx.example.com:8089/ws`;
+    //const url = `ws://pbx.example.com:8088/ws`;
+
+    const server = "nodefony.com";
+    const transport = new nodefony.WebSocket(url, {
       protocol: "sip"
     }, this);
-    const sip = new nodefony.protocols.Sip("127.0.0.1", transport, {}, this);
+    transport.on("onerror", (event, code, reason)=>{
+      this.log(`Websocket Error code : ${code||null} ==> ${reason}`,"ERROR");
+    });
+    transport.on("onclose", (event, code, reason)=>{
+      this.log(`Websocket Close code : ${code} => ${reason}`,"WARNING");
+    });
+    const sip = new nodefony.protocols.Sip(server, transport, {}, this);
     sip.on("onConnect" ,()=>{
       this.log("connect asterisk")
       sip.register(user, passwd);

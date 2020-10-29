@@ -282,14 +282,28 @@ class Nodefony {
 
   isSameOrigin(Url) {
     const loc = window.location;
-    const a = url.parse(Url);
+    let a = null ;
+    if( typeof Url === "string"){
+      a = url.parse(Url);
+    }else{
+      a= Url;
+    }
     return a.hostname === loc.hostname &&
       a.port == loc.port &&
       a.protocol === loc.protocol;
   }
 
   isSecure(Url = null) {
-    const a = Url ? url.parse(Url) : window.location.href;
+    let a = null ;
+    if( ! url){
+      a = url.parse(window.location.href);
+    }else{
+      if( typeof Url === "string"){
+        a = url.parse(Url);
+      }else{
+        a= Url;
+      }
+    }
     return a.protocol === "https:" || a.protocol === "wss:";
   }
 
