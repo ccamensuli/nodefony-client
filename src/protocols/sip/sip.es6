@@ -351,10 +351,11 @@ export default (nodefony) => {
     }
 
     generateVia(addr) {
+      let transportType = this.transportType.toUpperCase();
       if (this.rport) {
-        return this.version + "/" + this.settings.transport + " " + addr + ";rport";
+        return this.version + "/" + transportType + " " + addr + ";rport";
       } else {
-        return this.version + "/" + this.settings.transport + " " + addr;
+        return this.version + "/" + transportType + " " + addr;
       }
     }
 
