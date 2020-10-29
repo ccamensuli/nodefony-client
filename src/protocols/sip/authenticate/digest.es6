@@ -29,7 +29,7 @@ export default (nodefony) => {
       if (typeof params[ele] === 'function') {
         continue;
       }
-      let value = params[ele].replace(/"|'/, "");
+      let value = params[ele].replace(/"|'/g, "");
       if ( ! ( ele in exclude ) ) {
         value = `"${value}"`;
       }
