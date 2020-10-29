@@ -21,10 +21,11 @@ sip(nodefony);*/
 import Nodefony from "../../../../../src/nodefony.es6";
 //console.log(process.env.NODE_ENV)
 const nodefony = new Nodefony(process.env.NODE_ENV);
+window.nodefony = nodefony;
 import Media from "../../../../../src/medias/medias.es6";
 Media(nodefony);
 //console.log(nodefony)
-import Socket from "../../../../../src/transports/socket.es6";
+import Socket from "../../../../../src/transports/socket/socket.es6";
 Socket(nodefony);
 import Webaudio from "../../../../../src/medias/webaudio/webaudio.es6";
 Webaudio(nodefony);
@@ -43,13 +44,12 @@ class App extends nodefony.Kernel {
     this.on("load", () => {
       this.initialize();
     });
-    this.log("LOG DEMO INFO", "INFO");
-    this.log("LOG DEMO ERROR", "ERROR");
-    this.log("LOG DEMO WARNING", "WARNING");
-    this.log("LOG DEMO DEBUG", "DEBUG");
-    let error = new Error("my error");
-    this.log(error, "ERROR");
-
+    //this.log("LOG DEMO INFO", "INFO");
+    //this.log("LOG DEMO ERROR", "ERROR");
+    //this.log("LOG DEMO WARNING", "WARNING");
+    //this.log("LOG DEMO DEBUG", "DEBUG");
+    //let error = new Error("my error");
+    //this.log(error, "ERROR");
   }
 
   async initialize() {
@@ -74,6 +74,7 @@ class App extends nodefony.Kernel {
   login() {
     this.api.login("api/jwt/login", "admin", "admin")
       .then((response) => {
+        this.log(response.result.token)
         return response;
       })
       .catch(e => {
@@ -82,6 +83,7 @@ class App extends nodefony.Kernel {
       });
     this.api2.login(undefined, "1000", "1234")
       .then((response) => {
+        this.log(response.result.token)
         return response;
       })
       .catch(e => {
@@ -130,16 +132,36 @@ class App extends nodefony.Kernel {
   }
 
   createSocket() {
-    let sock = new nodefony.Socket(`wss://localhost:5152/socket?foo=bar&bar=foo`, null, this);
-    sock.on("onopen", (event) => {
-      this.logger(`onopen`, event);
+    let sock = new nodefony.Socket(`wss://localhost:5152/socket`, null, this);
+
+    sock.on("ready", (message, socket) => {
+      this.logger(`ready`, message);
+      socket.subscribe("monitoring");
     });
-    sock.on("onmessage", (event) => {
-      this.logger(`onmessage`, event);
+    sock.on("message", (service, message, socket) => {
+      socket.logger(`message`, JSON.parse(message));
     });
-    sock.on("onerror", (error) => {
-      this.logger(`onerror`, error);
+    sock.on("subscribe", (service, message, socket) => {
+      socket.logger(`subscribe`, service);
+      setTimeout(() => {
+        socket.unSubscribe(service);
+      }, 10 * 1000);
     });
+    sock.on("monitoring", (message, socket) => {
+      socket.logger("monitoring", JSON.parse(message));
+      //socket.log(JSON.parse(message));
+    });
+    sock.on("unSubscribe", (service, message, socket) => {
+      socket.logger(`unsubscribe`, service);
+    });
+    sock.on("connect", (message, socket) => {
+      socket.logger(`connect`, message);
+    });
+    sock.on("error", (message, socket) => {
+      socket.logger(`error`, message);
+    });
+
+    console.log(sock)
   }
 
   createSip() {
@@ -157,19 +179,18 @@ class App extends nodefony.Kernel {
     const transport = new nodefony.WebSocket(url, {
       protocol: "sip"
     }, this);
-    transport.on("onerror", (event, code, reason)=>{
-      this.log(`Websocket Error code : ${code||null} ==> ${reason}`,"ERROR");
+    transport.on("onerror", (event, code, reason) => {
+      this.log(`Websocket Error code : ${code||null} ==> ${reason}`, "ERROR");
     });
-    transport.on("onclose", (event, code, reason)=>{
-      this.log(`Websocket Close code : ${code} => ${reason}`,"WARNING");
+    transport.on("onclose", (event, code, reason) => {
+      this.log(`Websocket Close code : ${code} => ${reason}`, "WARNING");
     });
     const sip = new nodefony.protocols.Sip(server, transport, {}, this);
-    sip.on("onConnect" ,()=>{
+    sip.on("onConnect", () => {
       this.log("connect asterisk")
       sip.register(user, passwd);
     })
-
-    sip.on("onRegister" ,()=>{
+    sip.on("onRegister", () => {
       this.log(`Register User ${user} asterisk`);
     });
   }

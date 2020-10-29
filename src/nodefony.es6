@@ -106,7 +106,7 @@ class Nodefony {
 
   async prefetchSocket() {
     // socket
-    return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-socket" */ './transports/socket.es6')
+    return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-socket" */ './transports/socket/socket.es6')
       .then((module) => {
         return module.default(this);
       });
@@ -288,9 +288,19 @@ class Nodefony {
     }else{
       a= Url;
     }
+    let proto = null;
+    if (a.protocol === "wss:" || a.protocol === "ws:"){
+      if( a.protocol === "wss:" ){
+        proto = "https:"
+      }else{
+        proto = "http:"
+      }
+    } else{
+      proto = a.protocol ;
+    }
     return a.hostname === loc.hostname &&
       a.port == loc.port &&
-      a.protocol === loc.protocol;
+      proto === loc.protocol;
   }
 
   isSecure(Url = null) {

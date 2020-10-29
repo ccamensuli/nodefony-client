@@ -1,39 +1,21 @@
 export default (nodefony) => {
-  
+
   'use strict';
 
-  const clientsCapabilities = function() {
+  const clientsCapabilities = function () {
     let tab = [];
     let ws = nodefony.nativeWebSocket ? tab.push("websocket") : null;
-    let poll = nodefony.Poll ? tab.push("poll") : null;
-    let lpoll = nodefony.LongPoll ? tab.push("long-polling") : null;
-    let jsonp = nodefony.Jsonp ? tab.push("callback-polling") : null;
+    //let poll = nodefony.Poll ? tab.push("poll") : null;
+    //let lpoll = nodefony.LongPoll ? tab.push("long-polling") : null;
+    //let jsonp = nodefony.Jsonp ? tab.push("callback-polling") : null;
     return tab;
   }();
 
-  const onHandshakeResponse = function(message) {
+  const onHandshakeResponse = function (message) {
     if (message.successful) {
       try {
-        if (!this.socket) {
-          //let socket = this.getBestConnection(message.supportedConnectionTypes);
-          this.socket = new nodefony.Socket(this.url, {
-            protocol: this
-          });
-          this.socket.on("onopen", () => {
-            this.socket.send(this.connect(message));
-            this.fire("onHandshake", message, this.socket);
-          });
-        }
-        this.socket.on("onmessage", (message) => {
-          if (message.data) {
-            this.onMessage(message.data);
-          }
-        });
-        this.socket.on("onerror", this.listen(this, "onError"));
-        this.socket.on("onclose", (err) => {
-          delete this.socket;
-          this.fire("onClose", err);
-        });
+        message.ext.address = JSON.parse(message.ext.address);
+        this.fire("onHandshake", message, this);
       } catch (e) {
         throw new Error(e);
       }
@@ -42,86 +24,87 @@ export default (nodefony) => {
     }
   };
 
-  const reconnect = function() {
+  const reconnect = function () {
     this.reconnect = true;
     this.fire("reConnect", this);
   };
 
-  const onConnectResponse = function(message) {
+  const onConnectResponse = function (message) {
     if (message.successful) {
       this.connected = true;
       this.idconnection = message.clientId;
       if (message.advice) {
         for (let ele in message.advice) {
           switch (ele) {
-            case "reconnect":
-              if (message.advice[ele] === "retry") {
-                if (!this.reconnect) {
-                  this.on("onClose", reconnect);
-                }
+          case "reconnect":
+            if (message.advice[ele] === "retry") {
+              if (!this.reconnect) {
+                this.on("onClose", reconnect);
               }
-              break;
+            }
+            break;
           }
         }
       }
-      this.fire("onConnect", message);
+      message.ext.address = JSON.parse(message.ext.address);
+      this.fire("onConnect", message, this);
     } else {
       this.connected = false;
       onError.call(this, message);
     }
   };
 
-  const onDisconnectResponse = function(message) {
+  const onDisconnectResponse = function (message) {
     if (message.successful) {
       if (this.socket) {
         this.socket.close();
         this.socket = null;
-        this.fire("onDisconnect", message);
+        this.fire("onDisconnect", message, this);
       }
     } else {
       onError.call(this, message);
     }
   };
 
-  const onSubscribeResponse = function(message) {
+  const onSubscribeResponse = function (message) {
     if (message.successful) {
-      this.fire("onSubscribe", message);
+      this.fire("onSubscribe", message, this);
     } else {
       onError.call(this, message);
     }
   };
 
-  const onUnsubscribeResponse = function(message) {
+  const onUnsubscribeResponse = function (message) {
     if (message.successful) {
-      this.fire("onUnsubscribe", message);
+      this.fire("onUnsubscribe", message, this);
     } else {
       onError.call(this, message);
     }
   };
 
-  const onError = function(message) {
+  const onError = function (message) {
     if (message.error) {
       let code = null;
       let arg = null;
       let mess = null;
       try {
         switch (nodefony.typeOf(message.error)) {
-          case "string":
-            let res = message.error.split(":");
-            code = res[0];
-            arg = res[1];
-            mess = res[2];
-            break;
-          case "object":
-            if (message.error) {
-              return onError.call(this, message.error);
-            }
-            break;
-          case "Error":
-            message.error = "500::" + message.error.message;
+        case "string":
+          let res = message.error.split(":");
+          code = res[0];
+          arg = res[1];
+          mess = res[2];
+          break;
+        case "object":
+          if (message.error) {
             return onError.call(this, message.error);
-          default:
-            throw new Error("Bad protocole error BAYEUX");
+          }
+          break;
+        case "Error":
+          message.error = "500::" + message.error.message;
+          return onError.call(this, message.error);
+        default:
+          throw new Error("Bad protocole error BAYEUX");
         }
         return this.fire("onError", code, arg, mess);
       } catch (e) {
@@ -146,7 +129,16 @@ export default (nodefony) => {
         this.socket = url;
         this.socket.on("onopen", (message) => {
           this.socket.send(this.connect(message));
-          this.fire("onHandshake", message, this.socket);
+        });
+        this.socket.on("onmessage", (message) => {
+          if (message.data) {
+            this.onMessage(message.data);
+          }
+        });
+        this.socket.on("onerror", this.listen(this, "onError"));
+        this.socket.on("onclose", (err) => {
+          delete this.socket;
+          this.fire("onClose", err);
         });
       } else {
         this.url = url;
@@ -191,10 +183,13 @@ export default (nodefony) => {
       });
     }
 
-    subscribe(name, data) {
+    subscribe(name, data, parser = "application/json") {
       return JSON.stringify({
         channel: "/meta/subscribe",
         clientId: this.idconnection,
+        advice: {
+          parser: parser
+        },
         subscription: "/service/" + name,
         data: data
       });
@@ -229,19 +224,27 @@ export default (nodefony) => {
         return;
       }
       switch (message.channel) {
-        case "/meta/handshake":
-          return onHandshakeResponse.call(this, message);
-        case "/meta/connect":
-          return onConnectResponse.call(this, message);
-        case "/meta/disconnect":
-          return onDisconnectResponse.call(this, message);
-        case "/meta/subscribe":
-          return onSubscribeResponse.call(this, message);
-        case "/meta/unsubscribe":
-          return onUnsubscribeResponse.call(this, message);
-        default:
-          // /some/channel
-          this.fire("onMessage", message);
+      case "/meta/handshake":
+        return onHandshakeResponse.call(this, message);
+      case "/meta/connect":
+        return onConnectResponse.call(this, message);
+      case "/meta/disconnect":
+        return onDisconnectResponse.call(this, message);
+      case "/meta/subscribe":
+        return onSubscribeResponse.call(this, message);
+      case "/meta/unsubscribe":
+        return onUnsubscribeResponse.call(this, message);
+      default:
+        // /some/channel
+        if (message.channel){
+          if (message.error){
+            return onError.call(this, message);
+          }
+          return this.fire("onMessage", message.channel.split("/")[2], message, this);
+        }
+        if (message.error) {
+          return onError.call(this, message);
+        }
       }
     }
 

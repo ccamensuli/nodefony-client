@@ -1,14 +1,13 @@
-import bayeux from '../protocols/bayeux/bayeux.es6';
+import bayeux from '../../protocols/bayeux/bayeux.es6';
 
 
 export default (nodefony) => {
 
   const defaultSettings = {
-    type: "websocket", //   websocket | poll | longPoll
+    type: "websocket",
     protocol: "bayeux"
   };
   const Bayeux = bayeux(nodefony);
-
   /*
    *
    */
@@ -66,43 +65,29 @@ export default (nodefony) => {
         } else {
           this.protocol = new nodefony.protocols.Bayeux(this, options, this);
         }
-        this.protocol.on("onMessage", (message) => {
-          if (message.error) {
-            if (message.channel) {
-              this.fire("onerror", message.error);
-            } else {
-              this.fire("onerror", message.id, message.successful);
-            }
-          } else {
-            if (message.channel) {
-              this.fire("onmessage", message.channel.split("/")[2], message.data);
-            } else {
-              this.fire("oneessage", message.id, message.successful);
-            }
-          }
-        });
         this.protocol.on("onHandshake", (message, socket) => {
           if (message.ext && message.ext.address) {
-            const addr = JSON.parse(message.ext.address);
+            const addr = message.ext.address;
             this.publicAddress = addr.remoteAddress;
             this.domain = addr.host;
           }
-          this.fire("onHandshake", message, socket, this);
+          this.fire("ready", message, this);
+          this.fire("onHandshake", message, this);
         });
         this.protocol.on("onConnect", (message) => {
           this.services = message.data;
           this.connected = true;
           if (message.ext && message.ext.address) {
-            const addr = JSON.parse(message.ext.address);
+            const addr = message.ext.address;
             this.publicAddress = addr.remoteAddress;
             this.domain = addr.host;
           }
-          this.fire("onConnect", message, this);
+          this.fire("connect", message, this);
         });
         this.protocol.on("onDisconnect", (message) => {
           this.services = message.data;
           this.connected = false;
-          this.fire("onDisconnect", message, this);
+          this.fire("disconnect", message, this);
         });
         this.protocol.on("reConnect", (bayeux) => {
           setTimeout(() => {
@@ -110,30 +95,35 @@ export default (nodefony) => {
           }, 60000);
         });
         this.protocol.on("onSubscribe", (message) => {
-          var service = message.subscription.split("/")[2];
+          const service = message.subscription.split("/")[2];
           this.subscribedService[service] = message;
           this.nbSubscribed++;
-          this.fire("onSubscribe", service, message, this);
+          this.fire("subscribe", service, message, this);
         });
         this.protocol.on("onUnsubscribe", (message) => {
-          var service = message.subscription.split("/")[2];
+          const service = message.subscription.split("/")[2];
           delete this.subscribedService[service];
           this.nbSubscribed--;
-          this.fire("onUnSubscribe", service, message, this);
+          this.fire("unSubscribe", service, message, this);
         });
         this.protocol.on("onError", (code, arg, message) => {
-          this.fire("onerror", code, arg, message);
+          this.fire("error", code, arg, message);
         });
         this.protocol.on("onClose", (message) => {
           this.connected = false;
-          this.fire("onClose", message);
+          this.fire("close", message);
           for (var service in this.subscribedService) {
             //this.unSubscribe(service);
             delete this.subscribedService[service];
           }
         });
-        this.on("onopen", () => {
-          this.protocol.handshake(this.url.href);
+        this.protocol.on("onConnect", () => {
+          this.protocol.handshake();
+        });
+        this.protocol.on("onMessage", (service, message) => {
+            let data = message.data ;
+            this.fire("message", service, data, this);
+            this.fire(service, data, this);
         });
       } catch (e) {
         throw e;
@@ -142,9 +132,6 @@ export default (nodefony) => {
 
     connect(url, settings = null) {
       let options = settings ? settings : this.options;
-      //this.url = nodefony.urlToOject(url);
-      //this.url = nodefony.url(url);
-      //this.crossDomain = !nodefony.isSameOrigin(url);
       try {
         this.socket = new this.transport(url, options, this);
       } catch (e) {
@@ -168,22 +155,22 @@ export default (nodefony) => {
       }
     }
 
-    subscribe(name, data) {
+    subscribe(name, data = null) {
       if (!this.connected) {
         const error = new Error(`Not connected`);
-        this.fire('onerror', 500, error);
+        this.fire('error', 500, error);
         return false;
       }
       if (name in this.services) {
         if (name in this.subscribedService) {
           const error = new Error(`Already subscribed`);
-          this.fire('onerror', 500, "already subscribed");
+          this.fire('error', 500, "already subscribed");
           return false;
         }
         return this.send(this.protocol.subscribe(name, data));
       }
       const error = new Error(`service : ${name} not exist`);
-      this.fire('onerror', 500, error);
+      this.fire('error', 500, error);
       return false;
     }
 

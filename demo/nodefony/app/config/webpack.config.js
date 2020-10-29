@@ -6,12 +6,6 @@ const {
 } = require('webpack-merge');
 const precss = require('precss');
 const autoprefixer = require('autoprefixer');
-try {
-  console.log(require.resolve("nodefony-client/dist/medias"));
-} catch (e) {
-  console.log(e)
-}
-
 
 // Default context <bundle base directory>
 //const context = path.resolve(__dirname, "..", "Resources", "public");
