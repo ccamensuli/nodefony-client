@@ -4,10 +4,10 @@ on:
   push:
     branches:        [main]
     paths-ignore: 
-    - node_modules
-    - demo 
+    - "node_modules"
+    - "demo" 
     paths:
-    - src 
+    - "src" 
   pull_request:
     # The branches below must be a subset of the branches above
     branches:        [main]
