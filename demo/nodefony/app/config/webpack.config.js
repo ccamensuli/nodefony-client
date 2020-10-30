@@ -29,7 +29,8 @@ module.exports = merge(wpconfig, {
   //context: context,
   target: "web",
   entry: {
-    app: ["./Resources/js/app.js"]
+    app: ["./Resources/js/app.js"],
+    tests: ["./Resources/js/tests.js"]
   },
   output: {
     path: public,
@@ -56,7 +57,7 @@ module.exports = merge(wpconfig, {
   module: {
     rules: [{
         // BABEL TRANSCODE
-        test: new RegExp("\.es6$|\.js$"),
+        test: new RegExp("\\.es6$|\\.js$"),
         exclude: new RegExp("node_modules"),
         use: [{
           loader: 'babel-loader',

@@ -5,8 +5,9 @@ const Package = require(Path);
  *	@constructor
  *	@param {class} container
  *	@param {class} context
+ *  @Route ("/test")
  */
-class appController extends nodefony.Controller {
+class testController extends nodefony.Controller {
 
   constructor(container, context) {
     super(container, context);
@@ -14,17 +15,17 @@ class appController extends nodefony.Controller {
     this.startSession();
   }
 
-/**
- *    @Route ("/",
- *      name="home")
- */
+  /**
+   *    @Route ("",
+   *      name="test")
+   */
   indexAction() {
-    return this.render("app::index.html.twig", {
+    return this.render("app:test:index.html.twig", {
       name: this.kernel.projectName,
-			description: this.kernel.package.description ,
+      description: this.kernel.package.description,
       package : Package
-  });
+    });
   }
 }
 
-module.exports = appController;
+module.exports = testController;

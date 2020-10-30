@@ -1,9 +1,15 @@
-const assert = require('assert');
-//console.log(assert)
-const chai = require('chai');
-const Nodefony = require('../../src/nodefony.es6').default;
-const nodefony = new Nodefony(process.env.NODE_ENV);
-
+try {
+  //var assert = require('assert');
+  //console.log(assert)
+  var chai = require('chai');
+  var assert = chai.assert;
+  var Nodefony = require('../../src/nodefony.es6').default;
+  var nodefony = new Nodefony(process.env.NODE_ENV);
+} catch (e) {
+  var chai = window.chai;
+  var assert = chai.assert;
+  var mocha = window.mocha;
+}
 
 
 describe("NODEFONY Notifications Center", () => {

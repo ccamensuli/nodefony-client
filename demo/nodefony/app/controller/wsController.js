@@ -59,21 +59,18 @@ class wsController extends nodefony.Controller {
       switch (this.method) {
         case "GET":
           return this.getResponse("PING");
-        case "POST":
-          return this.realtime.handleConnection(this.getParameters("query").request, this.context);
         case "WEBSOCKET":
           if (message) {
             return this.realtime.handleConnection(message.utf8Data, this.context);
           }
-          this.log(`handShake`, "INFO");
+          this.log(`Socket Connect`, "INFO");
           this.log(`Protocol accept ${this.context.acceptedProtocol}`, "INFO");
-          //this.log(this.getRoute())
-          return this.context.send(JSON.stringify({
-            handShake:"ok",
+          /*return this.context.send(JSON.stringify({
+            connect:"ok",
             protocol:this.context.acceptedProtocol,
             route:this.getRoute(),
             query:this.query
-          }));
+          }));*/
         break;
       default:
         throw new Error("REALTIME METHOD NOT ALLOWED");

@@ -1,0 +1,18 @@
+{% extends './basetest.html.twig' %}
+
+{% block body %}
+
+  <div class="hello">
+    <h1>{{ package.name }} </h1>
+    <h2>{{package.version}}</h2>
+    <a href="{{url('test')}}">
+      reload
+    </a>
+  </div>
+
+  <div id="mocha"></div>
+  <script src="/app/tests/unit/containerTest.js"></script>
+  <script src="/app/tests/unit/notificationsTest.js"></script>
+  <script src="/app/tests/unit/syslogTest.js"></script>
+
+{% endblock %}

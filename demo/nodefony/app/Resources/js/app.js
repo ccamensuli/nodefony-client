@@ -133,13 +133,12 @@ class App extends nodefony.Kernel {
 
   createSocket() {
     let sock = new nodefony.Socket(`wss://localhost:5152/socket`, null, this);
-
     sock.on("ready", (message, socket) => {
       this.logger(`ready`, message);
       socket.subscribe("monitoring");
     });
     sock.on("message", (service, message, socket) => {
-      socket.logger(`message`, JSON.parse(message));
+      //socket.logger(`message`, JSON.parse(message));
     });
     sock.on("subscribe", (service, message, socket) => {
       socket.logger(`subscribe`, service);
@@ -148,7 +147,7 @@ class App extends nodefony.Kernel {
       }, 10 * 1000);
     });
     sock.on("monitoring", (message, socket) => {
-      socket.logger("monitoring", JSON.parse(message));
+      //socket.logger(JSON.parse(message));
       //socket.log(JSON.parse(message));
     });
     sock.on("unSubscribe", (service, message, socket) => {
@@ -158,9 +157,10 @@ class App extends nodefony.Kernel {
       socket.logger(`connect`, message);
     });
     sock.on("error", (message, socket) => {
-      socket.logger(`error`, message);
+      if(socket){
+        socket.logger(`error`, message);
+      }
     });
-
     console.log(sock)
   }
 
