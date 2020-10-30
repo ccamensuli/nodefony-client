@@ -18,7 +18,7 @@ module.exports = {
       dependOn: 'nodefony'
     },
     socket: {
-      import: path.resolve(__dirname, "..", 'src', 'transports', "socket.es6"),
+      import: path.resolve(__dirname, "..", 'src', 'transports', "socket", "socket.es6"),
       dependOn: 'nodefony'
     },
     webaudio: {

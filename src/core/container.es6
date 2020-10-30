@@ -251,9 +251,9 @@ export default (nodefony) => {
       }
     }
   }
-  nodefony.Container = Container;
-  nodefony.Scope = Scope;
-  nodefony.ExtendedScope = ExtendedScope;
+  //nodefony.Container = Container;
+  //nodefony.Scope = Scope;
+  //nodefony.ExtendedScope = ExtendedScope;
   return {
     Container,
     Scope,

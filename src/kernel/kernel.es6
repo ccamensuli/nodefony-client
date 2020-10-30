@@ -9,7 +9,7 @@ import {
 export default (nodefony) => {
 
   const defaultOptions = {
-    environment : "production",
+    environment : nodefony.environment || "production",
     debug : false,
     loadEvent: "load", //"DOMContentLoaded"
   }
@@ -29,7 +29,6 @@ export default (nodefony) => {
         this.log(`EVENT : ${this.options.loadEvent} `,"INFO");
         this.emit("load", event, this);
       });
-
     }
 
     createApi(baseUrl, option = {}){
@@ -37,7 +36,5 @@ export default (nodefony) => {
     }
 
   }
-  nodefony.Kernel = Kernel;
   return Kernel;
-
 };

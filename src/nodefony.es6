@@ -15,7 +15,7 @@ import {
 
 import Events from './core/events.es6';
 import error from './core/error.es6';
-import Syslog from './core/syslog/syslog.es6';
+import syslog from './core/syslog/syslog.es6';
 import Container from './core/container.es6';
 import Service from './core/service.es6';
 import Storage from './core/storage/storage.es6';
@@ -46,15 +46,44 @@ class Nodefony {
     this.nativeWebSocket = nativeWebSocket;
     this.URL = url;
     this.util = util;
-    Events(this);
-    error(this);
-    Syslog(this);
-    Container(this);
-    Service(this);
-    Storage(this);
-    Websocket(this);
-    Api(this);
-    Kernel(this);
+    this.Events = Events(this);
+    this.Error = error(this);
+    const {
+      Syslog,
+      PDU
+    } = syslog(this);
+    this.Syslog = Syslog;
+    this.PDU = PDU;
+    //this.Container = Container(this).Container;
+    this.Service = Service(this);
+    this.Storage = Storage(this);
+    this.WebSocket = Websocket(this);
+    this.Api = Api(this);
+    this.Kernel = Kernel(this);
+  }
+
+  static isError(error) {
+    switch (true) {
+    case error instanceof ReferenceError:
+      return "ReferenceError";
+    case error instanceof TypeError:
+      return "TypeError";
+    case error instanceof SyntaxError:
+      return "SyntaxError";
+    case error instanceof Error:
+      if (error.errno) {
+        return "SystemError";
+      }
+      if (error.bytesParsed) {
+        return "ClientError";
+      }
+      try {
+        return error.constructor.name || "Error";
+      } catch (e) {
+        return "Error";
+      }
+    }
+    return false;
   }
 
   async load(obj = null) {
@@ -111,14 +140,14 @@ class Nodefony {
         return module.default(this);
       });
   }
-  async prefetchWebRtc(){
+  async prefetchWebRtc() {
     // webrtc
     return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-webrtc" */ './medias/webrtc/webrtc.es6')
       .then((module) => {
         return module.default(this);
       });
   }
-  async prefetchSip(){
+  async prefetchSip() {
     // sip
     return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-sip" */ './protocols/sip/sip.es6')
       .then((module) => {
@@ -144,7 +173,7 @@ class Nodefony {
     return querystring.parse(query);
   }
 
-  getUuid() {
+  generateId() {
     return uuidv4();
   }
 
@@ -189,6 +218,10 @@ class Nodefony {
       }
       if (value instanceof SyntaxError) {
         return "SyntaxError";
+      }
+      let res = null;
+      if (res = Nodefony.isError(value)) {
+        return res
       }
       if (value instanceof Error) {
         return "Error";
@@ -259,8 +292,9 @@ class Nodefony {
   }
 
   isContainer(container) {
+    const nodefonyContainer = this.getContainer();
     if (container) {
-      if (container instanceof nodefony.Container) {
+      if (container instanceof nodefonyContainer) {
         return true;
       }
       if (container.protoService && container.protoParameters) {
@@ -269,6 +303,13 @@ class Nodefony {
       return false;
     }
     return false;
+  }
+
+  getContainer(service= null){
+    if (service){
+      return service.container;
+    }
+    return Container(this).Container;
   }
 
   isPromise(obj) {
@@ -282,21 +323,21 @@ class Nodefony {
 
   isSameOrigin(Url) {
     const loc = window.location;
-    let a = null ;
-    if( typeof Url === "string"){
+    let a = null;
+    if (typeof Url === "string") {
       a = url.parse(Url);
-    }else{
-      a= Url;
+    } else {
+      a = Url;
     }
     let proto = null;
-    if (a.protocol === "wss:" || a.protocol === "ws:"){
-      if( a.protocol === "wss:" ){
+    if (a.protocol === "wss:" || a.protocol === "ws:") {
+      if (a.protocol === "wss:") {
         proto = "https:"
-      }else{
+      } else {
         proto = "http:"
       }
-    } else{
-      proto = a.protocol ;
+    } else {
+      proto = a.protocol;
     }
     return a.hostname === loc.hostname &&
       a.port == loc.port &&
@@ -304,14 +345,14 @@ class Nodefony {
   }
 
   isSecure(Url = null) {
-    let a = null ;
-    if( ! url){
+    let a = null;
+    if (!url) {
       a = url.parse(window.location.href);
-    }else{
-      if( typeof Url === "string"){
+    } else {
+      if (typeof Url === "string") {
         a = url.parse(Url);
-      }else{
-        a= Url;
+      } else {
+        a = Url;
       }
     }
     return a.protocol === "https:" || a.protocol === "wss:";

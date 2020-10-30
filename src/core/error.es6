@@ -50,29 +50,7 @@ export default (nodefony) => {
         this.parseMessage(message);
       }
     }
-    static isError(error) {
-      switch (true) {
-        case error instanceof ReferenceError:
-          return "ReferenceError";
-        case error instanceof TypeError:
-          return "TypeError";
-        case error instanceof SyntaxError:
-          return "SyntaxError";
-        case error instanceof Error:
-          if (error.errno) {
-            return "SystemError";
-          }
-          if (error.bytesParsed) {
-            return "ClientError";
-          }
-          try {
-            return error.constructor.name || "Error";
-          } catch (e) {
-            return "Error";
-          }
-      }
-      return false;
-    }
+
 
     parseMessage(message) {
       this.message = message;
@@ -81,5 +59,5 @@ export default (nodefony) => {
   }
 
   Object.defineProperty(nodefonyError.prototype, 'toJSON', jsonNodefony);
-  return nodefony.Error = nodefonyError;
+  return nodefonyError;
 };

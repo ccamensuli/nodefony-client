@@ -167,5 +167,5 @@ export default (nodefony) => {
         });
     }
   }
-  return nodefony.Api = Api;
+  return Api;
 };

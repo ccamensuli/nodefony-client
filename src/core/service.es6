@@ -1,7 +1,9 @@
 'use strict';
+import container from "./container.es6";
 
 export default (nodefony) => {
 
+  const Container = container(nodefony).Container;
   const settingsSyslog = {
     //rateLimit:100,
     //burstLimit:10,
@@ -15,12 +17,22 @@ export default (nodefony) => {
     }
   };
 
-  const conditionOptions = {
-    severity: {
-      operator: "<=",
-      data: "7"
+  const conditionOptions = function () {
+    if (nodefony.environment === "development") {
+      return {
+        severity: {
+          operator: "<=",
+          data: "7"
+        }
+      };
     }
-  };
+    return {
+      severity: {
+        operator: "<=",
+        data: "6"
+      }
+    };
+  }();
 
   class Service {
 
@@ -42,17 +54,17 @@ export default (nodefony) => {
           this.options = nodefony.extend(true, {}, defaultOptions, options);
         }
       }
-      if (container instanceof nodefony.Container) {
+      if (container instanceof Container) {
         this.container = container;
       } else {
         if (container) {
           if (nodefony.isContainer(container)) {
             this.container = container;
           } else {
-            throw new Error("Service nodefony container not valid must be instance of nodefony.Container");
+            throw new Error("Service nodefony container not valid must be instance of Container");
           }
         } else {
-          this.container = new nodefony.Container();
+          this.container = new Container();
           this.container.set("container", this.container);
         }
       }
@@ -115,7 +127,7 @@ export default (nodefony) => {
     clean(syslog = false) {
       this.settingsSyslog = null;
       delete this.settingsSyslog;
-      if (syslog){
+      if (syslog) {
         this.syslog.reset();
       }
       this.syslog = null;
@@ -286,5 +298,5 @@ export default (nodefony) => {
       return this.container.has(...args);
     }
   }
-  return nodefony.Service = Service;
+  return Service;
 };

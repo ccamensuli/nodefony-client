@@ -52,5 +52,5 @@ export default (nodefony) => {
       delete this.token;
     }
   }
-  return nodefony.Storage = Storage;
+  return Storage;
 };

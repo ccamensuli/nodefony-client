@@ -71,8 +71,8 @@ export default (nodefony) => {
             this.publicAddress = addr.remoteAddress;
             this.domain = addr.host;
           }
-          this.fire("ready", message, this);
           this.fire("onHandshake", message, this);
+          this.fire("ready", message, this);
         });
         this.protocol.on("onConnect", (message) => {
           this.services = message.data;
@@ -167,7 +167,7 @@ export default (nodefony) => {
           this.fire('error', 500, "already subscribed");
           return false;
         }
-        return this.send(this.protocol.subscribe(name, data));
+        return this.protocol.subscribe(name, data);
       }
       const error = new Error(`service : ${name} not exist`);
       this.fire('error', 500, error);
@@ -183,7 +183,7 @@ export default (nodefony) => {
       if (name in this.services) {
         if (name in this.subscribedService) {
           var clientId = this.subscribedService[name].clientId;
-          return this.send(this.protocol.unSubscribe(name, clientId, data));
+          return this.protocol.unSubscribe(name, clientId, data);
         } else {
           const error = new Error(`Service :${name} not subcribed`);
           this.fire('onerror', 500, error);

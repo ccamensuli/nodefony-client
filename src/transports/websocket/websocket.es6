@@ -102,7 +102,7 @@
      sendAsync(data, timeout = null) {
        return new Promise((resolve, reject) => {
          let message = {
-           nodefonyId: nodefony.getUuid(),
+           nodefonyId: nodefony.generateId(),
            data: data,
            timeout: timeout || this.options.timeout || defaultSettings.timeout,
            timeoutid: null
@@ -151,7 +151,7 @@
      }
    };
 
-   nodefony.WebSocket = Websocket;
+   //nodefony.WebSocket = Websocket;
 
    return Websocket;
  };

@@ -25,6 +25,9 @@ export default (nodefony) => {
     async: false
   };
 
+
+  const trace = console.trace || console.log ;
+
   /*
    * Severity syslog
    * <pre>
@@ -774,25 +777,39 @@ export default (nodefony) => {
 
     static wrapper(pdu){
       switch (pdu.severity) {
+      // EMERGENCY
       case 0:
+        return {
+          logger: console.error
+        }
+      // ALERT
       case 1:
+        return {
+          logger: window.alert.bind(window)
+        }
+      // CRITIC
       case 2:
+      // ERROR
       case 3:
         return {
           logger: console.error
         }
+      // WARNING
       case 4:
         return {
           logger: console.warn
         }
+      // NOTICE
       case 5:
         return {
-          logger: console.log
+          logger: trace
         }
+      // INFO
       case 6:
         return {
           logger: console.info
         }
+      // DEBUG
       case 7:
         return {
           logger: console.debug
@@ -822,8 +839,6 @@ export default (nodefony) => {
       return wrapper.logger(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
     };
   }
-  nodefony.Syslog = Syslog;
-  nodefony.PDU = PDU;
   return {
     Syslog,
     PDU

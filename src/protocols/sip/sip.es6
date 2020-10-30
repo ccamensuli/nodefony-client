@@ -2,6 +2,8 @@
 import dialog from './dialog.es6';
 import authenticate from './authenticate/authenticate.es6';
 import sipMessage from './sipmessage.es6';
+import error from './siperror.es6';
+
 /*import transaction from './transaction.es6'
 import sipRequest from './siprequest.es6'
 import sipResponse from './sipresponse.es6'
@@ -14,6 +16,7 @@ export default (nodefony) => {
   const Dialog = dialog(nodefony);
   const Authenticate = authenticate(nodefony);
   const SipMessage = sipMessage(nodefony);
+  const sipError = error(nodefony);
   /*const Transaction = transaction(nodefony);
   const SipRequest = sipRequest(nodefony);
   const SipResponse = sipResponse(nodefony);

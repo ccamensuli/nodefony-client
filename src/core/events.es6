@@ -106,5 +106,5 @@ export default (nodefony) => {
     }
   }
 
-  return nodefony.Events = Notification;
+  return  Notification;
 };

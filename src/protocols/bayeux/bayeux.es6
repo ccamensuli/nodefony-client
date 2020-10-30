@@ -121,14 +121,14 @@ export default (nodefony) => {
 
     constructor(url, settings = {}, service = null) {
       if (service) {
-        super("bayeux", service.container, service.notificationCenter, settings);
+        super("bayeux", service.container, null, settings);
       } else {
         super("bayeux", null, null, settings);
       }
       if (url instanceof nodefony.Socket) {
         this.socket = url;
         this.socket.on("onopen", (message) => {
-          this.socket.send(this.connect(message));
+          this.connect(message);
         });
         this.socket.on("onmessage", (message) => {
           if (message.data) {
@@ -161,15 +161,16 @@ export default (nodefony) => {
         minimumVersion: "1.0",
         supportedConnectionTypes: clientsCapabilities
       }));
-      return this.send(req);
+      return this.socket.send(req);
     }
 
     connect(message) {
-      return JSON.stringify({
+      let req = JSON.stringify({
         channel: "/meta/connect",
         clientId: message.clientId,
         connectionType: this.socketType
       });
+      return this.socket.send(req);
     }
 
     stopReConnect() {
@@ -184,7 +185,7 @@ export default (nodefony) => {
     }
 
     subscribe(name, data, parser = "application/json") {
-      return JSON.stringify({
+      let req = JSON.stringify({
         channel: "/meta/subscribe",
         clientId: this.idconnection,
         advice: {
@@ -193,15 +194,17 @@ export default (nodefony) => {
         subscription: "/service/" + name,
         data: data
       });
+      return this.socket.send(req);
     }
 
     unSubscribe(name, clientId, data) {
-      return JSON.stringify({
+      let req = JSON.stringify({
         channel: "/meta/unsubscribe",
         clientId: clientId,
         subscription: "/service/" + name,
         data: data
       });
+      return this.socket.send(req);
     }
 
     sendMessage(service, data, clientId) {
@@ -248,11 +251,11 @@ export default (nodefony) => {
       }
     }
 
-    send(data) {
+    /*send(data) {
       if (this.socket) {
         return this.socket.send(data);
       }
-    }
+    }*/
   }
 
   nodefony.protocols.Bayeux = Bayeux;
