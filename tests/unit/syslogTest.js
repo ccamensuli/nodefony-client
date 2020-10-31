@@ -21,7 +21,7 @@ describe("NODEFONY SYSLOG", function () {
 
   before(function () {
     global.syslog = new nodefony.Syslog();
-    let ret = global.syslog.listenWithConditions(this, defaultOptions,
+    let ret = global.syslog.listenWithConditions( defaultOptions,
       (pdu) => {
         //nodefony.Syslog.normalizeLog(pdu);
         return true
@@ -48,7 +48,7 @@ describe("NODEFONY SYSLOG", function () {
       let inst = new nodefony.Syslog({
         moduleName: "MYMODULE"
       });
-      inst.listenWithConditions(this, defaultOptions,
+      inst.listenWithConditions( defaultOptions,
         (pdu) => {
           assert.strictEqual(pdu.moduleName, 'MYMODULE');
           assert.strictEqual(pdu.severity, 7);
@@ -62,7 +62,7 @@ describe("NODEFONY SYSLOG", function () {
         moduleName: "MYMODULE2",
         defaultSeverity: "ALERT",
       });
-      inst.listenWithConditions(this, defaultOptions,
+      inst.listenWithConditions( defaultOptions,
         (pdu) => {
           assert.strictEqual(pdu.moduleName, 'MYMODULE2');
           assert.strictEqual(pdu.severity, 1);
@@ -179,7 +179,7 @@ describe("NODEFONY SYSLOG", function () {
         maxStack: 100
       });
       let i = 0;
-      inst.listenWithConditions(this, {
+      inst.listenWithConditions( {
         severity: {
           data: "INFO"
         }
@@ -197,7 +197,7 @@ describe("NODEFONY SYSLOG", function () {
         maxStack: 100
       });
       let i = 0;
-      inst.listenWithConditions(this, {
+      inst.listenWithConditions( {
         severity: {
           data: "INFO"
         }
@@ -221,7 +221,7 @@ describe("NODEFONY SYSLOG", function () {
     });
     it("LOG sevirity ", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, defaultOptions,
+      global.syslog.listenWithConditions( defaultOptions,
         (pdu) => {
           switch (pdu.severityName) {
           case "EMERGENCY":
@@ -304,7 +304,7 @@ describe("NODEFONY SYSLOG", function () {
 
     it("listener ", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, defaultOptions,
+      global.syslog.listenWithConditions( defaultOptions,
         (pdu) => {
           return i++
         });
@@ -318,7 +318,7 @@ describe("NODEFONY SYSLOG", function () {
 
     it("Other listener 2 ", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions({
           severity: {
             operator: "<=",
             data: "INFO"
@@ -337,7 +337,7 @@ describe("NODEFONY SYSLOG", function () {
 
     it("Other listener 3 ", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             operator: "<=",
             data: "INFO"
@@ -358,7 +358,7 @@ describe("NODEFONY SYSLOG", function () {
 
     it("listener condition severity interger ", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             data: 6
           }
@@ -378,7 +378,7 @@ describe("NODEFONY SYSLOG", function () {
 
     it("listener condition severity operator == ", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             operator: "==",
             data: "7"
@@ -399,7 +399,7 @@ describe("NODEFONY SYSLOG", function () {
     });
     it("listener condition severity listerner1 ", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             data: "INFO,DEBUG,WARNING"
           }
@@ -414,7 +414,7 @@ describe("NODEFONY SYSLOG", function () {
     });
     it("listener condition severity listerner tab", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             data: ["INFO", "WARNING", "DEBUG"]
           }
@@ -429,7 +429,7 @@ describe("NODEFONY SYSLOG", function () {
     });
     it("listener condition severity listerner tab string", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             data: ["6", "4", "7"]
           }
@@ -444,7 +444,7 @@ describe("NODEFONY SYSLOG", function () {
     });
     it("listener condition severity listerner tab integer", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             data: [6, 4, 7]
           }
@@ -460,7 +460,7 @@ describe("NODEFONY SYSLOG", function () {
 
     it("listener condition severity listerner >=", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             operator: ">=",
             data: 4
@@ -476,7 +476,7 @@ describe("NODEFONY SYSLOG", function () {
     });
     it("listener condition severity listerner >", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             operator: ">",
             data: 4
@@ -492,7 +492,7 @@ describe("NODEFONY SYSLOG", function () {
     });
     it("listener condition severity listerner <", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             operator: "<",
             data: 4
@@ -508,7 +508,7 @@ describe("NODEFONY SYSLOG", function () {
     });
     it("listener condition severity listerner < string", function (done) {
       let i = 0;
-      global.syslog.listenWithConditions(this, {
+      global.syslog.listenWithConditions( {
           severity: {
             operator: "<",
             data: "WARNING"
@@ -529,7 +529,7 @@ describe("NODEFONY SYSLOG", function () {
     it("listener condition MSGID ", () => {
       return new Promise((resolve, reject) => {
         let i = 0
-        global.syslog.listenWithConditions(this, {
+        global.syslog.listenWithConditions( {
             msgid: {
               data: "NODEFONY"
             }

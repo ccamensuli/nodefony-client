@@ -17,23 +17,6 @@ export default (nodefony) => {
     }
   };
 
-  const conditionOptions = function () {
-    if (nodefony.environment === "development") {
-      return {
-        severity: {
-          operator: "<=",
-          data: "7"
-        }
-      };
-    }
-    return {
-      severity: {
-        operator: "<=",
-        data: "6"
-      }
-    };
-  }();
-
   class Service {
 
     constructor(name, container, notificationsCenter, options = {}) {
@@ -113,11 +96,8 @@ export default (nodefony) => {
       delete this.options.events;
     }
 
-    initSyslog(environment = "production", debug = false, options = null) {
-      return this.syslog.listenWithConditions(this, options || conditionOptions,
-        (pdu) => {
-          return nodefony.Syslog.normalizeLog(pdu);
-        });
+    initSyslog(environment = nodefony.environment, debug = false, options = null) {
+      return this.syslog.init(environment, options);
     }
 
     getName() {

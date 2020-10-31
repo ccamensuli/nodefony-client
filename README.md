@@ -70,7 +70,7 @@ console.log(nodefony)
 ```
 ### version library + chunks
 ```html
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/nodefony-client@6.0.0-beta.2/dist/nodefony.js?medias=true&socket=true"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/nodefony-client@6.0.0/dist/nodefony.js?medias=true&socket=true"></script>
 ```
 
 ## unpkg.com
@@ -81,39 +81,50 @@ console.log(nodefony)
 ```
 ### latest library + chunks
 ```html
-<script type="text/javascript" src="https://unpkg.com/nodefony-client@6.0.0-beta.2/dist/nodefony.js?medias=true&socket=true"></script>
+<script type="text/javascript" src="https://unpkg.com/nodefony-client@6.0.0/dist/nodefony.js?medias=true&socket=true"></script>
 ```
 ### version library + chunks
 ```html
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/nodefony-client@6.0.0-beta.0/dist/nodefony.js?medias=true&socket=true"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/nodefony-client@6.0.0/dist/nodefony.js?medias=true&socket=true"></script>
 ```
-
 
 ### CDN Available Chunks
 ```
 medias
 socket
 webaudio
+sip
 ```
 
-# Use With Webpack
+# Use Nodefony-client In Webpack
+##  Release
 ```js
-
   // import base library
   import nodefony from "nodefony-client";
-
   // import chunk medias
   import media from "nodefony-client/dist/medias";
   media(nodefony);
-
   // import chunk webaudio
   import webaudio from "nodefony-client/dist/webaudio";
   webaudio(nodefony);
-
   // import chunk socket
   import socket from "nodefony-client/dist/socket";
   socket(nodefony);
+  window.nodefony = nodefony;
+```
 
+## Sources
+```js
+const source_dir = path.resolve("<path.to.sources>")
+import Nodefony from `${source_dir}/src/nodefony.es6`;
+const nodefony = new Nodefony(process.env.NODE_ENV);
+import Media from `${source_dir}/src/medias/medias.es6`;
+Media(nodefony);
+import Webaudio from `${source_dir}/src/medias/webaudio/webaudio.es6`;
+Webaudio(nodefony);
+import Socket from `${source_dir}/src/transports/socket/socket.es6`;
+Socket(nodefony);
+window.nodefony = nodefony;
 ```
 
 # Base Library
@@ -155,11 +166,18 @@ console.log(instance)
   syslog: Syslog {_events: {…}, _eventsCount: 0, _maxListeners: undefined, settings: {…}, ringStack: Array(0), …}
 }
 ```
-## Containers
-```
-```
 
 ## Syslog
-```
+```js
+const syslog = new nodefony.Syslog();
+syslog.init();
+syslog.log('info', "INFO");
+syslog.log('debug', "DEBUG");
+syslog.log('notice', "NOTICE");
+syslog.log('warning', "WARNING");
+syslog.log('error', "ERROR");
+syslog.log('alert', "ALERT");
+syslog.log('critic', "CRITIC");
+syslog.log('emergency', "EMERGENCY");
 
 ```

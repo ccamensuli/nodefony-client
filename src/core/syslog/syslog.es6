@@ -1,6 +1,23 @@
 export default (nodefony) => {
 
   'use strict';
+
+  const conditionOptions = function (environment) {
+    if (environment === "development") {
+      return {
+        severity: {
+          operator: "<=",
+          data: "7"
+        }
+      };
+    }
+    return {
+      severity: {
+        operator: "<=",
+        data: "6"
+      }
+    };
+  };
   /*
    * default settings
    * <pre>
@@ -25,7 +42,7 @@ export default (nodefony) => {
     async: false
   };
 
-  const trace = console.trace || console.log ;
+  const trace = console.trace || console.log;
   const sysLogSeverity = nodefony.PDU.sysLogSeverity();
   const operators = {
     "<": function (ele1, ele2) {
@@ -55,7 +72,7 @@ export default (nodefony) => {
     severity: (pdu, condition) => {
       for (let sev in condition.data) {
         let res = operators[condition.operator](pdu.severity, condition.data[sev]);
-        if( res ){
+        if (res) {
           return true;
         }
       }
@@ -64,7 +81,7 @@ export default (nodefony) => {
     msgid: (pdu, condition) => {
       for (let sev in condition.data) {
         let res = operators[condition.operator](pdu.msgid, sev);
-        if( res ){
+        if (res) {
           return true;
         }
       }
@@ -167,7 +184,7 @@ export default (nodefony) => {
     return false;
   };
 
-  const wrapperCondition = function (conditions, callback, context = null) {
+  const wrapperCondition = function (conditions, callback) {
     let myFuncCondition = null;
     let Conditions = null;
     try {
@@ -182,19 +199,15 @@ export default (nodefony) => {
       switch (nodefony.typeOf(callback)) {
       case "function":
         return (pdu) => {
-          let res = myFuncCondition(Conditions, pdu);
+          const res = myFuncCondition(Conditions, pdu);
           if (res) {
-            if (context) {
-              callback.call(context, pdu);
-            } else {
-              callback(pdu);
-            }
+            callback(pdu);
           }
         };
       case "array":
         let tab = [];
         for (let i = 0; i < callback.length; i++) {
-          let res = myFuncCondition(Conditions, callback[i]);
+          const res = myFuncCondition(Conditions, callback[i]);
           if (res) {
             tab.push(callback[i]);
           }
@@ -314,7 +327,7 @@ export default (nodefony) => {
    *
    *
    *
-   *    controller.logIntance.listenWithConditions(context,{
+   *    controller.logIntance.listenWithConditions({
    *        checkConditions: "&&",
    *        severity:{
    *            data:"CRITIC,ERROR"
@@ -399,11 +412,18 @@ export default (nodefony) => {
       this.fire = this.settings.async ? super.fireAsync : super.fire;
     }
 
-    clean(){
+    init(environment = nodefony.environment, options = null) {
+      return this.listenWithConditions(options || conditionOptions(environment),
+        (pdu) => {
+          return Syslog.normalizeLog(pdu);
+        });
+    }
+
+    clean() {
       return this.reset();
     }
 
-    reset(){
+    reset() {
       this.ringStack.length = 0;
       this.removeAllListeners();
     }
@@ -594,14 +614,13 @@ export default (nodefony) => {
      *    @method  filter
      *
      */
-    filter(conditions = null, callback = null, context = null) {
-
+    filter(conditions = null, callback = null) {
       if (!conditions) {
         throw new Error("filter conditions not found ");
       }
       try {
         conditions = nodefony.extend(true, {}, conditions);
-        let wrapper = wrapperCondition.call(this, conditions, callback, context);
+        let wrapper = wrapperCondition.call(this, conditions, callback);
         if (wrapper) {
           return super.on("onLog", wrapper);
         }
@@ -616,8 +635,8 @@ export default (nodefony) => {
      *    @method  listenWithConditions
      *
      */
-    listenWithConditions(context, conditions, callback) {
-      return this.filter(conditions, callback, context);
+    listenWithConditions(conditions, callback) {
+      return this.filter(conditions, callback);
     }
 
     log() {
@@ -648,41 +667,41 @@ export default (nodefony) => {
       return this.logger(data, "NOTICE");
     }
 
-    static wrapper(pdu){
+    static wrapper(pdu) {
       switch (pdu.severity) {
-      // EMERGENCY
+        // EMERGENCY
       case 0:
         return {
           logger: console.error
         }
-      // ALERT
+        // ALERT
       case 1:
         return {
           logger: window.alert.bind(window)
         }
-      // CRITIC
+        // CRITIC
       case 2:
-      // ERROR
+        // ERROR
       case 3:
         return {
           logger: console.error
         }
-      // WARNING
+        // WARNING
       case 4:
         return {
           logger: console.warn
         }
-      // NOTICE
+        // NOTICE
       case 5:
         return {
           logger: trace
         }
-      // INFO
+        // INFO
       case 6:
         return {
           logger: console.info
         }
-      // DEBUG
+        // DEBUG
       case 7:
         return {
           logger: console.debug
@@ -694,7 +713,7 @@ export default (nodefony) => {
       }
     }
 
-    static normalizeLog (pdu) {
+    static normalizeLog(pdu) {
       let date = new Date(pdu.timeStamp);
       if (pdu.payload === "" || pdu.payload === undefined) {
         console.warn(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : logger message empty !!!!`);
@@ -703,14 +722,14 @@ export default (nodefony) => {
       }
       let message = pdu.payload;
       switch (true) {
-        case nodefony.isObject(message):
-          try {
-            message = `\n${nodefony.inspect(message)}`;
-          } catch (e) {}
+      case nodefony.isObject(message):
+        try {
+          message = `\n${nodefony.inspect(message)}`;
+        } catch (e) {}
       }
       let wrapper = nodefony.Syslog.wrapper(pdu);
       return wrapper.logger(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
     };
   }
-  return Syslog ;
+  return Syslog;
 };

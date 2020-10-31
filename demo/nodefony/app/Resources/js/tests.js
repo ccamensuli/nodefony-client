@@ -15,7 +15,6 @@ window.nodefony = nodefony;*/
 import Nodefony from "../../../../../src/nodefony.es6";
 //console.log(process.env.NODE_ENV)
 const nodefony = new Nodefony(process.env.NODE_ENV);
-window.nodefony = nodefony;
 import Media from "../../../../../src/medias/medias.es6";
 Media(nodefony);
 //console.log(nodefony)
@@ -23,11 +22,9 @@ import Socket from "../../../../../src/transports/socket/socket.es6";
 Socket(nodefony);
 import Webaudio from "../../../../../src/medias/webaudio/webaudio.es6";
 Webaudio(nodefony);
-
 import Sip from "../../../../../src/protocols/sip/sip.es6";
 Sip(nodefony);
-//console.log(nodefony)
-
+window.nodefony = nodefony;
 
 
 class Test extends nodefony.Kernel {
