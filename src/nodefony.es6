@@ -15,6 +15,7 @@ import {
 
 import Events from './core/events.es6';
 import error from './core/error.es6';
+import pdu from './core/syslog/pdu.es6';
 import syslog from './core/syslog/syslog.es6';
 import Container from './core/container.es6';
 import Service from './core/service.es6';
@@ -22,6 +23,7 @@ import Storage from './core/storage/storage.es6';
 import Websocket from './transports/websocket/websocket.es6';
 import Api from './api/api.es6';
 import Kernel from './kernel/kernel.es6';
+
 //import webrtc from './src/medias/webrtc/webrtc.es6';
 //nodefony.medias.webrtc = webrtc(nodefony);
 //import transaction from './src/medias/webrtc/transaction.es6';
@@ -48,13 +50,8 @@ class Nodefony {
     this.util = util;
     this.Events = Events(this);
     this.Error = error(this);
-    const {
-      Syslog,
-      PDU
-    } = syslog(this);
-    this.Syslog = Syslog;
-    this.PDU = PDU;
-    //this.Container = Container(this).Container;
+    this.PDU = pdu(this);
+    this.Syslog = syslog(this);
     this.Service = Service(this);
     this.Storage = Storage(this);
     this.WebSocket = Websocket(this);
@@ -292,8 +289,8 @@ class Nodefony {
   }
 
   isContainer(container) {
-    const nodefonyContainer = this.getContainer();
     if (container) {
+      const nodefonyContainer = this.getContainer();
       if (container instanceof nodefonyContainer) {
         return true;
       }
