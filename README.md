@@ -88,12 +88,17 @@ console.log(nodefony)
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/nodefony-client@6.0.0/dist/nodefony.js?medias=true&socket=true"></script>
 ```
 
-### CDN Available Chunks
-```
+### CDN Available Library Chunks query : ?medias&sip
+```  
 medias
 socket
 webaudio
 sip
+```
+### CDN Available Library environment query : ?debug=true&environment=development
+```  
+debug = sip,socket,webaudio,medias | true | flase
+environment = production | development
 ```
 
 # Use Nodefony-client In Webpack
@@ -117,7 +122,7 @@ sip
 ```js
 const source_dir = path.resolve("<path.to.sources>")
 import Nodefony from `${source_dir}/src/nodefony.es6`;
-const nodefony = new Nodefony(process.env.NODE_ENV);
+const nodefony = new Nodefony(process.env.NODE_ENV, process.env.NODE_DEBUG);
 import Media from `${source_dir}/src/medias/medias.es6`;
 Media(nodefony);
 import Webaudio from `${source_dir}/src/medias/webaudio/webaudio.es6`;
