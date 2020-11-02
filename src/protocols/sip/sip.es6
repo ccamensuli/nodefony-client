@@ -12,7 +12,7 @@ import sipBody from './sipbody.es6'*/
 
 export default (nodefony) => {
   'use strict';
-
+  nodefony.modules.push("sip");
   const Dialog = dialog(nodefony);
   const Authenticate = authenticate(nodefony);
   const SipMessage = sipMessage(nodefony);
@@ -46,7 +46,7 @@ export default (nodefony) => {
 
   const onMessage = function (response) {
 
-    this.log(response, "INFO", "RECIEVE");
+    this.log(`RECIEVE\n${response}`, "DEBUG");
     let message = null;
     let res = null;
     try {
@@ -319,12 +319,10 @@ export default (nodefony) => {
 
   class Sip extends nodefony.Service {
     constructor(server, transport, settings, service = null) {
-
       super("SIP", (service ? service.container : null) , null, nodefony.extend({}, defaultSettings, settings));
       this.settings = this.options // nodefony.extend({}, defaultSettings, settings);
       this.dialogs = {};
       this.version = this.settings.version;
-
       //server
       this.server = server || "127.0.0.1";
       this.serverPort = this.settings.portServer;
@@ -567,7 +565,7 @@ export default (nodefony) => {
     }
 
     send(data) {
-      this.log(data, "INFO", "SEND");
+      this.log(`SEND\n${data}`, "DEBUG");
       this.fire("onSend", data);
       this.transport.send(data);
     }

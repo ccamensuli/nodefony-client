@@ -3,7 +3,7 @@ import Track from './track.es6';
 import Mixer from './mixer.es6';
 
 export default (nodefony)=>{
-
+  nodefony.modules.push("webaudio");
   const audioContext = window.AudioContext || window.webkitAudioContext;
 
    return nodefony.webAudio = {

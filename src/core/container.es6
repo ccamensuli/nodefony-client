@@ -91,7 +91,7 @@ export default (nodefony) => {
         return this.services[name];
       }
       return null;
-      //this.logger("GET : " + name+" don't exist", "WARNING");
+      //this.log("GET : " + name+" don't exist", "WARNING");
     }
 
     has(name) {
@@ -141,24 +141,24 @@ export default (nodefony) => {
 
     setParameters(name, str) {
       if (typeof name !== "string") {
-        this.logger(new Error("setParameters : container parameter name must be a string"));
+        this.log(new Error("setParameters : container parameter name must be a string"));
         return false;
       }
       if (!ISDefined(str)) {
-        this.logger(new Error("setParameters : " + name + " container parameter value must be define"));
+        this.log(new Error("setParameters : " + name + " container parameter value must be define"));
         return false;
       }
       if (parseParameterString.call(this.protoParameters.prototype, name, str) === str) {
         return str;
       } else {
-        this.logger(new Error("container parameter " + name + " parse error"));
+        this.log(new Error("container parameter " + name + " parse error"));
         return false;
       }
     }
 
     getParameters(name) {
       if (typeof name !== "string") {
-        this.logger(new Error("container parameter name must be a string"));
+        this.log(new Error("container parameter name must be a string"));
         return false;
       }
       //return parseParameterString.call(this.protoParameters.prototype, name, null);
@@ -201,7 +201,7 @@ export default (nodefony) => {
       if (parseParameterString.call(this.parameters, name, str) === str) {
         return super.setParameters(name, str);
       } else {
-        this.logger(new Error("container parameter " + name + " parse error"));
+        this.log(new Error("container parameter " + name + " parse error"));
         return false;
       }
     }
@@ -246,7 +246,7 @@ export default (nodefony) => {
       if (parseParameterString.call(this.parameters, name, str) === str) {
         return super.setParameters(name, str);
       } else {
-        this.logger(new Error("container parameter " + name + " parse error"));
+        this.log(new Error("container parameter " + name + " parse error"));
         return false;
       }
     }

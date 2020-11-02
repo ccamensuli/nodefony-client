@@ -40,6 +40,6 @@
 //import "core-js/stable";
 
 import Nodefony from './src/nodefony.es6';
-const nodefony = new Nodefony(process.env.NODE_ENV);
+const nodefony = new Nodefony(process.env.NODE_ENV, process.env.NODE_DEBUG, false);
 nodefony.load();
 export default nodefony;

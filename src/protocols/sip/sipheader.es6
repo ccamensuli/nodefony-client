@@ -87,7 +87,7 @@ export default (nodefony) => {
             try {
               this[headName] = this[func](headValue);
             } catch (e) {
-              this.message.sip.logger("Parse : " + headName, "ERROR");
+              this.message.sip.log("Parse : " + headName, "ERROR");
               throw e;
             }
           }

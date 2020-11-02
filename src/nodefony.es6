@@ -24,6 +24,11 @@ import Websocket from './transports/websocket/websocket.es6';
 import Api from './api/api.es6';
 import Kernel from './kernel/kernel.es6';
 
+const environment = {
+  production: true,
+  development: true
+};
+
 //import webrtc from './src/medias/webrtc/webrtc.es6';
 //nodefony.medias.webrtc = webrtc(nodefony);
 //import transaction from './src/medias/webrtc/transaction.es6';
@@ -32,9 +37,11 @@ import Kernel from './kernel/kernel.es6';
 //nodefony.medias.userMedia = user(nodefony);
 
 class Nodefony {
-  constructor(env) {
+  constructor(env = "production", debug = false) {
     this.version = Package.version;
-    this.environment = env;
+    this.modules = [];
+    this.setEnv(env, debug);
+    this.loaded = false;
     this.isRegExp = util.isRegExp;
     this.isObject = util.isObject;
     this.isFunction = util.isFunction;
@@ -57,6 +64,33 @@ class Nodefony {
     this.WebSocket = Websocket(this);
     this.Api = Api(this);
     this.Kernel = Kernel(this);
+  }
+
+  setEnv(env, debug){
+    this.query = this.getQuery();
+    this.environment = env;
+    this.debug = debug;
+    if(this.query.environment){
+      if (this.query.environment in environment) {
+        this.environment = this.query.environment;
+      }
+    }
+    if(this.query.hasOwnProperty("debug") ) {
+      this.debug = this.query.debug || true;
+    }
+  }
+
+  showBanner() {
+    console.debug(
+      `\t\t\tNODEFONY-CLIENT\n\n`,
+      `\tVersion :\t\t\t ${this.version}\n`,
+      `\tenvironment :\t\t ${this.environment}\n`,
+      `\tdebug :\t\t\t\t`,
+      this.debug,
+      `\n\tmodules :\t\t\t`,
+      `${this.modules}`,
+      `\n\n\n`
+    );
   }
 
   static isError(error) {
@@ -83,70 +117,79 @@ class Nodefony {
     return false;
   }
 
-  async load(obj = null) {
-    if (!obj) {
-      obj = this.getQuery();
-    }
+  async load(obj = this.query || {}) {
     if (obj) {
-      console.debug(`load query for Prefetch module : `, obj);
+      //console.debug(`load query for Prefetch module : `, obj);
       for (let lib in obj) {
         if (lib === "medias") {
-          console.debug(`Nodefony Prefetch module ${lib}`);
-          await this.prefetchMedias();
+          //console.debug(`Nodefony Prefetch module ${lib}`);
+          await this.loadMedias();
         }
         if (lib === "socket") {
-          console.debug(`Nodefony Prefetch module ${lib}`);
-          await this.prefetchSocket();
+          //console.debug(`Nodefony Prefetch module ${lib}`);
+          await this.loadSocket();
         }
         if (lib === "webaudio") {
-          console.debug(`Nodefony Prefetch module ${lib}`);
-          await this.prefetchWebAudio();
+          //console.debug(`Nodefony Prefetch module ${lib}`);
+          await this.loadWebAudio();
         }
         if (lib === "webrtc") {
-          console.debug(`Nodefony Prefetch module ${lib}`);
-          await this.prefetchWebRtc();
+          //console.debug(`Nodefony Prefetch module ${lib}`);
+          await this.loadWebRtc();
         }
         if (lib === "sip") {
-          console.debug(`Nodefony Prefetch module ${lib}`);
-          await this.prefetchSip();
+          //console.debug(`Nodefony Prefetch module ${lib}`);
+          await this.loadSip();
         }
       }
     }
+    this.loaded = true;
+    this.showBanner();
   }
 
-  async prefetchMedias() {
+  async loadMedias() {
     // medias
-    await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-medias" */ './medias/medias.es6')
+    await import(
+      /* webpackChunkName: "chunk-nodefony-medias"*/
+      './medias/medias.es6')
     .then((module) => {
       return module.default(this);
     });
   }
 
-  async prefetchWebAudio() {
+  async loadWebAudio() {
     // medias webaudio
-    await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-webaudio" */ './medias/webaudio/webaudio.es6')
+    await import(
+      /* webpackChunkName: "chunk-nodefony-webaudio"*/
+      './medias/webaudio/webaudio.es6')
     .then((module) => {
       return module.default(this);
     });
   }
 
-  async prefetchSocket() {
+  async loadSocket() {
     // socket
-    return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-socket" */ './transports/socket/socket.es6')
+    return await import(
+        /* webpackChunkName: "chunk-nodefony-socket"*/
+        './transports/socket/socket.es6')
       .then((module) => {
         return module.default(this);
       });
   }
-  async prefetchWebRtc() {
+  async loadWebRtc() {
     // webrtc
-    return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-webrtc" */ './medias/webrtc/webrtc.es6')
+    return await import(
+        /* webpackChunkName: "chunk-nodefony-webrtc"*/
+        './medias/webrtc/webrtc.es6')
       .then((module) => {
         return module.default(this);
       });
   }
-  async prefetchSip() {
+  async loadSip() {
     // sip
-    return await import( /* webpackPrefetch: true , webpackChunkName: "chunk-nodefony-sip" */ './protocols/sip/sip.es6')
+    return await import(
+        /* webpackChunkName: "chunk-nodefony-sip"*/
+        './protocols/sip/sip.es6')
       .then((module) => {
         return module.default(this);
       });
@@ -160,9 +203,9 @@ class Nodefony {
           return querystring.parse(myurl.query);
         }
       }
-      return null;
+      return {};
     } catch (e) {
-      return null;
+      return {};
     }
   }
 
@@ -302,8 +345,8 @@ class Nodefony {
     return false;
   }
 
-  getContainer(service= null){
-    if (service){
+  getContainer(service = null) {
+    if (service) {
       return service.container;
     }
     return Container(this).Container;

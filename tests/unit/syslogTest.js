@@ -20,9 +20,11 @@ const defaultOptions = {
 describe("NODEFONY SYSLOG", function () {
 
   before(function () {
+    let self = this ;
     global.syslog = new nodefony.Syslog();
     let ret = global.syslog.listenWithConditions( defaultOptions,
       (pdu) => {
+        assert.strictEqual(this, self);
         //nodefony.Syslog.normalizeLog(pdu);
         return true
       });
@@ -547,8 +549,34 @@ describe("NODEFONY SYSLOG", function () {
         global.syslog.log("nopass", "INFO")
         global.syslog.log("pass", "INFO", "NODEFONY")
       })
-
     });
+
+    it("listener condition MSGID array ", () => {
+      return new Promise((resolve, reject) => {
+        let i = 0
+        global.syslog.listenWithConditions( {
+            msgid: {
+              data: ["NODEFONY","SIP"]
+            }
+          },
+          (pdu) => {
+            i++;
+            //nodefony.Syslog.normalizeLog(pdu);
+            assert(pdu.msgid === "NODEFONY" || pdu.msgid === "SIP");
+            assert.strictEqual(pdu.payload, "pass");
+            if (i === 4) {
+              resolve();
+            }
+          });
+        global.syslog.log("pass", "INFO", "NODEFONY")
+        global.syslog.log("nopass", "INFO")
+        global.syslog.log("pass", "INFO", "NODEFONY")
+        global.syslog.log("pass", "INFO", "SIP")
+        global.syslog.log("nopass", "INFO")
+        global.syslog.log("pass", "INFO", "SIP")
+      })
+    });
+
   });
 
 

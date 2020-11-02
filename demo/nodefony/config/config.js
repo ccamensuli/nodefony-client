@@ -116,7 +116,7 @@ module.exports = {
      *       }
      */
     bundles: {
-      //"users-bundle": path.resolve("src", "bundles", "users-bundle")
+      "users-bundle": path.resolve("src", "bundles", "users-bundle")
     },
     /**
      * SYSLOG NODEFONY

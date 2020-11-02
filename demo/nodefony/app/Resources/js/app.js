@@ -8,20 +8,20 @@ import "../css/app.css";
 // with release production
 
 /*import nodefony from "nodefony-client";
-import media from "nodefony-client/dist/medias.js";
+import media from "nodefony-client/dist/medias";
 media(nodefony);
 import webaudio from "nodefony-client/dist/webaudio";
 webaudio(nodefony);
 import socket from "nodefony-client/dist/socket";
 socket(nodefony);
 import sip from "nodefony-client/dist/sip";
-sip(nodefony);*/
+sip(nodefony);
+window.nodefony = nodefony;*/
 
 // dev
 import Nodefony from "../../../../../src/nodefony.es6";
 //console.log(process.env.NODE_ENV)
-const nodefony = new Nodefony(process.env.NODE_ENV);
-window.nodefony = nodefony;
+const nodefony = new Nodefony(process.env.NODE_ENV, process.env.NODE_DEBUG);
 import Media from "../../../../../src/medias/medias.es6";
 Media(nodefony);
 //console.log(nodefony)
@@ -32,15 +32,16 @@ Webaudio(nodefony);
 
 import Sip from "../../../../../src/protocols/sip/sip.es6";
 Sip(nodefony);
-//console.log(nodefony)
-
-
+window.nodefony = nodefony;
 /*
  *	Class Bundle App
  */
 class App extends nodefony.Kernel {
   constructor() {
-    super({});
+    super({
+      environment: process.env.NODE_ENV || "production",
+      debug: process.env.NODE_DEBUG
+    });
     this.on("load", () => {
       this.initialize();
     });
@@ -53,13 +54,13 @@ class App extends nodefony.Kernel {
   }
 
   async initialize() {
-    this.createMixer();
-    await this.createMediaStream();
-    //this.createWebsocket();
+    //this.createMixer();
+    //await this.createMediaStream();
+    this.createWebsocket();
     //this.createSocket();
     //this.initializeApi();
     //this.login();
-    //this.createSip();
+    this.createSip();
   }
 
   initializeApi() {
@@ -106,11 +107,22 @@ class App extends nodefony.Kernel {
   }
 
   createWebsocket() {
-    let sock = new nodefony.WebSocket(`wss://localhost:5152/ws?foo=bar&bar=foo`, {
+    const sock = new nodefony.WebSocket(`wss://localhost:5152/ws?foo=bar&bar=foo`, {
       protocol: "sip"
     }, this);
     sock.on("onopen", (event) => {
       this.logger(`onopen`, event)
+      setTimeout(async () => {
+        let res = await sock.sendAsync(JSON.stringify({
+            foo: "bar"
+          }))
+          .catch((error) => {
+            console.error(error);
+          })
+        if (res) {
+          this.log(res);
+        }
+      }, 1000);
     })
     sock.on("onmessage", (event) => {
       this.logger(`onmessage`, event)
@@ -118,30 +130,20 @@ class App extends nodefony.Kernel {
     sock.on("onerror", (error) => {
       this.logger(`onerror`, error)
     })
-    setTimeout(async () => {
-      let res = await sock.sendAsync(JSON.stringify({
-          foo: "bar"
-        }))
-        .catch((error) => {
-          console.error(error);
-        })
-      if (res) {
-        console.log(res);
-      }
-    }, 1000);
+
   }
 
   createSocket() {
-    let sock = new nodefony.Socket(`wss://localhost:5152/socket`, null, this);
+    const sock = new nodefony.Socket(`wss://localhost:5152/socket`, null, this);
     sock.on("ready", (message, socket) => {
-      this.logger(`ready`, message);
+      this.log(`ready`);
       socket.subscribe("monitoring");
     });
     sock.on("message", (service, message, socket) => {
-      //socket.logger(`message`, JSON.parse(message));
+      socket.log(JSON.parse(message), "DEBUG");
     });
     sock.on("subscribe", (service, message, socket) => {
-      socket.logger(`subscribe`, service);
+      socket.log(`Socket subscribe ${service}`,"DEBUG")
       setTimeout(() => {
         socket.unSubscribe(service);
       }, 10 * 1000);
@@ -151,17 +153,18 @@ class App extends nodefony.Kernel {
       //socket.log(JSON.parse(message));
     });
     sock.on("unSubscribe", (service, message, socket) => {
-      socket.logger(`unsubscribe`, service);
+      socket.log(`Socket unsubscribe : ${service}`,"DEBUG")
     });
     sock.on("connect", (message, socket) => {
-      socket.logger(`connect`, message);
+      socket.log(`Socket connect`,"DEBUG")
+      //socket.logger(`connect`, message);
     });
     sock.on("error", (message, socket) => {
-      if(socket){
+      if (socket) {
         socket.logger(`error`, message);
       }
     });
-    console.log(sock)
+    this.log(sock)
   }
 
   createSip() {
@@ -193,6 +196,7 @@ class App extends nodefony.Kernel {
     sip.on("onRegister", () => {
       this.log(`Register User ${user} asterisk`);
     });
+    this.log(sip)
   }
 }
 

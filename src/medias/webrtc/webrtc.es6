@@ -1,6 +1,7 @@
 'use strict';
 
 export default function (nodefony) {
+  nodefony.modules.push("webrtc");
   const defaultSettings = {
     audio: true,
     video: true,

@@ -25,6 +25,10 @@ if (kernel.environment === "dev") {
   dev = false;
 }
 
+//const debug = kernel.debug ? "SIP" : false ;
+const debug = kernel.debug ? "SIP,SOCKET" : false ;
+//const debug = kernel.debug ? "*" : false ;
+
 module.exports = merge(wpconfig, {
   //context: context,
   target: "web",
@@ -41,7 +45,10 @@ module.exports = merge(wpconfig, {
   },
   externals: {},
   resolve: {
-    //modules: [path.resolve(__dirname, "..", "node_modules")]
+    /*symlinks: true,
+    alias:{
+      "nodefony-client": path.resolve(__dirname, "..", "..", "..", "..", "..","nodefony-client")
+    },*/
     modules: [
       path.resolve(__dirname, "..", 'node_modules'),
       path.resolve(__dirname, "..", "..", 'node_modules'),
@@ -125,7 +132,8 @@ module.exports = merge(wpconfig, {
     }),
     new webpack.DefinePlugin({
       'process.env': {
-        'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+        "NODE_DEBUG":JSON.stringify(debug)
       }
     }),
   ],

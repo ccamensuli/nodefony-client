@@ -149,7 +149,7 @@ export default (nodefony) => {
 
     createTransaction(to) {
       this.currentTransaction = new Transaction(to || this.to, this);
-      this.sip.logger("SIP NEW TRANSACTION :" + this.currentTransaction.branch, "DEBUG");
+      this.sip.log("SIP NEW TRANSACTION :" + this.currentTransaction.branch, "DEBUG");
       this.transactions[this.currentTransaction.branch] = this.currentTransaction;
       return this.currentTransaction;
     }
@@ -191,7 +191,7 @@ export default (nodefony) => {
       if (this.status === this.statusCode.CANCEL) {
         return null;
       }
-      this.sip.logger("SIP INVITE DIALOG");
+      this.sip.log("SIP INVITE DIALOG", "DEBUG");
       if (userTo) {
         this.to = "<sip:" + userTo + ">";
       }

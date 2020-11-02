@@ -84,7 +84,7 @@ export default (nodefony) => {
           this.body = new SipBody(this, "");
         }
       } catch (e) {
-        this.sip.logger("SIP parseBody Message :" + this.split[1], "ERROR");
+        this.sip.log("SIP parseBody Message :" + this.split[1], "ERROR");
         throw e;
       }
     }
@@ -94,7 +94,7 @@ export default (nodefony) => {
         try {
           this.header = new SipHeader(this, this.split[0]);
         } catch (e) {
-          this.sip.logger("SIP parseHeader Message :" + this.split[0], "ERROR");
+          this.sip.log("SIP parseHeader Message :" + this.split[0], "ERROR");
           throw e;
         }
       } else {
@@ -128,7 +128,7 @@ export default (nodefony) => {
         if (!this.dialog) {
           this.dialog = this.sip.createDialog(this);
         } else {
-          this.sip.logger("SIP HYDRATE DIALOG :" + this.dialog.callId, "DEBUG");
+          this.sip.log("SIP HYDRATE DIALOG :" + this.dialog.callId, "DEBUG");
           this.dialog.hydrate(this);
         }
         return this.dialog;
@@ -147,7 +147,7 @@ export default (nodefony) => {
           if (!this.transaction) {
             this.transaction = this.dialog.createTransaction(this);
           } else {
-            this.sip.logger("SIP HYDRATE TRANSACTION :" + this.transaction.branch, "DEBUG");
+            this.sip.log("SIP HYDRATE TRANSACTION :" + this.transaction.branch, "DEBUG");
             this.transaction.hydrate(this);
           }
         } else {
@@ -156,7 +156,7 @@ export default (nodefony) => {
         return this.transaction;
       } else {
         // TODO CSEQ mandatory
-        this.sip.logger(this.rawMessage, "ERROR");
+        this.sip.log(this.rawMessage, "ERROR");
         throw new Error("BAD FORMAT SIP MESSAGE no Branch", 500);
       }
     }

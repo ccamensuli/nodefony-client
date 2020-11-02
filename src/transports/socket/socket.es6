@@ -2,7 +2,7 @@ import bayeux from '../../protocols/bayeux/bayeux.es6';
 
 
 export default (nodefony) => {
-
+  nodefony.modules.push("socket");
   const defaultSettings = {
     type: "websocket",
     protocol: "bayeux"
@@ -18,7 +18,7 @@ export default (nodefony) => {
         settings = defaultSettings;
       }
       if (service) {
-        super("Socket", service.container, null, settings);
+        super("SOCKET", service.container, null, settings);
         this.socket = null;
       } else {
         super("Socket", null, null, settings);

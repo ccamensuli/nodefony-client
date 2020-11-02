@@ -2,21 +2,47 @@ export default (nodefony) => {
 
   'use strict';
 
-  const conditionOptions = function (environment) {
+  const formatDebug= function(debug){
+    switch(typeof debug){
+      case "boolean":
+        return debug;
+      case "string":
+        const tab = debug.split(/,| /);
+        if (tab[0] === "*"){
+          return true;
+        }
+        return tab;
+      case undefined:
+        return false;
+      default:
+        return false;
+    }
+  }
+
+  const conditionOptions = function (environment, debug = undefined) {
+    debug = formatDebug(debug);
+    let obj = null;
     if (environment === "development") {
-      return {
+      obj = {
         severity: {
           operator: "<=",
-          data: "7"
+          data: (debug === false ) ? 6 : 7
+        }
+      };
+    }else{
+      obj =  {
+        severity: {
+          operator: "<=",
+          data: (debug) ? 7 : 6
         }
       };
     }
-    return {
-      severity: {
-        operator: "<=",
-        data: "6"
+    if( typeof debug === "object"){
+      obj.msgid = {
+          data: debug
       }
-    };
+    }
+    return obj;
   };
   /*
    * default settings
@@ -164,6 +190,9 @@ export default (nodefony) => {
         res = ele;
       }
       break;
+    case "array":
+      res = ele;
+      break;
     default:
       throw new Error("checkFormatMsgId bad format " + nodefony.typeOf(ele) + " : " + ele);
     }
@@ -310,48 +339,6 @@ export default (nodefony) => {
 
   /**
    * A class for product log in nodefony.
-   * @example
-   *
-   *    var ERROR_DEFINE = {
-   *       '-101': 'I18N string'
-   *    };
-   *
-   *    var settings = {
-   *        rateLimit:100,
-   *        burstLimit:10,
-   *        moduleName:"LIVE",
-   *        defaultSeverity:"ERROR"
-   *    };
-   *
-   *    var logIntance = new nodefony.Syslog(settings);
-   *
-   *
-   *
-   *    controller.logIntance.listenWithConditions({
-   *        checkConditions: "&&",
-   *        severity:{
-   *            data:"CRITIC,ERROR"
-   *            //data:"1,7"
-   *        },
-   *        date:{
-   *            operator:">=",
-   *            data:new Date()
-   *        },
-   *        msgid:{
-   *            data:"myFunction"
-   *        }
-   *
-   *
-   *    },function(pdu){
-   *        logView(pdu)
-   *    } )
-   *
-   *
-   *    var myFunction = function(error){
-   *        controller.logIntance.logger(error, "ERROR", "myFunction", ERROR_DEFINE[error] );
-   *    }
-   *
-   *
    *
    *    @class syslog
    *    @module library
@@ -412,8 +399,8 @@ export default (nodefony) => {
       this.fire = this.settings.async ? super.fireAsync : super.fire;
     }
 
-    init(environment = nodefony.environment, options = null) {
-      return this.listenWithConditions(options || conditionOptions(environment),
+    init(environment = nodefony.environment, debug, options = null) {
+      return this.listenWithConditions(options || conditionOptions(environment, debug),
         (pdu) => {
           return Syslog.normalizeLog(pdu);
         });
@@ -450,13 +437,13 @@ export default (nodefony) => {
 
     /**
      * logger message
-     * @method logger
+     * @method log
      * @param {void} payload payload for log. protocole controle information
      * @param {Number | String} severity severity syslog like.
      * @param {String} msgid informations for message. example(Name of function for debug)
      * @param {String} msg  message to add in log. example (I18N)
      */
-    logger(payload, severity, msgid, msg) {
+    log(payload, severity, msgid, msg) {
       let pdu = null;
       if (this.settings.rateLimit) {
         let now = new Date().getTime();
@@ -620,7 +607,7 @@ export default (nodefony) => {
       }
       try {
         conditions = nodefony.extend(true, {}, conditions);
-        let wrapper = wrapperCondition.call(this, conditions, callback);
+        const wrapper = wrapperCondition.call(this, conditions, callback);
         if (wrapper) {
           return super.on("onLog", wrapper);
         }
@@ -639,96 +626,81 @@ export default (nodefony) => {
       return this.filter(conditions, callback);
     }
 
-    log() {
-      return this.logger.apply(this, arguments);
-    }
-
     error(data) {
-      return this.logger(data, "ERROR");
+      return this.log(data, "ERROR");
     }
 
     warn(data) {
-      return this.logger(data, "WARNING");
+      return this.log(data, "WARNING");
     }
 
     warnning(data) {
-      return this.logger(data, "WARNING");
+      return this.log(data, "WARNING");
     }
 
     info(data) {
-      return this.logger(data, "INFO");
+      return this.log(data, "INFO");
     }
 
     debug(data) {
-      return this.logger(data, "DEBUG");
+      return this.log(data, "DEBUG");
     }
 
     trace(data) {
-      return this.logger(data, "NOTICE");
+      return this.log(data, "NOTICE");
     }
 
-    static wrapper(pdu) {
+    static wrapper(pdu, message) {
+      let date = new Date(pdu.timeStamp);
+      let obj = {};
       switch (pdu.severity) {
         // EMERGENCY
       case 0:
-        return {
-          logger: console.error
-        }
+        obj.logger = console.error;
+        break;
         // ALERT
       case 1:
-        return {
-          logger: window.alert.bind(window)
-        }
+        obj.logger = window.alert.bind(window);
+        obj.text = `${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`;
+        return obj;
         // CRITIC
       case 2:
         // ERROR
       case 3:
-        return {
-          logger: console.error
-        }
+        obj.logger = console.error;
+        break;
         // WARNING
       case 4:
-        return {
-          logger: console.warn
-        }
+        obj.logger = console.warn;
+        break;
         // NOTICE
       case 5:
-        return {
-          logger: trace
-        }
+        obj.logger = trace;
+        break;
         // INFO
       case 6:
-        return {
-          logger: console.info
-        }
+        obj.logger = console.info;
+        break;
         // DEBUG
       case 7:
-        return {
-          logger: console.debug
-        }
+        obj.logger = console.debug;
+        break;
       default:
-        return {
-          logger: console.log
-        }
+        obj.logger = console.log;
       }
+      obj.text = `${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} :`;
+      return obj;
     }
 
     static normalizeLog(pdu) {
-      let date = new Date(pdu.timeStamp);
       if (pdu.payload === "" || pdu.payload === undefined) {
-        console.warn(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : logger message empty !!!!`);
+        console.warn(`${pdu.severityName} ${pdu.msgid} : logger message empty !!!!`);
         console.trace(pdu);
         return;
       }
       let message = pdu.payload;
-      switch (true) {
-      case nodefony.isObject(message):
-        try {
-          message = `\n${nodefony.inspect(message)}`;
-        } catch (e) {}
-      }
-      let wrapper = nodefony.Syslog.wrapper(pdu);
-      return wrapper.logger(`${date.toDateString()} ${date.toLocaleTimeString()} ${pdu.severityName} ${pdu.msgid} : ${message}`);
+      const wrapper = Syslog.wrapper(pdu, message);
+      return wrapper.logger(`${wrapper.text}`, message);
     };
   }
   return Syslog;

@@ -3,8 +3,8 @@
 import Stream from "./streams/stream.es6";
 
 export default (nodefony) => {
-   const stream = Stream(nodefony);
-
+  const stream = Stream(nodefony);
+  nodefony.modules.push("medias")
   class Medias {
 
     constructor() {

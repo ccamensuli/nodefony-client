@@ -1,7 +1,9 @@
 const path = require("path");
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const { merge } = require('webpack-merge');
+const {
+  merge
+} = require('webpack-merge');
 const precss = require('precss');
 const autoprefixer = require('autoprefixer');
 
@@ -42,7 +44,10 @@ module.exports = merge(config, {
   externals: {},
   resolve: {
     extensions: ['.js', '.json', '.jsx', '.css', '.mjs'],
-    fallback: { "path": false }
+    fallback: {
+      "path": false,
+      "assert": false
+    }
   },
   module: {
     rules: [{

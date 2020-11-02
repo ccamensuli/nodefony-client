@@ -16,12 +16,13 @@ export default (nodefony) => {
       nbListeners: 20
     }
   };
+  const trace = console.trace || console.log;
 
   class Service {
 
     constructor(name, container, notificationsCenter, options = {}) {
       if (name) {
-        this.name = name;
+        this.name = name.toUpperCase();
       }
       if (options) {
         if (notificationsCenter === false) {
@@ -65,7 +66,6 @@ export default (nodefony) => {
       } else {
         this.settingsSyslog = this.syslog.settings;
       }
-
       if (notificationsCenter instanceof nodefony.Events) {
         this.notificationsCenter = notificationsCenter;
         if (options) {
@@ -81,7 +81,7 @@ export default (nodefony) => {
         if (notificationsCenter !== false) {
           this.notificationsCenter = new nodefony.Events(this.options, this, this.options.events);
           this.notificationsCenter.on('error', (err) => {
-            this.logger(err, "ERROR", "Error events");
+            this.log(err, "ERROR", "Error events");
           });
 
           if (!this.kernel) {
@@ -96,8 +96,8 @@ export default (nodefony) => {
       delete this.options.events;
     }
 
-    initSyslog(environment = nodefony.environment, debug = false, options = null) {
-      return this.syslog.init(environment, options);
+    initSyslog(environment = nodefony.environment, debug = undefined, options = null) {
+      return this.syslog.init(environment, debug, options);
     }
 
     getName() {
@@ -124,17 +124,25 @@ export default (nodefony) => {
     log(pci, severity, msgid, msg) {
       try {
         if (!msgid) {
-          msgid = "SERVICE " + this.name + " ";
+          msgid = this.name;
         }
-        return this.syslog.logger(pci, severity, msgid, msg);
+        return this.syslog.log(pci, severity, msgid, msg);
       } catch (e) {
-        console.log(pci);
+        console.log(severity, msgid, msg, " : ", pci);
+        console.warn(e);
       }
     }
 
-    logger(...args) {
-      this.log("LOGGER", "DEBUG");
-      console.debug(...args);
+    logger(one, ...args) {
+      if (nodefony.environment !== "production") {
+        return console.debug(nodefony.Syslog.wrapper(this.log(one, "DEBUG")).text, one, ...args);
+      }
+    }
+
+    trace() {
+      if (nodefony.environment !== "production") {
+        return trace(nodefony.Syslog.wrapper(this.log(one, "DEBUG")).text, one, ...args);
+      }
     }
 
     eventNames(...args) {

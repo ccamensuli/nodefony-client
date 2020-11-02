@@ -71,7 +71,7 @@
          this.socket = null;
        }
        try {
-         this.log(`Protocol : ${options.protocol}`);
+         this.log(`Protocol : ${options.protocol}`, "DEBUG");
          this.socket = new window.WebSocket(this.url.href, options.protocol);
        } catch (e) {
          this.fire("onerror", e);
