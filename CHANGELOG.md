@@ -1,15 +1,34 @@
 # Changelog
 
+## 6.0.0-beta.8 (02/11/2020)
+- [log granularity management](https://github.com/nodefony/nodefony-client/commit/f8e2ace62f5640371720566ad1fa47666df7eccc)
+- [clean syslog in service:wq](https://github.com/nodefony/nodefony-client/commit/d9e9ecc1639e4795ce6d2022fa8ef6612cdf4d20)
+- [Analyzer](https://github.com/nodefony/nodefony-client/commit/1a56bedd627fa1c06973250eb164d5446262a804)
+- [clean syslog PDU class](https://github.com/nodefony/nodefony-client/commit/5c6345d83d8cc5e70ad99799c7af2a67bd2e5d4b)
+- [clean linter](https://github.com/nodefony/nodefony-client/commit/b71e038103d821d9d3fa36f81463e4635bf27775)
+- [add page test browser](https://github.com/nodefony/nodefony-client/commit/dd8b1e6372a817bcb628b914c2d20a67396fefee)
+- [codeql-analysis](https://github.com/nodefony/nodefony-client/commit/fefe5353e6e21f9f7297e8cca9a36d6bc5f89b63)
+- [clean socket](https://github.com/nodefony/nodefony-client/commit/b567d6eaa8c379db7b2543b738d78291f5fe2d30)
+- [debug Via transport type](https://github.com/nodefony/nodefony-client/commit/6107e86beabb96a905b3e6b23867f7be3bbd986f)
+- [Update codeql-analysis.yml](https://github.com/nodefony/nodefony-client/commit/1f3d315369dc38556003c152928a48041228fa9a)
+- [debug regexpwq](https://github.com/nodefony/nodefony-client/commit/375ace158e0ef3548eff58f53dba8ad9c21aa052)
+- [Update codeql-analysis.yml](https://github.com/nodefony/nodefony-client/commit/172a5e468a4dd58e1e41cf1718855e35a49ff2e3)
+- [upgrade deps](https://github.com/nodefony/nodefony-client/commit/5f72e724df6032a09cba3ff57363f2c1ef6ec524)
+- [clean url param in transport](https://github.com/nodefony/nodefony-client/commit/6c60d2ab489d83c39701cae3fa0a6f33ca70354b)
+
+---
+
 ## 6.0.0-beta.7 (27/10/2020)
 - [release 6.0.0-beta.7](https://github.com/nodefony/nodefony-client/commit/ad34c8f753720353bc7fa77b993fa211c3083039)
 - [upgrade deps](https://github.com/nodefony/nodefony-client/commit/1c6a75086687baf6d4a6763fdfbaae22657a7bd8)
 - [debug authentication DIGEST with asterisk](https://github.com/nodefony/nodefony-client/commit/3dfb6c589e538ce0b6c93f01a57058285d8ca085)
 - [add sip](https://github.com/nodefony/nodefony-client/commit/295c0dc7be37529edfe2fad82c1fe2971e3d799c)
+- [Merge branch 'main' of github.com:ccamensuli/nodefony-client into main](https://github.com/nodefony/nodefony-client/commit/e5e2d9a182a1290e4d3033c8f43602bbf8bff70b)
 - [clean syslog | clean entrypoint](https://github.com/nodefony/nodefony-client/commit/44c8d588e5e5380e8e527be04a6b6ca6518577be)
 - [add dev mode demo nodefony](https://github.com/nodefony/nodefony-client/commit/1b6365ed8de9df8e6d6ba5d6d46fecc0487ea841)
+- [Create FUNDING.yml](https://github.com/nodefony/nodefony-client/commit/89ac0666e4d74b9e282e924bab6038e1851859d5)
 
 ---
-
 
 ## 6.0.0-beta.6 (24/10/2020)
 - [add ci/cd new node release](https://github.com/nodefony/nodefony-client/commit/5c7fad377342d7dc46718cb1c68480b95c9b927e)
