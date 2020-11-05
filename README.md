@@ -118,6 +118,14 @@ environment = production | development
   window.nodefony = nodefony;
 ```
 
+## CommonJS modules
+```js
+const nodefony = require('nodefony-client')
+//chunk
+const socket = require("nodefony-client/dist/socket");
+socket(nodefony);
+```
+
 ## Sources
 ```js
 const source_dir = path.resolve("<path.to.sources>")

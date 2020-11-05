@@ -14,7 +14,6 @@ export default (nodefony) => {
   const onHandshakeResponse = function (message) {
     if (message.successful) {
       try {
-        message.ext.address = JSON.parse(message.ext.address);
         this.fire("onHandshake", message, this);
       } catch (e) {
         throw new Error(e);
@@ -46,7 +45,6 @@ export default (nodefony) => {
           }
         }
       }
-      message.ext.address = JSON.parse(message.ext.address);
       this.fire("onConnect", message, this);
     } else {
       this.connected = false;
@@ -135,7 +133,7 @@ export default (nodefony) => {
             this.onMessage(message.data);
           }
         });
-        this.socket.on("onerror", this.listen(this, "onError"));
+        //this.socket.on("onerror", this.listen(this, "onError"));
         this.socket.on("onclose", (err) => {
           delete this.socket;
           this.fire("onClose", err);
@@ -159,15 +157,16 @@ export default (nodefony) => {
       let req = JSON.stringify(nodefony.extend({}, this.request, {
         channel: "/meta/handshake",
         minimumVersion: "1.0",
+        clientId: this.idconnection,
         supportedConnectionTypes: clientsCapabilities
       }));
-      return this.socket.send(req);
+      return req;
     }
 
     connect(message) {
       let req = JSON.stringify({
         channel: "/meta/connect",
-        clientId: message.clientId,
+        //clientId: message.clientId,
         connectionType: this.socketType
       });
       return this.socket.send(req);
@@ -178,19 +177,18 @@ export default (nodefony) => {
     }
 
     disconnect() {
-      return JSON.stringify({
+      let req = JSON.stringify({
         channel: "/meta/disconnect",
         clientId: this.idconnection,
       });
+      return this.socket.send(req);
     }
 
     subscribe(name, data, parser = "application/json") {
       let req = JSON.stringify({
         channel: "/meta/subscribe",
         clientId: this.idconnection,
-        advice: {
-          parser: parser
-        },
+        advice: {},
         subscription: "/service/" + name,
         data: data
       });
@@ -250,12 +248,6 @@ export default (nodefony) => {
         }
       }
     }
-
-    /*send(data) {
-      if (this.socket) {
-        return this.socket.send(data);
-      }
-    }*/
   }
 
   nodefony.protocols.Bayeux = Bayeux;

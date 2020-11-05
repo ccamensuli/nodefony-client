@@ -1,9 +1,13 @@
 //nodefony.preloadMedias();
 //nodefony.preloadSocket();
 
-const kernel = new nodefony.Kernel();
+const kernel = new nodefony.Kernel("kernel",{
+  environment: "development",
+  debug: true
+});
 kernel.on("load", (event) => {
   try {
+    kernel.log(this, "DEBUG");
     kernel.log("CREATE webAudio Mixer", "DEBUG");
     let Mixer = new nodefony.webAudio.Mixer("Mixer", {}, kernel);
     kernel.log("CREATE MediaStream", "DEBUG");

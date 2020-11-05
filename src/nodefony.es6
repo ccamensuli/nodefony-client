@@ -53,7 +53,7 @@ class Nodefony {
     this.protocols = {};
     this.crypto = {};
     this.nativeWebSocket = nativeWebSocket;
-    this.URL = url;
+    this.url = url;
     this.util = util;
     this.Events = Events(this);
     this.Error = error(this);
@@ -142,9 +142,9 @@ class Nodefony {
           await this.loadSip();
         }
       }
+      //this.showBanner();
     }
     this.loaded = true;
-    this.showBanner();
   }
 
   async loadMedias() {
@@ -196,6 +196,7 @@ class Nodefony {
   }
 
   getQuery() {
+    //console.log("resourceQuery",__resourceQuery);
     try {
       if (document.currentScript) {
         let myurl = url.parse(document.currentScript.src);

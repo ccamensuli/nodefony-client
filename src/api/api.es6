@@ -49,7 +49,7 @@ export default (nodefony) => {
       }
       let myurl = null;
       if (this.baseUrl.href) {
-        myurl = nodefony.URL.resolve(this.baseUrl.href, url);
+        myurl = nodefony.url.resolve(this.baseUrl.href, url);
       } else {
         myurl = url;
       }

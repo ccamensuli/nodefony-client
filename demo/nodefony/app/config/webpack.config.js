@@ -26,7 +26,7 @@ if (kernel.environment === "dev") {
 }
 
 //const debug = kernel.debug ? "SIP" : false ;
-const debug = kernel.debug ? "SIP,SOCKET" : false ;
+const debug = kernel.debug ? "APP,SIP,SOCKET" : false ;
 //const debug = kernel.debug ? "*" : false ;
 
 module.exports = merge(wpconfig, {

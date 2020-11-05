@@ -38,9 +38,9 @@ window.nodefony = nodefony;
  */
 class App extends nodefony.Kernel {
   constructor() {
-    super({
+    super("App", {
       environment: process.env.NODE_ENV || "production",
-      debug: process.env.NODE_DEBUG
+      debug: process.env.NODE_DEBUG || false
     });
     this.on("load", () => {
       this.initialize();
@@ -56,11 +56,11 @@ class App extends nodefony.Kernel {
   async initialize() {
     //this.createMixer();
     //await this.createMediaStream();
-    this.createWebsocket();
-    //this.createSocket();
+    //this.createWebsocket();
+    this.createSocket();
     //this.initializeApi();
     //this.login();
-    this.createSip();
+    //this.createSip();
   }
 
   initializeApi() {
@@ -125,25 +125,33 @@ class App extends nodefony.Kernel {
       }, 1000);
     })
     sock.on("onmessage", (event) => {
-      this.logger(`onmessage`, event)
+      this.log( event, "DEBUG")
     })
     sock.on("onerror", (error) => {
-      this.logger(`onerror`, error)
+      this.log( error, "ERROR")
     })
-
   }
 
   createSocket() {
-    const sock = new nodefony.Socket(`wss://localhost:5152/socket`, null, this);
+    this.log("createSocket")
+    //const sock = new nodefony.Socket(`wss://localhost:5152/socket`, null, this);
+    const sock = new nodefony.Socket(`/nodefony/socket`, null, this);
+    sock.on("handshake", (message, socket) => {
+      sock.log("handshake", "INFO");
+    });
     sock.on("ready", (message, socket) => {
       this.log(`ready`);
       socket.subscribe("monitoring");
     });
+    sock.on("disconnect", (message, socket) => {
+      sock.log("disconnect", "INFO");
+    });
     sock.on("message", (service, message, socket) => {
+      sock.log("message", "INFO");
       socket.log(JSON.parse(message), "DEBUG");
     });
     sock.on("subscribe", (service, message, socket) => {
-      socket.log(`Socket subscribe ${service}`,"DEBUG")
+      socket.log(`Socket subscribe ${service}`)
       setTimeout(() => {
         socket.unSubscribe(service);
       }, 10 * 1000);
@@ -152,19 +160,19 @@ class App extends nodefony.Kernel {
       //socket.logger(JSON.parse(message));
       //socket.log(JSON.parse(message));
     });
-    sock.on("unSubscribe", (service, message, socket) => {
-      socket.log(`Socket unsubscribe : ${service}`,"DEBUG")
+    sock.on("unsubscribe", (service, message, socket) => {
+      socket.log(`Socket unsubscribe : ${service}`)
     });
     sock.on("connect", (message, socket) => {
-      socket.log(`Socket connect`,"DEBUG")
-      //socket.logger(`connect`, message);
+      socket.log(`Socket connect`)
     });
-    sock.on("error", (message, socket) => {
-      if (socket) {
-        socket.logger(`error`, message);
-      }
+    sock.on("error", (code, args, message) => {
+      sock.log( message, "ERROR");
     });
-    this.log(sock)
+    setTimeout(() => {
+      sock.disconnect();
+    }, 12 * 1000);
+    this.log(sock);
   }
 
   createSip() {
@@ -196,7 +204,7 @@ class App extends nodefony.Kernel {
     sip.on("onRegister", () => {
       this.log(`Register User ${user} asterisk`);
     });
-    this.log(sip)
+    this.log(sip, "DEBUG")
   }
 }
 

@@ -1,21 +1,32 @@
 export default (nodefony) => {
 
   'use strict';
+  const trace = console.trace || console.log;
 
-  const formatDebug= function(debug){
-    switch(typeof debug){
-      case "boolean":
-        return debug;
-      case "string":
-        const tab = debug.split(/,| /);
-        if (tab[0] === "*"){
-          return true;
-        }
-        return tab;
-      case undefined:
+  const formatDebug = function (debug) {
+    switch (typeof debug) {
+    case "boolean":
+      return debug;
+    case "string":
+      if (debug === "false" ||
+        debug === "undefined" ||
+        debug === "null") {
         return false;
-      default:
-        return false;
+      }
+      if (debug === "true") {
+        return true;
+      }
+      const tab = debug.split(/,| /);
+      if (tab[0] === "*") {
+        return true;
+      }
+      return tab;
+    case "undefined":
+      return false;
+    case "object":
+      return false;
+    default:
+      return false;
     }
   }
 
@@ -26,20 +37,20 @@ export default (nodefony) => {
       obj = {
         severity: {
           operator: "<=",
-          data: (debug === false ) ? 6 : 7
+          data: (debug === false) ? 6 : 7
         }
       };
-    }else{
-      obj =  {
+    } else {
+      obj = {
         severity: {
           operator: "<=",
           data: (debug) ? 7 : 6
         }
       };
     }
-    if( typeof debug === "object"){
+    if (typeof debug === "object") {
       obj.msgid = {
-          data: debug
+        data: debug
       }
     }
     return obj;
@@ -68,7 +79,6 @@ export default (nodefony) => {
     async: false
   };
 
-  const trace = console.trace || console.log;
   const sysLogSeverity = nodefony.PDU.sysLogSeverity();
   const operators = {
     "<": function (ele1, ele2) {

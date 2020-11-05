@@ -9,15 +9,15 @@ import {
 export default (nodefony) => {
 
   const defaultOptions = {
-    environment: nodefony.environment || "production",
+    environment: nodefony.environment,
     debug: nodefony.debug,
     version: "1.0.0",
     loadEvent: "load", //"DOMContentLoaded"
   }
 
   class Kernel extends nodefony.Service {
-    constructor(options) {
-      super("KERNEL", null, null, nodefony.extend(true, {}, defaultOptions, options));
+    constructor(name = "KERNEL", options) {
+      super(name, null, null, nodefony.extend(true, {}, defaultOptions, options));
       this.set("kernel", this);
       this.environment = this.options.environment;
       this.version = this.options.version;
@@ -28,7 +28,7 @@ export default (nodefony) => {
       this.util = util;
       this.uuid = uuid;
       window.addEventListener(this.options.loadEvent, (event) => {
-        this.showBanner();
+        //this.showBanner();
         this.log(`EVENT ${this.options.loadEvent} `, "DEBUG");
         this.emit("load", event, this);
       });

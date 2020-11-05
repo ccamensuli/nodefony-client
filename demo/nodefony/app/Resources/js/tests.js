@@ -1,4 +1,3 @@
-
 /*import nodefony from "nodefony-client";
 import media from "nodefony-client/dist/medias.js";
 media(nodefony);
@@ -9,7 +8,6 @@ socket(nodefony);
 import sip from "nodefony-client/dist/sip";
 sip(nodefony);
 window.nodefony = nodefony;*/
-
 
 // dev
 import Nodefony from "../../../../../src/nodefony.es6";
@@ -29,7 +27,9 @@ window.nodefony = nodefony;
 
 class Test extends nodefony.Kernel {
   constructor() {
-    super({});
+    super("Test", {
+      debug:true
+    });
     this.initialize();
     this.on("load", () => {
 

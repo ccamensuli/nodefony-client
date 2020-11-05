@@ -11,7 +11,6 @@ class wsController extends nodefony.Controller {
     super(container, context);
     // start session
     this.startSession();
-    this.realtime = this.get("realTime");
   }
 
 /**
@@ -50,32 +49,6 @@ class wsController extends nodefony.Controller {
         throw new nodefony.Error("Bad request");
     }
   }
-
-  /**
-   *    @Route ("/socket",
-   *      name="socket",requirements={"protocol" = "bayeux"})
-   */
-    socketAction(message) {
-      switch (this.method) {
-        case "GET":
-          return this.getResponse("PING");
-        case "WEBSOCKET":
-          if (message) {
-            return this.realtime.handleConnection(message.utf8Data, this.context);
-          }
-          this.log(`Socket Connect`, "INFO");
-          this.log(`Protocol accept ${this.context.acceptedProtocol}`, "INFO");
-          /*return this.context.send(JSON.stringify({
-            connect:"ok",
-            protocol:this.context.acceptedProtocol,
-            route:this.getRoute(),
-            query:this.query
-          }));*/
-        break;
-      default:
-        throw new Error("REALTIME METHOD NOT ALLOWED");
-      }
-    }
 }
 
 module.exports = wsController;

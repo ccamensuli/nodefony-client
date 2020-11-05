@@ -121,7 +121,7 @@ export default (nodefony) => {
       delete this.kernel;
     }
 
-    log(pci, severity, msgid, msg) {
+    log(pci, severity, msgid = null, msg = null) {
       try {
         if (!msgid) {
           msgid = this.name;
@@ -134,15 +134,11 @@ export default (nodefony) => {
     }
 
     logger(one, ...args) {
-      if (nodefony.environment !== "production") {
-        return console.debug(nodefony.Syslog.wrapper(this.log(one, "DEBUG")).text, one, ...args);
-      }
+      return console.debug(nodefony.Syslog.wrapper(this.log(one, "DEBUG")).text, one, ...args);
     }
 
     trace() {
-      if (nodefony.environment !== "production") {
-        return trace(nodefony.Syslog.wrapper(this.log(one, "DEBUG")).text, one, ...args);
-      }
+      return trace(nodefony.Syslog.wrapper(this.log(one, "DEBUG")).text, one, ...args);
     }
 
     eventNames(...args) {

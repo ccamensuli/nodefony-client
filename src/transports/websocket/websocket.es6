@@ -48,23 +48,23 @@
    class Websocket extends nodefony.Service {
 
      constructor(url, settings = defaultSettings, service = null) {
-       if (settings === null) {
+       if( !settings){
          settings = defaultSettings;
        }
        if (service) {
-         super("Websocket", service.container, service.notificationsCenter, settings);
+         super("WEBSOCKET", service.container, null, settings);
        } else {
-         super("Websocket", null, null, settings);
+         super("WEBSOCKET", null, null, settings);
        }
        this.socket = null;
        if (url) {
-         this.connect(url, this.options);
+         this.connect(url);
        }
      }
 
      connect(url, settings = null) {
-       this.url = nodefony.url(url);
-       let options = settings ? settings : this.options;
+       this.url = nodefony.url.parse(url);
+       const options = settings ? settings : this.options;
        if (this.socket) {
          this.log(`Socket already exist `, "WARNING");
          this.socket.close();
@@ -83,11 +83,9 @@
        this.socket.onerror = (event) => {
          return error.call(this, event);
        };
-       //this.listen(this, "onerror");
        this.socket.onclose = (event) => {
          return error.call(this, event);
        };
-       //this.listen(this, "onclose");
        return this.socket;
      }
 
@@ -99,19 +97,15 @@
        return this.socket.send(data);
      }
 
-     sendAsync(data, timeout = null) {
+     sendAsync(data, timeout = this.options.timeout) {
        return new Promise((resolve, reject) => {
          let message = {
            nodefonyId: nodefony.generateId(),
            data: data,
-           timeout: timeout || this.options.timeout || defaultSettings.timeout,
+           timeout: timeout,
            timeoutid: null
          };
-         message.timeoutid = setTimeout(() => {
-           this.removeListener("onmessage", events)
-           let error = new Error(`timeout messageid : ${message.nodefonyId}`);
-           return reject(error);
-         }, message.timeout);
+         let clean = false;
          let events = (event) => {
            let result = null
            try {
@@ -131,14 +125,22 @@
              }
            }
          };
+         message.timeoutid = setTimeout(() => {
+           this.removeListener("onmessage", events)
+           let error = new Error(`timeout messageid : ${message.nodefonyId}`);
+           return reject(error);
+         }, message.timeout);
          this.on("onmessage", events);
+         clean= true;
          try {
            this.socket.send(JSON.stringify(message));
          } catch (e) {
            if (message.timeoutid) {
              clearTimeout(message.timeoutid)
            }
-           this.removeListener("onmessage", events)
+           if (clean){
+             this.removeListener("onmessage", events);
+           }
            throw e;
          }
        })
@@ -150,8 +152,5 @@
        this.removeAllListeners();
      }
    };
-
-   //nodefony.WebSocket = Websocket;
-
    return Websocket;
  };
