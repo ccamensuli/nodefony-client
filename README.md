@@ -4,6 +4,8 @@
 </p>
 <h1 align="center">NODEFONY CLIENT</h1>
 
+![nodefony-client CI](https://github.com/nodefony/nodefony-client/workflows/nodefony-client%20CI/badge.svg?branch=main)
+
 # Library Install
 ```bash
 $ npm install nodefony-client
