@@ -30,8 +30,6 @@ Socket(nodefony);
 import Webaudio from "../../../../../src/medias/webaudio/webaudio.es6";
 Webaudio(nodefony);
 
-import Sip from "../../../../../src/protocols/sip/sip.es6";
-Sip(nodefony);
 window.nodefony = nodefony;
 /*
  *	Class Bundle App
@@ -60,7 +58,6 @@ class App extends nodefony.Kernel {
     this.createSocket();
     //this.initializeApi();
     //this.login();
-    //this.createSip();
   }
 
   initializeApi() {
@@ -135,77 +132,55 @@ class App extends nodefony.Kernel {
   createSocket() {
     this.log("createSocket")
     //const sock = new nodefony.Socket(`wss://localhost:5152/socket`, null, this);
-    const sock = new nodefony.Socket(`/nodefony/socket`, null, this);
-    sock.on("handshake", (message, socket) => {
-      sock.log("handshake", "INFO");
+    this.socket = new nodefony.Socket(`/nodefony/socket`, null, this);
+    this.socket.on("handshake", (message, socket) => {
+      socket.log("handshake", "INFO");
     });
-    sock.on("ready", (message, socket) => {
+    this.socket.on("ready", (message, socket) => {
       this.log(`ready`);
-      socket.subscribe("monitoring");
+      this.subscribeMonitoring();
     });
-    sock.on("disconnect", (message, socket) => {
-      sock.log("disconnect", "INFO");
+    this.socket.on("disconnect", (message, socket) => {
+      socket.log("disconnect", "INFO");
     });
-    sock.on("message", (service, message, socket) => {
-      sock.log("message", "INFO");
+    this.socket.on("message", (service, message, socket) => {
+      socket.log("message", "INFO");
       socket.log(JSON.parse(message), "DEBUG");
     });
-    sock.on("subscribe", (service, message, socket) => {
+    this.socket.on("subscribe", (service, message, socket) => {
       socket.log(`Socket subscribe ${service}`)
       setTimeout(() => {
         socket.unSubscribe(service);
       }, 10 * 1000);
     });
-    sock.on("monitoring", (message, socket) => {
+    this.socket.on("monitoring", (message, socket) => {
       //socket.logger(JSON.parse(message));
       //socket.log(JSON.parse(message));
     });
-    sock.on("unsubscribe", (service, message, socket) => {
+    this.socket.on("unsubscribe", (service, message, socket) => {
       socket.log(`Socket unsubscribe : ${service}`)
     });
-    sock.on("connect", (message, socket) => {
+    this.socket.on("connect", (message, socket) => {
       socket.log(`Socket connect`)
     });
-    sock.on("error", (code, args, message) => {
-      sock.log( message, "ERROR");
+    this.socket.on("error", (code, args, message) => {
+      this.socket.log( message, "ERROR");
     });
     setTimeout(() => {
-      sock.disconnect();
+      this.socket.stop();
     }, 12 * 1000);
-    this.log(sock);
+
+    setTimeout(() => {
+      this.socket.start();
+    }, 20 * 1000);
+
+    this.log(this.socket);
   }
 
-  createSip() {
-    const user = "1002";
-    const passwd = "1002";
-    //const user = "5021";
-    //const passwd = "1234";
-
-    const url = `wss://localhost:8090/ws`;
-    //const url = `ws://localhost:8090/ws`;
-    //const url = `wss://pbx.example.com:8089/ws`;
-    //const url = `ws://pbx.example.com:8088/ws`;
-
-    const server = "nodefony.com";
-    const transport = new nodefony.WebSocket(url, {
-      protocol: "sip"
-    }, this);
-    transport.on("onerror", (event, code, reason) => {
-      this.log(`Websocket Error code : ${code||null} ==> ${reason}`, "ERROR");
-    });
-    transport.on("onclose", (event, code, reason) => {
-      this.log(`Websocket Close code : ${code} => ${reason}`, "WARNING");
-    });
-    const sip = new nodefony.protocols.Sip(server, transport, {}, this);
-    sip.on("onConnect", () => {
-      this.log("connect asterisk")
-      sip.register(user, passwd);
-    })
-    sip.on("onRegister", () => {
-      this.log(`Register User ${user} asterisk`);
-    });
-    this.log(sip, "DEBUG")
+  subscribeMonitoring(){
+    return this.socket.subscribe("monitoring");
   }
+
 }
 
 /*

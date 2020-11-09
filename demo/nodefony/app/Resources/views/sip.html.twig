@@ -1,0 +1,36 @@
+{% extends './base.html.twig' %}
+
+{% set error = getFlashBag("error") %}
+{% set info = getFlashBag("info") %}
+
+{% block stylesheets %}
+  <!-- WEBPACK BUNDLE -->
+  <link rel="stylesheet" href="{{CDN('stylesheet')}}/app/assets/css/sip.css"/>
+{% endblock %}
+
+{% block body %}
+
+<div class="hello">
+
+  <img class=displayed src=/framework-bundle/images/nodefony-logo.png>
+  <h1>{{ package.name }} </h1>
+  <h2>{{package.version}}</h2>
+
+  <p>
+    <h1> Sip </h1>
+  </p>
+
+  <img class="displayed"  style=" width:10%; height:10%" src="/framework-bundle/images/nodejs/nodejs-new-pantone-black.png">
+  <img class="displayed" style=" width:15%; height:15%" src="/framework-bundle/images/webpack/webpack.svg">
+
+</div>
+<p>
+  {{readme}}
+</p>
+
+{% endblock %}
+
+{% block javascripts %}
+  <!-- WEBPACK BUNDLE -->
+  <script type="text/javascript" src="{{CDN('javascript')}}/app/assets/js/sip.js"></script>
+{% endblock %}

@@ -34,7 +34,8 @@ module.exports = merge(wpconfig, {
   target: "web",
   entry: {
     app: ["./Resources/js/app.js"],
-    tests: ["./Resources/js/tests.js"]
+    tests: ["./Resources/js/tests.js"],
+    sip: ["./Resources/js/sip.js"]
   },
   output: {
     path: public,
@@ -126,9 +127,7 @@ module.exports = merge(wpconfig, {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      fallback: "style-loader",
-      filename: "./css/[name].css",
-      allChunks: true
+      filename: "./css/[name].css"
     }),
     new webpack.DefinePlugin({
       'process.env': {

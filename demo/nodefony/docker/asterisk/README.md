@@ -50,9 +50,9 @@ CMD asterisk -fvvv
 ```
 ## Use Docker container
 ```bash
-$ docker run -d -p 127.0.0.1:5066:5062/udp -p 127.0.0.1:8090:8089/tcp -p 127.0.0.1:10000-10010:10000-10010/udp  --name asterisk -v $(pwd)/conf:/etc/asterisk asterisk:1.0
+docker run -d -p 127.0.0.1:5062:5062/udp  -p 127.0.0.1:5060:5060/tcp   -p 127.0.0.1:8090:8089/tcp -p 127.0.0.1:10000-10010:10000-10010/udp  --name asterisk -v $(pwd)/conf:/etc/asterisk asterisk:1.0
 ```
-  Asterisk run on the local machine, on port 5066 (in the docker, it runs on port 5062). The websocket (in https) listens on port 8090 (8089 in the image of the docker). All the configuration is in the conf / directory if there is a need to change things. Ten RTP ports are open (from 10,000 to 10010).
+  Asterisk run on the local machine, udp on port 5062 tcp 5060 (in the docker, it runs on port tcp: 5060 udp:5062 ) . websocket (in https) listens on port 8090 (8089 in the image of the docker). All the configuration is in the conf / directory if there is a need to change things. Ten RTP ports are open (from 10,000 to 10010).
 
 ## Stop Docker container
 ```
