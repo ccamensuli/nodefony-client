@@ -162,6 +162,9 @@ export default (nodefony) => {
     listen(...args) {
       return this.notificationsCenter.listen(...args);
     }
+    unListen(...args){
+      return this.notificationsCenter.unListen(...args);
+    }
     on(...args) {
       return this.notificationsCenter.on(...args);
     }
