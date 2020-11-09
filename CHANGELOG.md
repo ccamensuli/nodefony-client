@@ -1,7 +1,19 @@
 # Changelog
 
+## 6.0.0-beta.10 (09/11/2020)
+- [release 6.0.0-beta.10](https://github.com/nodefony/nodefony-client/commit/f63d82756c2d1402e6307cae6fd10c66daf32b05)
+- [packge lock](https://github.com/nodefony/nodefony-client/commit/47405deb3f3ad9e91016d13a52b957691055d8a4)
+- [lib socket stop start reconnect](https://github.com/nodefony/nodefony-client/commit/67ec87c8b27674730c6f16a2ce1d0b72e54c53c6)
+- [upgrade nodefony demo](https://github.com/nodefony/nodefony-client/commit/3fb3f24ab3cfbc853c074a6b1e5b2ce49747789b)
+- [upgrade deps](https://github.com/nodefony/nodefony-client/commit/687966f57de390e60fc5902a0391707260d7f623)
+- [actions](https://github.com/nodefony/nodefony-client/commit/650d479db999df8aa3edfe9e0882afe1c485c904)
+
+---
+
 ## 6.0.0-beta.9 (05/11/2020)
+- [actions](https://github.com/nodefony/nodefony-client/commit/11f8eaacbb258b5f740b3f314a778a3395514d5e)
 - [release 6.0.0-beta.9](https://github.com/nodefony/nodefony-client/commit/da515034b8a640be3549a6ee64b0877704e6ad0c)
+- [package.lock](https://github.com/nodefony/nodefony-client/commit/4f3ead39e063432eb45e6f7d9f45e956f0e3a90d)
 - [Socket](https://github.com/nodefony/nodefony-client/commit/7f804b321a26cd18080ef101fe8fdac99c1941ad)
 - [upgrade deps](https://github.com/nodefony/nodefony-client/commit/26b2ee3e86369cebdf4ceb0c15e5bdc14d186d72)
 
@@ -44,6 +56,16 @@
 - [clean syslog | clean entrypoint](https://github.com/nodefony/nodefony-client/commit/44c8d588e5e5380e8e527be04a6b6ca6518577be)
 - [add dev mode demo nodefony](https://github.com/nodefony/nodefony-client/commit/1b6365ed8de9df8e6d6ba5d6d46fecc0487ea841)
 - [Create FUNDING.yml](https://github.com/nodefony/nodefony-client/commit/89ac0666e4d74b9e282e924bab6038e1851859d5)
+
+---
+
+## 6.0.0-beta.4 (24/10/2020)
+
+
+---
+
+## 6.0.0-beta.2 (24/10/2020)
+
 
 ---
 
