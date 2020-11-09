@@ -19,16 +19,16 @@ export default (nodefony) => {
 
     constructor(name = "api", baseUrl = "", options = {}, service = null) {
       super(name, nodefony.extend(true, {}, defaultOptions, options), service);
-      this.baseUrl = nodefony.url(baseUrl);
+      this.baseUrl = nodefony.url.parse(baseUrl);
       if (this.baseUrl.slashes !== null) {
         if (this.baseUrl.slashes === false) {
-          this.baseUrl = nodefony.url(`${baseUrl}/`);
+          this.baseUrl = nodefony.url.parse(`${baseUrl}/`);
         }
       } else {
         if (this.baseUrl.href) {
           let slash = this.baseUrl.href[this.baseUrl.href.length - 1];
           if (slash !== "/") {
-            this.baseUrl = nodefony.url(`${baseUrl}/`);
+            this.baseUrl = nodefony.url.parse(`${baseUrl}/`);
           }
         }
       }

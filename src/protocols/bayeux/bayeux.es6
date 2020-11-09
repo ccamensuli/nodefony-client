@@ -56,7 +56,7 @@ export default (nodefony) => {
     if (message.successful) {
       if (this.socket) {
         this.socket.close();
-        this.socket = null;
+        //this.socket = null;
         this.fire("onDisconnect", message, this);
       }
     } else {
@@ -125,8 +125,8 @@ export default (nodefony) => {
       }
       if (url instanceof nodefony.Socket) {
         this.socket = url;
-        this.socket.on("onopen", (message) => {
-          this.connect(message);
+        this.socket.on("onopen", (event) => {
+          this.connect(event);
         });
         this.socket.on("onmessage", (message) => {
           if (message.data) {
@@ -135,7 +135,7 @@ export default (nodefony) => {
         });
         //this.socket.on("onerror", this.listen(this, "onError"));
         this.socket.on("onclose", (err) => {
-          delete this.socket;
+          //delete this.socket;
           this.fire("onClose", err);
         });
       } else {
@@ -163,7 +163,7 @@ export default (nodefony) => {
       return req;
     }
 
-    connect(message) {
+    connect(event) {
       let req = JSON.stringify({
         channel: "/meta/connect",
         //clientId: message.clientId,

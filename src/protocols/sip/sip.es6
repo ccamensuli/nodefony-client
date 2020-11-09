@@ -1,4 +1,3 @@
-
 import dialog from './dialog.es6';
 import authenticate from './authenticate/authenticate.es6';
 import sipMessage from './sipmessage.es6';
@@ -36,16 +35,7 @@ export default (nodefony) => {
     transport: "WSS" //"TCP" "UDP" for nodefony socket
   };
 
-  const onStart = function () {
-    this.fire("onStart", this);
-  };
-
-  const onStop = function () {
-    this.stop();
-  };
-
   const onMessage = function (response) {
-
     this.log(`RECIEVE\n${response}`, "DEBUG");
     let message = null;
     let res = null;
@@ -74,13 +64,16 @@ export default (nodefony) => {
           }
         }
       }
-      this.log(e, "ERROR");
-      this.log("SIP DROP : " + response, "ERROR");
+      this.log(e, "WARNING");
+      if(!response){
+        this.log("SIP DROP : message empty ", "WARNING");
+      }else{
+        this.log("SIP DROP message: " + response, "WARNING");
+      }
       this.fire("onDrop", response);
       return;
     }
     this.fire("onMessage", message.rawMessage);
-
     switch (message.method) {
     case "REGISTER":
       this.rport = message.header.Via[0].rport;
@@ -156,12 +149,12 @@ export default (nodefony) => {
         }
         this.registered = message.code;
 
-        let expires = message.header["contact-expires"] ||  this.settings.expires;
+        let expires = message.header["contact-expires"] || this.settings.expires;
         expires = parseInt(expires, 10) * 900; // 10% (ms)
         this.registerInterval = setInterval(() => {
-          if (! this.authenticateRegister){
+          if (!this.authenticateRegister) {
             this.diagRegister.register();
-          }else{
+          } else {
             this.authenticateRegister.register(message);
           }
           this.fire("onRenew", this, this.authenticateRegister, message);
@@ -283,6 +276,7 @@ export default (nodefony) => {
         break;
       case "RESPONSE":
         //console.log("SIP   :"+ message.method + " "+" code:"+message.code );
+        this.log(`SIP RESPONSE NOT ALLOWED : ${message.method} code : ${message.code}`, "WARNING");
         this.fire("onDrop", message);
         break;
       }
@@ -301,7 +295,6 @@ export default (nodefony) => {
 
         break;
       case "RESPONSE":
-
         this.fire("onDrop", message);
         break;
       }
@@ -311,7 +304,7 @@ export default (nodefony) => {
       this.fire("onDrop", message);
       break;
     default:
-      this.log("SIP DROP :" + message.method + " " + " code:" + message.code, "WARNING");
+      this.log("SIP DROP message :" + message.method + " " + " code:" + message.code, "WARNING");
       this.fire("onDrop", message);
       // TODO RESPONSE WITH METHOD NOT ALLOWED
     }
@@ -319,7 +312,7 @@ export default (nodefony) => {
 
   class Sip extends nodefony.Service {
     constructor(server, transport, settings, service = null) {
-      super("SIP", (service ? service.container : null) , null, nodefony.extend({}, defaultSettings, settings));
+      super("SIP", (service ? service.container : null), null, nodefony.extend({}, defaultSettings, settings));
       this.settings = this.options // nodefony.extend({}, defaultSettings, settings);
       this.dialogs = {};
       this.version = this.settings.version;
@@ -417,15 +410,14 @@ export default (nodefony) => {
       if (transport) {
         this.transport = transport;
       }
-
       // GET REMOTE IP
       if (this.transport.publicAddress) {
         //this.publicAddress = this.transport.domain.hostname;
         this.transportType = this.settings.transport.toLowerCase();
       } else {
-        if( this.transport.url && this.transport.url.protocol){
-          this.transportType = this.transport.url.protocol.replace(/:/,"");
-        }else{
+        if (this.transport.url && this.transport.url.protocol) {
+          this.transportType = this.transport.url.protocol.replace(/:/, "");
+        } else {
           this.transportType = this.settings.transport.toLowerCase();
         }
       }
@@ -433,26 +425,35 @@ export default (nodefony) => {
         // realtime nodefony
       case "tcp":
       case "udp":
-        this.transport.listen(this, "onSubscribe", function (service, message) {
-          if (service === "SIP" || service === "OPENSIP") {
-            onStart.call(this, message);
+        this.transport.on("subscribe", (service, message) => {
+          if (service === "sip" || service === "sip2") {
+            this.serviceName = service;
+            this.clientId = message.clientId;
+            this.connect(message);
           }
         });
-
-        this.transport.listen(this, "onUnsubscribe", function (service, message) {
-          if (service === "SIP" || service === "OPENSIP") {
-            onStop.call(this, message);
+        this.transport.on("unsubscribe", (service, message) => {
+          if (service === "sip" || service === "sip2") {
+            this.unregister();
+            this.serviceName = null;
+            this.clientId = null;
           }
         });
-        this.transport.listen(this, "onmessage", function (service, message) {
-          if (service === "SIP" || service === "OPENSIP") {
+        this.transport.on("sip", ( message) => {
             onMessage.call(this, message);
-          }
         });
-
-        this.transport.listen(this, "onClose", function (message) {
-          this.quit(message);
+        this.transport.on("sip2", ( message) => {
+            onMessage.call(this, message);
         });
+        this.transport.on("close", (message) => {
+            this.quit(message);
+        });
+        this.send = (data)=>{
+          let message = this.transport.protocol.sendMessage(this.serviceName, data, this.clientId)
+          this.log(`SEND\n${data}`, "DEBUG");
+          this.fire("onSend", data);
+          this.transport.send(message);
+        };
         break;
       case "ws":
       case "wss":

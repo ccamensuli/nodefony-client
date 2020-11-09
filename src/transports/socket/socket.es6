@@ -3,8 +3,7 @@ import bayeux from '../../protocols/bayeux/bayeux.es6';
 export default (nodefony) => {
   nodefony.modules.push("socket");
   const defaultSettings = {
-    type: "websocket",
-    protocol: "bayeux",
+    protocol:"bayeux",
     handshake: {
       method: "post",
       credentials: 'include',
@@ -40,29 +39,27 @@ export default (nodefony) => {
       this.protocol = null;
       this.transport = null;
       this.crossDomain = false;
-      switch (this.options.type) {
-      case "websocket":
-        this.transport = nodefony.WebSocket;
-        break;
-        /*case "poll":
-          this.transport = nodefony.Poll;
-          break;
-        case "longPoll":
-          this.transport = nodefony.LongPoll;
-          break;*/
-      default:
-        this.transport = nodefony.WebSocket;
-      }
-      switch (this.options.protocol) {
-      case "bayeux":
-        this.initBayeux(this.options);
-        break;
-      default:
-        this.initBayeux(this.options);
-      }
+      this.initBayeux(this.options);
       if (url) {
         this.handshake(url);
       }
+    }
+
+    start() {
+      if (this.connected) {
+        let error = new Error(`Connection already started`);
+        this.fire("onerror", 500, error);
+        return false;
+      }
+      return this.connect(this.url);
+    }
+
+    stop(){
+      return this.disconnect();
+    }
+
+    disconnect() {
+      return this.protocol.disconnect();
     }
 
     initBayeux(options) {
@@ -73,6 +70,7 @@ export default (nodefony) => {
           this.protocol = new nodefony.protocols.Bayeux(this, options, this);
         }
         this.protocol.on("onHandshake", (message, socket) => {
+          this.log(`Event handshake`,"DEBUG");
           this.fire("handshake", message, this);
         });
         this.protocol.on("onConnect", (message) => {
@@ -83,15 +81,18 @@ export default (nodefony) => {
             this.publicAddress = addr.remoteAddress;
             this.domain = addr.host;
           }
+          this.log(`Event ready`,"DEBUG");
           this.fire("connect", message, this);
           this.fire("ready", message, this);
         });
         this.protocol.on("onDisconnect", (message) => {
           this.services = message.data;
           this.connected = false;
+          this.log(`Event disconnect`,"DEBUG");
           this.fire("disconnect", message, this);
         });
         this.protocol.on("reConnect", (bayeux) => {
+          this.log(`Event reconnect`,"DEBUG");
           setTimeout(() => {
             this.start();
           }, 60000);
@@ -100,19 +101,23 @@ export default (nodefony) => {
           const service = message.subscription.split("/")[2];
           this.subscribedService[service] = message;
           this.nbSubscribed++;
+          this.log(`Event subscribe ${service}`,"DEBUG");
           this.fire("subscribe", service, message, this);
         });
         this.protocol.on("onUnsubscribe", (message) => {
           const service = message.subscription.split("/")[2];
           delete this.subscribedService[service];
           this.nbSubscribed--;
+          this.log(`Event unsubscribe ${service}`,"DEBUG");
           this.fire("unsubscribe", service, message, this);
         });
         this.protocol.on("onError", (code, arg, message) => {
+          this.log(`Event error`,"DEBUG");
           this.fire("error", code, arg, message);
         });
         this.protocol.on("onClose", (message) => {
           this.connected = false;
+          this.log(`Event close`,"DEBUG");
           this.fire("close", message);
           for (var service in this.subscribedService) {
             //this.unSubscribe(service);
@@ -162,6 +167,11 @@ export default (nodefony) => {
         .then(async (response) => {
           this.protocol.onMessage(response);
           const url = nodefony.url.format(response.ext.url);
+          if( response.supportedConnectionTypes.includes("websocket") ){
+            this.transport = nodefony.WebSocket;
+          }else{
+            throw new Error(`Socket accept only Websocket transport`);
+          }
           return this.connect(url, this.options);
         })
         .catch(async (error) => {
@@ -171,66 +181,57 @@ export default (nodefony) => {
     }
 
     connect(url, settings = null) {
-      const options = settings ? settings : this.options;
-      try {
-        this.socket = new this.transport(url, options, this);
-        this.socket.on("onopen", (event) => {
-          this.fire("onopen", event, this)
-        });
-        this.socket.on("onmessage", (event) => {
-          this.fire("onmessage", event, this)
-        });
-        this.socket.on("onerror", (event) => {
-          this.fire("onerror", event, this)
-        });
-        this.socket.on("onclose", (event) => {
-          this.fire("onclose", event, this)
-        });
-      } catch (e) {
-        this.fire("onerror", e, this);
-        throw e;
-      }
-      this.url = this.socket.url;
-      this.crossDomain = !nodefony.isSameOrigin(this.url);
-      return this.socket;
-    }
-
-    disconnect() {
-      return this.protocol.disconnect();
-    }
-
-    start() {
-      if (this.connected) {
-        let error = new Error(`Connection already started`);
-        this.fire("onerror", 500, error);
-        return false;
-      }
+      return new Promise((resolve, reject)=>{
+        const options = settings ? settings : this.options;
+        try {
+          this.socket = new this.transport(url, options, this);
+          this.socket.on("onopen", (event) => {
+            this.fire("onopen", event, this)
+            return resolve(this.socket);
+          });
+          this.socket.on("onmessage", (event) => {
+            this.fire("onmessage", event, this)
+          });
+          this.socket.on("onerror", (event) => {
+            this.fire("onerror", event, this)
+          });
+          this.socket.on("onclose", (event) => {
+            this.fire("onclose", event, this)
+          });
+        } catch (e) {
+          this.fire("onerror", e, this);
+          return reject( e);
+        }
+        this.url = this.socket.url;
+        this.crossDomain = !nodefony.isSameOrigin(this.url);
+        return this.socket;
+      });
     }
 
     subscribe(name, data = null) {
       if (!this.connected) {
         const error = new Error(`Not connected`);
         this.fire('error', 500, error);
-        return false;
+        throw error;
       }
       if (name in this.services) {
         if (name in this.subscribedService) {
           const error = new Error(`Already subscribed`);
           this.fire('onerror', 500, "already subscribed");
-          return false;
+          throw error;
         }
         return this.protocol.subscribe(name, data);
       }
       const error = new Error(`service : ${name} not exist`);
       this.fire('onerror', 500, error);
-      return false;
+      throw error;
     }
 
     unSubscribe(name, data) {
       if (!this.connected) {
         const error = new Error(`Not connected`);
         this.fire('onerror', 500, error);
-        return false;
+        throw error;
       }
       if (name in this.services) {
         if (name in this.subscribedService) {
@@ -239,12 +240,12 @@ export default (nodefony) => {
         } else {
           const error = new Error(`Service :${name} not subcribed`);
           this.fire('onerror', 500, error);
-          return false;
+          throw error;
         }
       }
       const error = new Error(`Service : ${name} not exist`);
       this.fire('onerror', 404, error);
-      return false;
+      throw error;
     }
 
     close(code = 1000, reason = "ok") {

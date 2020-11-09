@@ -137,7 +137,7 @@ export default (nodefony) => {
       return console.debug(nodefony.Syslog.wrapper(this.log(one, "DEBUG")).text, one, ...args);
     }
 
-    trace() {
+    trace(one, ...args) {
       return trace(nodefony.Syslog.wrapper(this.log(one, "DEBUG")).text, one, ...args);
     }
 
