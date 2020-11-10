@@ -33,10 +33,10 @@ class App extends nodefony.Kernel {
   }
 
   initialize() {
-    //this.createSipWebSocket("1003", "1003");
-    //this.createSipWebSocket("5021", "1234", "wss://pbx.example.com");
+    this.createSipWebSocket("1001", "1001");
     this.createSipSocket("1003", "1003", "TCP");
     this.createSipSocket("1002", "1002", "UDP");
+    //this.createSipWebSocket("5021", "1234", "wss://pbx.example.com");
     //this.createSipSocket("5015", "5015", "UDP");
     //this.createSipSocket("5015", "5015", "TCP");
   }
