@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.0.0-beta.11 (16/11/2020)
+- [release 6.0.0-beta.11](https://github.com/nodefony/nodefony-client/commit/91d52b41e6268a290f7ff7e635f5f9489044ca24)
+- [upgrade deps](https://github.com/nodefony/nodefony-client/commit/7ef1c7025759fa2f4dceeeff5300f76696e7bc85)
+- [add unListen in service](https://github.com/nodefony/nodefony-client/commit/dbc89be01d6ad7504053a1c12dd497f66947e827)
+
+---
+
 ## 6.0.0-beta.10 (09/11/2020)
 - [release 6.0.0-beta.10](https://github.com/nodefony/nodefony-client/commit/f63d82756c2d1402e6307cae6fd10c66daf32b05)
 - [packge lock](https://github.com/nodefony/nodefony-client/commit/47405deb3f3ad9e91016d13a52b957691055d8a4)
