@@ -19,8 +19,8 @@ import pdu from './core/syslog/pdu.es6';
 import syslog from './core/syslog/syslog.es6';
 import Container from './core/container.es6';
 import Service from './core/service.es6';
-import Storage from './core/storage/storage.es6';
 import Websocket from './transports/websocket/websocket.es6';
+import Storage from './api/storage/storage.es6';
 import Api from './api/api.es6';
 import Kernel from './kernel/kernel.es6';
 

@@ -1,5 +1,5 @@
 {
-  "name": "demo",
+  "name": "nodefony-client-demo",
   "version": "1.0.0",
   "description": "nodefony-client demo",
   "main": "nodefony",
@@ -34,7 +34,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "mongoose": "^5.10.13",
+    "mongoose": "^5.10.14",
     "pm2": "^4.5.0",
     "pm2-logrotate": "^2.7.0",
     "sequelize": "^6.3.5",

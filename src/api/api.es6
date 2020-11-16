@@ -11,28 +11,32 @@ export default (nodefony) => {
         "User-Agent": "nodefony-client"
       }
     },
+    baseUrl: "",
+    loginUrl: "/api/jwt/login",
+    logoutUrl: "/api/jwt/logout",
+    refrehUrl: "/api/jwt/token",
     tokenName: "jwt",
     storage: {}
   };
 
   class Api extends nodefony.Storage {
 
-    constructor(name = "api", baseUrl = "", options = {}, service = null) {
+    constructor(name = "api", options = {}, service = null) {
       super(name, nodefony.extend(true, {}, defaultOptions, options), service);
-      this.baseUrl = nodefony.url.parse(baseUrl);
+      this.baseUrl = nodefony.url.parse(this.options.baseUrl);
       if (this.baseUrl.slashes !== null) {
         if (this.baseUrl.slashes === false) {
-          this.baseUrl = nodefony.url.parse(`${baseUrl}/`);
+          this.baseUrl = nodefony.url.parse(`${this.options.baseUrl}/`);
         }
       } else {
         if (this.baseUrl.href) {
           let slash = this.baseUrl.href[this.baseUrl.href.length - 1];
           if (slash !== "/") {
-            this.baseUrl = nodefony.url.parse(`${baseUrl}/`);
+            this.baseUrl = nodefony.url.parse(`${this.options.baseUrl}/`);
           }
         }
       }
-      this.defaultOptions = this.options.fetch;
+      this.fetchOptions = this.options.fetch;
     }
 
     get token() {
@@ -43,7 +47,7 @@ export default (nodefony) => {
       super.token = value;
     }
 
-    http(url, method = "get", options = this.defaultOptions) {
+    http(url, method = "get", options = this.fetchOptions) {
       if (!url) {
         throw new Error(`No url defined`);
       }
@@ -87,34 +91,37 @@ export default (nodefony) => {
           }
         })
         .catch(async (error) => {
-          if (error.response && error.response.status === 401) {
-            if (error.response.statusText === "jwt expired") {
+          if (error.response && error.response.code === 401 && error.response.error) {
+            if (error.response.error.message === "jwt expired") {
+              this.clearToken();
               return this.getToken()
                 .then(() => {
                   return this.http(url, method, opt);
                 })
                 .catch((e) => {
+                  this.clearToken(true);
                   throw e;
                 });
             }
+            this.clearToken(true);
           }
           throw error;
         });
     }
-    get(url, options = this.defaultOptions) {
+    get(url, options = this.fetchOptions) {
       return this.http(url, "get", options);
     }
-    post(url, options = this.defaultOptions) {
+    post(url, options = this.fetchOptions) {
       return this.http(url, "post", options);
     }
-    put(url, options = this.defaultOptions) {
+    put(url, options = this.fetchOptions) {
       return this.http(url, "put", options);
     }
-    delete(url, options = this.defaultOptions) {
+    delete(url, options = this.fetchOptions) {
       return this.http(url, "delete", options);
     }
 
-    login(url = "/api/jwt/login", username = null, passwd = null, options = this.defaultOptions) {
+    login(url = this.options.loginUrl, username = null, passwd = null, options = this.fetchOptions) {
       let opt = nodefony.extend({}, options, {
         body: JSON.stringify({
           username,
@@ -133,7 +140,7 @@ export default (nodefony) => {
         });
     }
 
-    logout(url = "/api/jwt/logout", refreshToken = this.refreshToken, options = this.defaultOptions) {
+    logout(url = this.options.logoutUrl, refreshToken = this.refreshToken, options = this.fetchOptions) {
       let opt = nodefony.extend({}, options, {
         body: JSON.stringify({
           refreshToken
@@ -150,7 +157,7 @@ export default (nodefony) => {
         });
     }
 
-    getToken(url = "/api/jwt/token", options = {}) {
+    getToken(url = this.options.refrehUrl, options = this.fetchOptions) {
       let opt = nodefony.extend({}, options, {
         body: JSON.stringify({
           refreshToken: this.refreshToken
@@ -159,6 +166,9 @@ export default (nodefony) => {
       return this.post(url, opt)
         .then(response => {
           this.token = response.result.token;
+          if(response.result.refreshToken){
+            this.refreshToken = response.result.refreshToken;
+          }
           return response;
         })
         .catch((error) => {

@@ -1,5 +1,3 @@
-//nodefony.preloadMedias();
-//nodefony.preloadSocket();
 
 const kernel = new nodefony.Kernel("kernel",{
   environment: "development",

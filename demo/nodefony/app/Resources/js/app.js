@@ -52,8 +52,8 @@ class App extends nodefony.Kernel {
   }
 
   async initialize() {
-    //this.createMixer();
-    //await this.createMediaStream();
+    this.createMixer();
+    await this.createMediaStream();
     //this.createWebsocket();
     this.createSocket();
     //this.initializeApi();

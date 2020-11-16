@@ -20,13 +20,8 @@ export default (nodefony) => {
       } else {
         this.storage = window.sessionStorage;
       }
-      if (this.name) {
-        this.tokenName = `${this.name}-${this.options.storage.tokenName}`;
-        this.refreshTokenNane = `${this.name}-${this.options.storage.refreshTokenNane}`;
-      } else {
-        this.tokenName = `${this.options.storage.tokenName}`;
-        this.refreshTokenNane = `${this.options.storage.refreshTokenNane}`;
-      }
+      this.tokenName = `${this.options.storage.tokenName}`;
+      this.refreshTokenNane = `${this.options.storage.refreshTokenNane}`;
     }
 
     get token() {
