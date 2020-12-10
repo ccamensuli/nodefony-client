@@ -7,6 +7,23 @@ export default (nodefony) => {
     analyser: false,
     connect: true,
   };
+  const urlToOject = function (url) {
+    var result = {};
+    var anchor = document.createElement('a');
+    anchor.href = url;
+    var keys = 'protocol hostname host pathname port search hash href'.split(' ');
+    for (var keyIndex in keys) {
+      var currentKey = keys[keyIndex];
+      result[currentKey] = anchor[currentKey];
+    }
+    result.toString = function () {
+      return anchor.href;
+    };
+    result.requestUri = result.pathname + result.search;
+    result.basename = result.pathname.replace(/\\/g, '/').replace(/.*\//, '');
+    result.dirname = result.pathname.replace(/\\/g, '/').replace(/\/[^\/]*$/, '');
+    return result;
+  };
 
   class Track extends nodefony.Service {
 
@@ -48,10 +65,10 @@ export default (nodefony) => {
       switch (type) {
         case "object":
           switch (true) {
-            case media instanceof nodefony.medias.MediaStream:
+            case media instanceof nodefony.medias.Stream:
               this.mediaType = "stream";
               this.buffer = media.stream;
-              this.url = stage.io.urlToOject(media.urlStream);
+              this.url = urlToOject(media.urlStream);
               this.ready = true;
               this.fire("onReady", this);
               break;
@@ -82,7 +99,7 @@ export default (nodefony) => {
           };
           break;
         case "string":
-          this.url = stage.io.urlToOject(media);
+          this.url = urlToOject(media);
           this.load(media);
           break;
         default:
@@ -101,7 +118,6 @@ export default (nodefony) => {
     }
 
     createNodes() {
-
       this.audioNodes.mute = this.bus.createGain();
       this.in = this.audioNodes.mute;
       this.out = this.audioNodes.mute;
@@ -178,7 +194,7 @@ export default (nodefony) => {
       switch (this.mediaType) {
         case "element":
           this.media.play();
-          this.fire("onPlay", this);
+          //this.fire("onPlay", this);
           break;
         default:
           this.pause().connectSource();

@@ -26,7 +26,7 @@ if (kernel.environment === "dev") {
 }
 
 //const debug = kernel.debug ? "SIP" : false ;
-const debug = kernel.debug ? "APP,SIP,SOCKET" : false ;
+const debug = kernel.debug ? "*" : false ;
 //const debug = kernel.debug ? "*" : false ;
 
 module.exports = merge(wpconfig, {
@@ -35,7 +35,8 @@ module.exports = merge(wpconfig, {
   entry: {
     app: ["./Resources/js/app.js"],
     tests: ["./Resources/js/tests.js"],
-    sip: ["./Resources/js/sip.js"]
+    sip: ["./Resources/js/sip.js"],
+    webrtc: ["./Resources/js/webrtc.js"]
   },
   output: {
     path: public,
@@ -132,7 +133,8 @@ module.exports = merge(wpconfig, {
     new webpack.DefinePlugin({
       'process.env': {
         'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-        "NODE_DEBUG":JSON.stringify(debug)
+        "NODE_DEBUG":JSON.stringify(debug),
+        "NODEFONY_DOMAIN": JSON.stringify(kernel.domain)
       }
     }),
   ],

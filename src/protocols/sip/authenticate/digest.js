@@ -1,4 +1,4 @@
-import Md5 from "../../../crypto/md5.es6";
+import Md5 from "../../../crypto/md5.js";
 
 export default (nodefony) => {
   const md5 = Md5(nodefony)

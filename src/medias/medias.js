@@ -1,15 +1,12 @@
-//import adapter from "webrtc-adapter";
 'use strict';
-import Stream from "./streams/stream.es6";
+import Stream from "./streams/stream.js";
 
 export default (nodefony) => {
   const stream = Stream(nodefony);
   nodefony.modules.push("medias")
   class Medias {
-
     constructor() {
-      this.MediaStream = stream;
-      //this.adapter = require('webrtc-adapter');
+      this.Stream = stream;
     }
 
     async getDevices() {

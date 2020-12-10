@@ -39,7 +39,7 @@
 //import "regenerator-runtime/runtime";
 //import "core-js/stable";
 
-import Nodefony from './src/nodefony.es6';
+import Nodefony from './src/nodefony.js';
 const nodefony = new Nodefony(process.env.NODE_ENV, process.env.NODE_DEBUG);
 nodefony.load();
 export default nodefony;

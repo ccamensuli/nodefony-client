@@ -2,7 +2,7 @@ try {
   //var assert = require('assert');
   var chai = require('chai');
   var assert = chai.assert;
-  var Nodefony = require('../../src/nodefony.es6').default;
+  var Nodefony = require('../../src/nodefony.js').default;
   var nodefony = new Nodefony(process.env.NODE_ENV);
 } catch (e) {
   var chai = window.chai;

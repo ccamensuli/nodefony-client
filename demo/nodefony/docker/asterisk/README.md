@@ -64,7 +64,15 @@ $ docker rm -f asterisk
 For debugging, you can access the container shell with the following command:
 ```
 $ docker exec -it  asterisk bash
+
+asterisk -r
+=========================================================================
+Connected to Asterisk 17.8.1 currently running on 7d74c0e9f194 (pid = 6)
+
+CLI> pjsip set logger on
 ```
+
+
 ## Usable SIP Accounts
 
 The configuration provided allows the use of 4 accounts. Two are classic accounts (1000 and 1002) and two are websocket accounts (1001 and 1003).

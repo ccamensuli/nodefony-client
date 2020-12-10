@@ -1,6 +1,6 @@
-import sipRequest from './siprequest.es6';
-import sipResponse from './sipresponse.es6';
-import sipMessage from './sipmessage.es6';
+import sipRequest from './siprequest.js';
+import sipResponse from './sipresponse.js';
+import sipMessage from './sipmessage.js';
 
 export default (nodefony) => {
 
@@ -10,13 +10,14 @@ export default (nodefony) => {
 
   const SipRequest = sipRequest(nodefony);
   const SipResponse = sipResponse(nodefony);
-  const SipMessage = sipMessage(nodefony);
+  //const SipMessage = sipMessage(nodefony);
+  //const SipMessage = nodefony.protocols.Sip.SipMessage();
 
 
   class Transaction {
     constructor(to, dialog) {
       this.dialog = dialog;
-      if (to instanceof SipMessage) {
+      if (to instanceof nodefony.protocols.Sip.SipMessage()) {
         this.hydrate(to);
       } else {
         this.to = to;
@@ -43,6 +44,7 @@ export default (nodefony) => {
         this.method = this.dialog.method;
         this.branch = this.message.header.branch;
       }
+      return message ;
     }
 
     generateBranchId() {
@@ -107,6 +109,12 @@ export default (nodefony) => {
       // CLEAR INTERVAL
       if (this.interval) {
         clearInterval(this.interval);
+      }
+    }
+
+    bye() {
+      if (this.dialog) {
+        this.dialog.bye();
       }
     }
   }

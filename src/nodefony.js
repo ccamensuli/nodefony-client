@@ -6,35 +6,28 @@ import Package from '../package.json';
 //import isregexp from 'lodash.isregexp';
 const nativeWebSocket = window.WebSocket ? true : false;
 import querystring from 'querystring';
-import browser from './core/browser.es6';
+import browser from './core/browser.js';
 import url from 'url';
 import util from "util";
 import {
   v4 as uuidv4
 } from 'uuid';
 
-import Events from './core/events.es6';
-import error from './core/error.es6';
-import pdu from './core/syslog/pdu.es6';
-import syslog from './core/syslog/syslog.es6';
-import Container from './core/container.es6';
-import Service from './core/service.es6';
-import Websocket from './transports/websocket/websocket.es6';
-import Storage from './api/storage/storage.es6';
-import Api from './api/api.es6';
-import Kernel from './kernel/kernel.es6';
+import Events from './core/events.js';
+import error from './core/error.js';
+import pdu from './core/syslog/pdu.js';
+import syslog from './core/syslog/syslog.js';
+import Container from './core/container.js';
+import Service from './core/service.js';
+import Websocket from './transports/websocket/websocket.js';
+import Storage from './api/storage/storage.js';
+import Api from './api/api.js';
+import Kernel from './kernel/kernel.js';
 
 const environment = {
   production: true,
   development: true
 };
-
-//import webrtc from './src/medias/webrtc/webrtc.es6';
-//nodefony.medias.webrtc = webrtc(nodefony);
-//import transaction from './src/medias/webrtc/transaction.es6';
-//nodefony.medias.webrtcTransaction = transaction(nodefony);
-//import user from './src/medias/webrtc/user.es6';
-//nodefony.medias.userMedia = user(nodefony);
 
 class Nodefony {
   constructor(env = "production", debug = false) {
@@ -151,7 +144,7 @@ class Nodefony {
     // medias
     await import(
       /* webpackChunkName: "chunk-nodefony-medias"*/
-      './medias/medias.es6')
+      './medias/medias.js')
     .then((module) => {
       return module.default(this);
     });
@@ -161,7 +154,7 @@ class Nodefony {
     // medias webaudio
     await import(
       /* webpackChunkName: "chunk-nodefony-webaudio"*/
-      './medias/webaudio/webaudio.es6')
+      './medias/webaudio/webaudio.js')
     .then((module) => {
       return module.default(this);
     });
@@ -171,7 +164,7 @@ class Nodefony {
     // socket
     return await import(
         /* webpackChunkName: "chunk-nodefony-socket"*/
-        './transports/socket/socket.es6')
+        './transports/socket/socket.js')
       .then((module) => {
         return module.default(this);
       });
@@ -180,7 +173,7 @@ class Nodefony {
     // webrtc
     return await import(
         /* webpackChunkName: "chunk-nodefony-webrtc"*/
-        './medias/webrtc/webrtc.es6')
+        './medias/webrtc/webrtc.js')
       .then((module) => {
         return module.default(this);
       });
@@ -189,7 +182,7 @@ class Nodefony {
     // sip
     return await import(
         /* webpackChunkName: "chunk-nodefony-sip"*/
-        './protocols/sip/sip.es6')
+        './protocols/sip/sip.js')
       .then((module) => {
         return module.default(this);
       });

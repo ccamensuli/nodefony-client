@@ -14,7 +14,6 @@
 /.settings
 /nbproject/private/
 
-
 .github
 .git
 .travis
@@ -23,6 +22,7 @@
 .bithoundrc
 .grenrc.json
 .core
+.github
 
 npm-debug.log
 yarn-error.log
@@ -34,3 +34,5 @@ node_modules/**
 
 /demo
 /tests
+/tools
+/cli

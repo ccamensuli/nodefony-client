@@ -1,0 +1,64 @@
+{% extends './base.html.twig' %}
+
+{% set error = getFlashBag("error") %}
+{% set info = getFlashBag("info") %}
+
+{% block stylesheets %}
+  <!-- WEBPACK BUNDLE -->
+  <link rel="stylesheet" href="{{CDN('stylesheet')}}/app/assets/css/app.css"/>
+  <link rel="stylesheet" href="{{CDN('stylesheet')}}/app/assets/css/webrtc.css"/>
+{% endblock %}
+
+{% block body %}
+
+<div class="hello">
+
+  <button id="start">Register</button>
+  <button id="stop" style="display:none">unRegister</button>
+  <p>
+    <h1> SIP WEBRTC {{name}}</h1>
+    <p>
+      <container id="keyboard" style="display:none">
+        <block class="block" value="4">4</block>
+        <block class="block" value="3">3</block>
+        <block class="block" value="2">2</block>
+        <block class="block" value="1">1</block>
+        <block class="block" value="8">8</block>
+        <block class="block" value="7">7</block>
+        <block class="block" value="6">6</block>
+        <block class="block" value="5">5</block>
+        <block class="block" value="*">*</block>
+        <block class="block" value="#">#</block>
+        <block class="block" value="0">0</block>
+        <block class="block" value="9">9</block>
+        <input id="to" type="text" value="1001"></input>
+        <button id="offer" value="offer">offer</button>
+      </container>
+    </p>
+    <video
+      id="video"
+      width=500
+      height=280
+      muted
+      style="width:500px;height:280px">
+    </video>
+    <video
+      id="remote"
+      poster='/framework-bundle/images/nodefony-logo.png'
+      width=500
+      height=280
+      style="width:500px;height:280px">
+    </video>
+  </p>
+</div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+  <script>
+    window.name = `{{name}}`;
+  </script>
+  <!-- WEBPACK BUNDLE -->
+  <script type="text/javascript" src="{{CDN('javascript')}}/app/assets/js/webrtc.js"></script>
+{% endblock %}

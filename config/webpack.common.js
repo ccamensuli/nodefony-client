@@ -12,25 +12,25 @@ module.exports = {
    * See: http://webpack.github.io/docs/configuration.html#entry
    */
   entry: {
-    nodefony: path.resolve(__dirname, "..", "entry.es6"),
+    nodefony: path.resolve(__dirname, "..", "entry.js"),
     medias: {
-      import: path.resolve(__dirname, "..", 'src', 'medias', "medias.es6"),
+      import: path.resolve(__dirname, "..", 'src', 'medias', "medias.js"),
       dependOn: 'nodefony'
     },
     socket: {
-      import: path.resolve(__dirname, "..", 'src', 'transports', "socket", "socket.es6"),
+      import: path.resolve(__dirname, "..", 'src', 'transports', "socket", "socket.js"),
       dependOn: 'nodefony'
     },
     webaudio: {
-      import: path.resolve(__dirname, "..", 'src', 'medias', 'webaudio', "webaudio.es6"),
+      import: path.resolve(__dirname, "..", 'src', 'medias', 'webaudio', "webaudio.js"),
       dependOn: 'nodefony'
     },
     webrtc: {
-      import: path.resolve(__dirname, "..", 'src', 'medias', 'webrtc', "webrtc.es6"),
+      import: path.resolve(__dirname, "..", 'src', 'medias', 'webrtc', "webrtc.js"),
       dependOn: 'nodefony'
     },
     sip: {
-      import: path.resolve(__dirname, "..", 'src', 'protocols', 'sip', "sip.es6"),
+      import: path.resolve(__dirname, "..", 'src', 'protocols', 'sip', "sip.js"),
       dependOn: 'nodefony'
     }
   },
@@ -76,7 +76,7 @@ module.exports = {
      *
      * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
      */
-    extensions: ['.js', '.es6'],
+    extensions: ['.js', '.ts','.tsx'],
     // An array of directory names to be resolved to the current directory
     modules: [path.resolve(__dirname, "..", "node_modules")],
     fallback: {
@@ -96,7 +96,7 @@ module.exports = {
   module: {
     rules: [{
       // BABEL TRANSCODE
-      test: new RegExp("\\.es6$|\\.js$|\\.es7$"),
+      test: new RegExp("\\.js$"),
       exclude: new RegExp("node_modules"),
       use: [{
         loader: 'babel-loader',
@@ -109,6 +109,10 @@ module.exports = {
       test: /\.json$/i,
       loader: 'json5-loader',
       type: 'javascript/auto',
+    },{
+      test: /\.tsx?$/,
+      use: 'ts-loader',
+      exclude: /node_modules/
     }]
   },
   /*

@@ -1,11 +1,10 @@
-import AudioBus from './audiobus.es6';
-import Track from './track.es6';
-import Mixer from './mixer.es6';
+import AudioBus from './audiobus.js';
+import Track from './track.js';
+import Mixer from './mixer.js';
 
 export default (nodefony)=>{
   nodefony.modules.push("webaudio");
   const audioContext = window.AudioContext || window.webkitAudioContext;
-
    return nodefony.webAudio = {
     audioContext,
     Mixer: Mixer(nodefony),

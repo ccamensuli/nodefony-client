@@ -1,10 +1,10 @@
-import transaction from './transaction.es6';
-import sipMessage from './sipmessage.es6';
+import transaction from './transaction.js';
+import sipMessage from './sipmessage.js';
 
 export default (nodefony) => {
 
   const Transaction = transaction(nodefony);
-  const SipMessage = sipMessage(nodefony);
+  //const SipMessage = sipMessage(nodefony);
 
   const statusCode = {
     INITIAL: 0,
@@ -37,7 +37,7 @@ export default (nodefony) => {
       this.tagFrom = this.generateTag();
       this.cseq = this.generateCseq();
       this.unregisterSended = false;
-      if (method instanceof SipMessage) {
+      if (method instanceof nodefony.protocols.Sip.SipMessage()) {
         this.hydrate(method);
       } else {
         this.method = method;
@@ -51,7 +51,6 @@ export default (nodefony) => {
     }
 
     hydrate(message) {
-
       if (message.type === "REQUEST") {
         this.cseq = message.cseq;
         this.method = message.method;
@@ -85,7 +84,6 @@ export default (nodefony) => {
           //this["request-uri"] =  message.contact + ":" + message.rport
           this["request-uri"] = message.contact;
         }
-
       }
       if (message.type === "RESPONSE") {
         this.cseq = message.cseq;
@@ -103,7 +101,6 @@ export default (nodefony) => {
             this.to = '"' + message.toNameDisplay + '"' + "<sip:" + message.to + ">";
           }
         }
-
         if (message.toTag) {
           this.tagTo = message.toTag;
         }
@@ -115,7 +112,6 @@ export default (nodefony) => {
           //this["request-uri"] =  message.contact + ":" + message.rport
           this["request-uri"] = message.contact;
         }
-
         // manage routes
         if (message.header.recordRoutes.length) {
           this.routes = message.header.recordRoutes;
@@ -187,7 +183,6 @@ export default (nodefony) => {
     }
 
     invite(userTo, description, type) {
-
       if (this.status === this.statusCode.CANCEL) {
         return null;
       }
@@ -199,7 +194,6 @@ export default (nodefony) => {
       if (!this["request-uri"]) {
         this["request-uri"] = "sip:" + userTo;
       }
-
       if (description.sdp) {
         this.bodyType = "application/sdp";
         this.body = description.sdp;
@@ -209,6 +203,7 @@ export default (nodefony) => {
       }
       let trans = this.createTransaction(this.to);
       let request = trans.createRequest(this.body, this.bodyType);
+      this.sip.fire("onInitCall", userTo, this, trans);
       request.send();
       return trans;
 
@@ -232,7 +227,6 @@ export default (nodefony) => {
       let request = trans.createRequest(this.body, this.bodyType);
       request.send();
       return this;
-
     }
 
     info(info, typeInfo) {
@@ -248,7 +242,6 @@ export default (nodefony) => {
       let request = trans.createRequest(this.body, this.bodyType);
       request.send();
       return this;
-
     }
 
     bye() {
@@ -257,7 +250,6 @@ export default (nodefony) => {
       let request = trans.createRequest();
       request.send();
       return this;
-
     }
 
     clear(id) {

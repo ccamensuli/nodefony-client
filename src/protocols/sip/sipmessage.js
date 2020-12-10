@@ -1,5 +1,5 @@
-import sipHeader from './sipheader.es6';
-import sipBody from './sipbody.es6';
+import sipHeader from './sipheader.js';
+import sipBody from './sipbody.js';
 
 export default (nodefony) => {
 
@@ -128,8 +128,8 @@ export default (nodefony) => {
         if (!this.dialog) {
           this.dialog = this.sip.createDialog(this);
         } else {
-          this.sip.log("SIP HYDRATE DIALOG :" + this.dialog.callId, "DEBUG");
           this.dialog.hydrate(this);
+          this.sip.log("SIP HYDRATE DIALOG :" + this.dialog.callId, "DEBUG");
         }
         return this.dialog;
       } else {

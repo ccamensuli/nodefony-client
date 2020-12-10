@@ -1,4 +1,4 @@
-import digest from './digest.es6';
+import digest from './digest.js';
 
 export default  (nodefony) => {
 

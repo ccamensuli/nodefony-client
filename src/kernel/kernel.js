@@ -1,5 +1,5 @@
 'use strict';
-import browser from '../core/browser.es6';
+import browser from '../core/browser.js';
 import url from 'url';
 import util from "util";
 import {

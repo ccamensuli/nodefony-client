@@ -1,4 +1,4 @@
-import sdp from './sdp.es6';
+import sdp from './sdp.js';
 
 export default (nodefony) => {
   const Sdp = sdp(nodefony);

@@ -3,9 +3,9 @@ try {
   //console.log(assert)
   var chai = require('chai');
   var assert = chai.assert;
-  var Nodefony = require('../../src/nodefony.es6').default;
+  var Nodefony = require('../../src/nodefony.js').default;
   var nodefony = new Nodefony(process.env.NODE_ENV);
-  var container = require("../../src/core/container.es6").default;
+  var container = require("../../src/core/container.js").default;
   var Container = container(nodefony).Container;
 } catch (e) {
   var chai = window.chai;

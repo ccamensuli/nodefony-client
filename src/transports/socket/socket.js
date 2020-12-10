@@ -1,4 +1,4 @@
-import bayeux from '../../protocols/bayeux/bayeux.es6';
+import bayeux from '../../protocols/bayeux/bayeux.js';
 
 export default (nodefony) => {
   nodefony.modules.push("socket");

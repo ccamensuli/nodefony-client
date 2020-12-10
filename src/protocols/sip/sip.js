@@ -1,13 +1,7 @@
-import dialog from './dialog.es6';
-import authenticate from './authenticate/authenticate.es6';
-import sipMessage from './sipmessage.es6';
-import error from './siperror.es6';
-
-/*import transaction from './transaction.es6'
-import sipRequest from './siprequest.es6'
-import sipResponse from './sipresponse.es6'
-import sipHeader from './sipheader.es6'
-import sipBody from './sipbody.es6'*/
+import dialog from './dialog.js';
+import authenticate from './authenticate/authenticate.js';
+import sipMessage from './sipmessage.js';
+import error from './siperror.js';
 
 export default (nodefony) => {
   'use strict';
@@ -16,12 +10,6 @@ export default (nodefony) => {
   const Authenticate = authenticate(nodefony);
   const SipMessage = sipMessage(nodefony);
   const sipError = error(nodefony);
-  /*const Transaction = transaction(nodefony);
-  const SipRequest = sipRequest(nodefony);
-  const SipResponse = sipResponse(nodefony);
-  const SipHeader = sipHeader(nodefony);
-  const SipBody = sipBody(nodefony);*/
-
 
   const defaultSettings = {
     expires: 200, // en secondes
@@ -36,7 +24,7 @@ export default (nodefony) => {
   };
 
   const onMessage = function (response) {
-    this.log(`RECIEVE\n${response}`, "DEBUG");
+    this.log(`RECEIVE\n${response}`, "DEBUG");
     let message = null;
     let res = null;
     try {
@@ -227,6 +215,7 @@ export default (nodefony) => {
           break;
         case 487:
         case 404:
+        case 481:
         case 477:
         case 480:
         case 484:
@@ -239,6 +228,9 @@ export default (nodefony) => {
         case 500:
           this.fire("onError", this, message);
           break;
+        case 503:
+          this.fire("onError", this, message);
+          break;
         default:
           this.fire("on" + message.code, this, message);
           break;
@@ -249,13 +241,11 @@ export default (nodefony) => {
       }
       break;
     case "ACK":
-      //console.log("ACK");
       //TODO manage interval messages timer retransmission
       break;
     case "BYE":
       switch (message.code) {
       case 200:
-        //console.log("200")
         this.fire("onBye", message);
         break;
       default:
@@ -281,7 +271,6 @@ export default (nodefony) => {
         break;
       }
       break;
-
     case "CANCEL":
       switch (message.type) {
       case "REQUEST":
@@ -292,7 +281,6 @@ export default (nodefony) => {
         res = message.transaction.createResponse(487, "Request Terminated");
         res.send();
         message.dialog.status = message.dialog.statusCode.TERMINATED;
-
         break;
       case "RESPONSE":
         this.fire("onDrop", message);
@@ -300,8 +288,21 @@ export default (nodefony) => {
       }
       break;
     case "REFER":
+      // transfers d'appel et conférence
       this.log("SIP REFER NOT ALLOWED :" + message.method, "WARNING");
       this.fire("onDrop", message);
+      break;
+    case "UPDATE":
+      switch (message.type) {
+        case "REQUEST":
+        this.fire("onUpdate", message);
+        res = message.transaction.createResponse(200, "OK");
+        res.send();
+        break;
+        case "RESPONSE":
+        this.fire("onDrop", message);
+        break;
+      }
       break;
     default:
       this.log("SIP DROP message :" + message.method + " " + " code:" + message.code, "WARNING");
@@ -339,6 +340,10 @@ export default (nodefony) => {
       this.contact = null;
       this.via = null;
     }
+
+    static SipMessage(){
+      return SipMessage;
+    };
 
     generateInvalid() {
       return parseInt(Math.random() * 1000000000, 10) + ".nodefony.invalid";
@@ -426,23 +431,20 @@ export default (nodefony) => {
       case "tcp":
       case "udp":
         this.transport.on("subscribe", (service, message) => {
-          if (service === "sip" || service === "sip2") {
+          if (service === "sip") {
             this.serviceName = service;
             this.clientId = message.clientId;
             this.connect(message);
           }
         });
         this.transport.on("unsubscribe", (service, message) => {
-          if (service === "sip" || service === "sip2") {
+          if (service === "sip" ) {
             this.unregister();
             this.serviceName = null;
             this.clientId = null;
           }
         });
         this.transport.on("sip", ( message) => {
-            onMessage.call(this, message);
-        });
-        this.transport.on("sip2", ( message) => {
             onMessage.call(this, message);
         });
         this.transport.on("close", (message) => {
@@ -458,7 +460,6 @@ export default (nodefony) => {
       case "ws":
       case "wss":
         this.transport.listen(this, "onmessage", function (message) {
-          //this.fire("onMessage",message.data);
           onMessage.call(this, message.data);
         });
         this.transport.listen(this, "onerror", function (message) {
@@ -555,7 +556,7 @@ export default (nodefony) => {
       var diagInv = this.createDialog("INVITE");
       var transaction = diagInv.invite(userTo + "@" + this.publicAddress, description);
       diagInv.toName = userTo;
-      this.fire("onInitCall", userTo, diagInv, transaction);
+      //this.fire("onInitCall", userTo, diagInv, transaction);
       return diagInv;
     }
 

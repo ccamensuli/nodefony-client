@@ -231,7 +231,6 @@ export default function (nodefony) {
             break;
           default:
             this.notificationsCenter.fire("onError", this.protocol, message);
-
           }
         });
 

@@ -19,15 +19,15 @@ sip(nodefony);
 window.nodefony = nodefony;*/
 
 // dev
-import Nodefony from "../../../../../src/nodefony.es6";
+import Nodefony from "../../../../../src/nodefony.js";
 //console.log(process.env.NODE_ENV)
 const nodefony = new Nodefony(process.env.NODE_ENV, process.env.NODE_DEBUG);
-import Media from "../../../../../src/medias/medias.es6";
+import Media from "../../../../../src/medias/medias.js";
 Media(nodefony);
 //console.log(nodefony)
-import Socket from "../../../../../src/transports/socket/socket.es6";
+import Socket from "../../../../../src/transports/socket/socket.js";
 Socket(nodefony);
-import Webaudio from "../../../../../src/medias/webaudio/webaudio.es6";
+import Webaudio from "../../../../../src/medias/webaudio/webaudio.js";
 Webaudio(nodefony);
 
 window.nodefony = nodefony;

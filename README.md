@@ -131,13 +131,13 @@ socket(nodefony);
 ## Sources
 ```js
 const source_dir = path.resolve("<path.to.sources>")
-import Nodefony from `${source_dir}/src/nodefony.es6`;
+import Nodefony from `${source_dir}/src/nodefony.js`;
 const nodefony = new Nodefony(process.env.NODE_ENV, process.env.NODE_DEBUG);
-import Media from `${source_dir}/src/medias/medias.es6`;
+import Media from `${source_dir}/src/medias/medias.js`;
 Media(nodefony);
-import Webaudio from `${source_dir}/src/medias/webaudio/webaudio.es6`;
+import Webaudio from `${source_dir}/src/medias/webaudio/webaudio.js`;
 Webaudio(nodefony);
-import Socket from `${source_dir}/src/transports/socket/socket.es6`;
+import Socket from `${source_dir}/src/transports/socket/socket.js`;
 Socket(nodefony);
 window.nodefony = nodefony;
 ```

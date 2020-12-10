@@ -1,12 +1,12 @@
 export default (nodefony) => {
-  
+
   'use strict';
   const mixSettings = {
     panner: true,
     analyser: true
   };
 
-  class MediaMix extends nodefony.Service {
+  class Mixer extends nodefony.Service {
 
     constructor(name = "Mixer", settings = {}, service = null) {
       if (service) {
@@ -148,5 +148,5 @@ export default (nodefony) => {
       return this.audioContext.createOscillator();
     }
   }
-  return MediaMix;
+  return Mixer;
 };

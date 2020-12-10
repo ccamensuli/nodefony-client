@@ -4,6 +4,9 @@ export default (nodefony) => {
     200: "OK"
   };
 
+  const fromToG =  /(.*)?<sip:(.*)@(.*)>/;
+  const endline = "\r\n";
+
   class sipResponse {
     constructor(message, code, messageCode, bodyMessage, typeBody) {
       this.message = message;
@@ -59,7 +62,7 @@ export default (nodefony) => {
         case "To":
           //console.log(message.header[head] )
           //console.log(this.dialog.sip.displayName )
-          var ret = regHeaders.fromToG.exec(message.header[head]);
+          var ret = fromToG.exec(message.header[head]);
           //console.log(ret)
           if (ret && (!ret[1])) {
             //console.log("traff to")

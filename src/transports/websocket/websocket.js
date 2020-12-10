@@ -39,7 +39,7 @@
    }
 
    const defaultSettings = {
-     protocol: "",
+     protocol: undefined,
      timeout: 10 * 1000
    };
    /*

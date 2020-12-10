@@ -91,9 +91,9 @@ export default (nodefony) => {
           continue;
         }
         if (context) {
-          this.listen(context || this, res[0], localSettings[i]);
+          return this.listen(context || this, res[0], localSettings[i]);
         }
-        this.on(res[0], localSettings[i]);
+        return this.on(res[0], localSettings[i]);
       }
     }
     /**

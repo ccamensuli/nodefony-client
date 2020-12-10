@@ -1,5 +1,5 @@
 'use strict';
-import container from "./container.es6";
+import container from "./container.js";
 
 export default (nodefony) => {
 

@@ -232,8 +232,10 @@ export default function (nodefony) {
      }
 
      sendDtmf(code, key, event) {
-       if (this.dialog.status !== this.dialog.statusCode.ESTABLISHED) {
-         return;
+       if( this.dialog){
+         if (this.dialog.status !== this.dialog.statusCode.ESTABLISHED) {
+           return;
+         }
        }
        if (this.dtmfSender) {
          var duration = 500;
