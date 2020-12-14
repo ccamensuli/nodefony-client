@@ -93,6 +93,10 @@ export default (nodefony) => {
         .catch(async (error) => {
           if (error.response && error.response.code === 401 && error.response.error) {
             if (error.response.error.message === "jwt expired") {
+              if(this.options.refrehUrl === url || this.options.refrehUrl ===  myurl){
+                this.clearToken(true);
+                throw error;
+              }
               this.clearToken();
               return this.getToken()
                 .then(() => {
