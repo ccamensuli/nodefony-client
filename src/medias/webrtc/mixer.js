@@ -17,13 +17,13 @@ export default (nodefony) => {
 
   class Mixer extends nodefony.Service {
     constructor(service) {
-      super("WEB AUDIO DTMF", service.container);
+      super("WEB-AUDIO-MIXER", service.container);
       this.mixer = new nodefony.webAudio.Mixer("dtmf", {}, this);
       this.dtmf = this.buildDtmf();
       this.tone = this.buildTone();
     }
 
-    addTrack(name, media) {
+    createTrack(name, media) {
       return this.mixer.createTrack(media, {
         name: name,
         gain: true,
@@ -112,7 +112,7 @@ export default (nodefony) => {
         os2.connect(merger, 0, 1);
         os1.start(0);
         os2.start(0);
-        const track = this.addTrack(dtmf, merger);
+        const track = this.createTrack(dtmf, merger);
         obj[dtmf] = track;
       }
       return obj;
@@ -124,7 +124,7 @@ export default (nodefony) => {
       os.type = "sine";
       os.frequency.value = 440;
       //os.start(0);
-      const track = this.addTrack("440", os);
+      const track = this.createTrack("440", os);
       return track;
     }
   }

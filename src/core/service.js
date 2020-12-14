@@ -126,7 +126,9 @@ export default (nodefony) => {
         if (!msgid) {
           msgid = this.name;
         }
-        return this.syslog.log(pci, severity, msgid, msg);
+        if (this.syslog) {
+          return this.syslog.log(pci, severity, msgid, msg);
+        }
       } catch (e) {
         console.log(severity, msgid, msg, " : ", pci);
         console.warn(e);
@@ -162,7 +164,7 @@ export default (nodefony) => {
     listen(...args) {
       return this.notificationsCenter.listen(...args);
     }
-    unListen(...args){
+    unListen(...args) {
       return this.notificationsCenter.unListen(...args);
     }
     on(...args) {
