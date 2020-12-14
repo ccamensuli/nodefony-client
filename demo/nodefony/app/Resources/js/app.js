@@ -95,10 +95,10 @@ class App extends nodefony.Kernel {
   }
 
   createMediaStream() {
-    const md = new nodefony.medias.MediaStream(document.getElementById("myvideo"), {}, this);
+    const md = new nodefony.medias.Stream(document.getElementById("myvideo"), {}, this);
     return md.getUserMedia({})
       .then((stream) => {
-        md.attachMediaStream();
+        md.attachStream();
         return stream;
       });
   }

@@ -36,7 +36,8 @@ module.exports = merge(wpconfig, {
     app: ["./Resources/js/app.js"],
     tests: ["./Resources/js/tests.js"],
     sip: ["./Resources/js/sip.js"],
-    webrtc: ["./Resources/js/webrtc.js"]
+    webrtc: ["./Resources/js/webrtc.js"],
+    api: ["./Resources/js/api.js"]
   },
   output: {
     path: public,

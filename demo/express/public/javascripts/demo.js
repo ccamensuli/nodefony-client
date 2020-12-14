@@ -9,10 +9,10 @@ kernel.on("load", (event) => {
     kernel.log("CREATE webAudio Mixer", "DEBUG");
     let Mixer = new nodefony.webAudio.Mixer("Mixer", {}, kernel);
     kernel.log("CREATE MediaStream", "DEBUG");
-    let md = new nodefony.medias.MediaStream(document.getElementById("myvideo"), {}, kernel);
+    let md = new nodefony.medias.Stream(document.getElementById("myvideo"), {}, kernel);
     md.getUserMedia({})
       .then((stream) => {
-        md.attachMediaStream();
+        md.attachStream();
       });
     kernel.logger(kernel, Mixer)
   } catch (error) {
