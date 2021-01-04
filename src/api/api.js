@@ -80,27 +80,25 @@ export default (nodefony) => {
             if (response.ok) {
               return response.json();
             }
-            let error = new Error(response.statusText);
-            error.response = await response.json();
-            throw error;
           } catch (error) {
-            if (!error.response) {
-              error.response = response;
-            }
+            error.response = response;
             throw error;
           }
+          let error = new Error(response.statusText);
+          error.response = await response.json();
+          throw error;
         })
-        .catch(async (error) => {
+        .catch((error) => {
           if (error.response && error.response.code === 401 && error.response.error) {
             if (error.response.error.message === "jwt expired") {
-              if(this.options.refrehUrl === url || this.options.refrehUrl ===  myurl){
+              if (this.options.refrehUrl === url || this.options.refrehUrl === myurl) {
                 this.clearToken(true);
                 throw error;
               }
               this.clearToken();
               return this.getToken()
                 .then(() => {
-                  return this.http(url, method, opt);
+                  return this.http(url, method, options);
                 })
                 .catch((e) => {
                   this.clearToken(true);
@@ -170,7 +168,7 @@ export default (nodefony) => {
       return this.post(url, opt)
         .then(response => {
           this.token = response.result.token;
-          if(response.result.refreshToken){
+          if (response.result.refreshToken) {
             this.refreshToken = response.result.refreshToken;
           }
           return response;

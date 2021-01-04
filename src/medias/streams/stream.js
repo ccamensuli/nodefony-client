@@ -58,7 +58,7 @@
           return navigator.mediaDevices.getUserMedia(options)
             .then((stream) => {
               this.stream = stream;
-              this.fire("onSucces", this.stream, this);
+              this.fire("onSuccess", this.stream, this);
               return resolve(this.stream);
             })
             .catch((e) => {
@@ -77,7 +77,7 @@
           return navigator.mediaDevices.getDisplayMedia(options)
             .then((stream) => {
               this.stream = stream;
-              this.fire("onSucces", this.stream, this);
+              this.fire("onSuccess", this.stream, this);
               return resolve(this.stream);
             })
             .catch((e) => {
@@ -103,6 +103,11 @@
         });
       }
 
+      async clear(){
+        await this.stop();
+        this.detachDomElement();
+      }
+
       getTracks(stream = this.stream) {
         let error = null;
         if (stream) {
@@ -117,6 +122,7 @@
             await this.stop();
             if(this.mediaElement){
               this.mediaElement.srcObject = this.createStream();
+              this.fire("detachstream", this.mediaElement);
             }
             return resolve(this.stream)
           }catch(e){
@@ -129,6 +135,9 @@
         return new Promise((resolve, reject) => {
           try {
             this.mediaElement = element;
+            if( !this.mediaElement ){
+              throw new Error(`can't attachStream ! no dom element to attach `);
+            }
             if ("srcObject" in this.mediaElement) {
               this.mediaElement.srcObject = stream;
             } else {
@@ -136,14 +145,14 @@
             }
             return this.mediaElement.play()
               .then((event) => {
-                this.fire("playing", this.mediaElement);
+                this.fire("playing", event, this.mediaElement);
                 return resolve(this.mediaElement);
               }).catch(e => {
                 this.fire("onError", e);
                 return reject(e);
               })
             this.mediaElement.onloadedmetadata = (event) => {
-              this.fire("onloadedmetadata", event);
+              this.fire("onloadedmetadata", event, this.mediaElement);
             };
           } catch (e) {
             this.fire("onError", e);
@@ -152,7 +161,7 @@
         });
       }
 
-      reattachMediaStream(stream, element = this.mediaElement) {
+      reattachStream(stream, element = this.mediaElement) {
         let error = null;
         if (stream) {
           this.stream = stream;
@@ -166,6 +175,20 @@
         error = new Error("no Stream detected");
         this.fire("onError", error);
         throw error;
+      }
+
+      detachDomElement(){
+        if(this.mediaElement){
+          this.mediaElement.srcObject = null;
+          this.fire("detachdom", this.mediaElement);
+        }
+      }
+
+      attachDomElement(){
+        if(this.mediaElement){
+          this.mediaElement.srcObject = this.stream;
+          this.fire("attachdom", this.mediaElement);
+        }
       }
 
       getVideoTracks(stream = this.stream) {
