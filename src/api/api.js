@@ -16,7 +16,8 @@ export default (nodefony) => {
     logoutUrl: "/api/jwt/logout",
     refrehUrl: "/api/jwt/token",
     tokenName: "jwt",
-    storage: {}
+    storage: {},
+    forceLogout401: false
   };
 
   class Api extends nodefony.Storage {
@@ -105,6 +106,8 @@ export default (nodefony) => {
                   throw e;
                 });
             }
+          }
+          if (this.options.forceLogout401 && error.response && error.response.code === 401) {
             this.clearToken(true);
           }
           throw error;
