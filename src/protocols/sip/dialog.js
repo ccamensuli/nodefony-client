@@ -58,7 +58,7 @@ export default (nodefony) => {
 
         // to
         if (message.fromNameDisplay) {
-          this.to = '"' + message.fromNameDisplay + '"' + "<sip:" + message.from + ">";
+          this.to = '"' + message.fromNameDisplay + '"' + " <sip:" + message.from + ">";
         } else {
           this.to = "<sip:" + message.from + ">";
         }
@@ -67,12 +67,11 @@ export default (nodefony) => {
         //from
         this.tagFrom = message.toTag || this.tagFrom;
         if (message.toNameDisplay) {
-          this.from = '"' + message.toNameDisplay + '"' + '<sip:' + message.to + '>';
+          this.from = '"' + message.toNameDisplay + '"' + ' <sip:' + message.to + '>';
         } else {
           this.from = "<sip:" + message.to + ">";
         }
         this.fromName = message.toName;
-
 
         // manage routes
         if (message.header.recordRoutes.length) {
@@ -92,13 +91,13 @@ export default (nodefony) => {
         }
         if (!this.to) {
           if (message.toNameDisplay) {
-            this.to = '"' + message.toNameDisplay + '"' + "<sip:" + message.to + ">";
+            this.to = '"' + message.toNameDisplay + '"' + " <sip:" + message.to + ">";
           } else {
             this.to = "<sip:" + message.to + ">";
           }
         } else {
           if (message.toNameDisplay) {
-            this.to = '"' + message.toNameDisplay + '"' + "<sip:" + message.to + ">";
+            this.to = '"' + message.toNameDisplay + '"' + " <sip:" + message.to + ">";
           }
         }
         if (message.toTag) {

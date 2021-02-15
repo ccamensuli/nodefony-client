@@ -26,7 +26,7 @@ export default (nodefony) => {
       if (ret && ret[1]) {
         var displayName = ret[1].replace(/"/g, "");
         //this.message[type+"Name"] = displayName ;
-        this.message[type + "NameDisplay"] = displayName;
+        this.message[type + "NameDisplay"] = displayName.replace(/^\s*|\s*$/g, "");
         //console.log(displayName)
       }
 

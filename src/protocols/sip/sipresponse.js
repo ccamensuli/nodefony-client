@@ -68,7 +68,6 @@ export default (nodefony) => {
             //console.log("traff to")
             message.header[head] = '"' + this.dialog.sip.displayName + '"' + message.header[head];
           }
-          //console.log(message.header[head])
           if (!message.header[head].match(/;tag=/)) {
             this.header.push(head + ": " + message.header[head] + (this.transaction.dialog.tagFrom ? ";tag=" + this.transaction.dialog.tagFrom : ""));
           } else {

@@ -372,7 +372,6 @@ export default (nodefony) => {
           this.settings.password = password;
         }
       }
-
       if (!this.contact || force) {
         var invalid = null;
         switch (this.transportType) {
@@ -380,10 +379,15 @@ export default (nodefony) => {
         case "wss":
           invalid = this.generateInvalid();
           this.via = this.generateVia(invalid);
+          let str = "";
           if (this.rport) {
-            return '"' + this.displayName + '"' + "<sip:" + this.userName + "@" + invalid + ":" + this.rport + ";transport=" + this.transportType + ">";
+            str = `"${this.displayName}" <sip:${this.userName}@${invalid}:${this.rport};transport="${this.transportType}">`;
+            //return '"' + this.displayName + '"' + "<sip:" + this.userName + "@" + invalid + ":" + this.rport + ";transport=" + this.transportType + ">";
+            return str;
           } else {
-            return '"' + this.displayName + '"' + "<sip:" + this.userName + "@" + invalid + ";transport=" + this.transportType + ">";
+            str = `"${this.displayName}" <sip:${this.userName}@${invalid};transport="${this.transportType}">`;
+            //return '"' + this.displayName + '"' + "<sip:" + this.userName + "@" + invalid + ";transport=" + this.transportType + ">";
+            return str ;
           }
           break;
         case "tcp":
