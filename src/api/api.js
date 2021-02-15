@@ -91,7 +91,12 @@ export default (nodefony) => {
         })
         .catch((error) => {
           if (error.response && error.response.code === 401 && error.response.error) {
-            if (error.response.error.message === "jwt expired") {
+            switch (error.response.error.message) {
+            case "invalid token":
+            case "invalid signature":
+              this.clearToken(true);
+              throw error;
+            case "jwt expired":
               if (this.options.refrehUrl === url || this.options.refrehUrl === myurl) {
                 this.clearToken(true);
                 throw error;
@@ -105,6 +110,11 @@ export default (nodefony) => {
                   this.clearToken(true);
                   throw e;
                 });
+            default:
+              if (this.options.forceLogout401) {
+                this.clearToken(true);
+              }
+              throw error;
             }
           }
           if (this.options.forceLogout401 && error.response && error.response.code === 401) {
