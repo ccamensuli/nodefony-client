@@ -125,7 +125,7 @@ environment = production | development
 const nodefony = require('nodefony-client')
 //chunk
 const socket = require("nodefony-client/dist/socket");
-socket(nodefony);
+socket.default(nodefony);
 ```
 
 ## Sources

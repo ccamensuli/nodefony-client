@@ -76,7 +76,7 @@ export default (nodefony) => {
       return tab;
     }
 
-    fireAsync(...args) {
+    async fireAsync(...args) {
       return this.emitAsync(...args);
     }
     /**
