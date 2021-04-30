@@ -13,26 +13,32 @@ module.exports = {
    */
   entry: {
     nodefony: path.resolve(__dirname, "..", "entry.js"),
-    medias: {
+    /*medias: {
       import: path.resolve(__dirname, "..", 'src', 'medias', "medias.js"),
-      dependOn: 'nodefony'
+      library: {
+        name: "[name]",
+        type: 'umd',
+        export: "default",
+        umdNamedDefine: true
+      },
+      //dependOn: 'nodefony'
     },
     socket: {
       import: path.resolve(__dirname, "..", 'src', 'transports', "socket", "socket.js"),
-      dependOn: 'nodefony'
+      //dependOn: 'nodefony'
     },
     webaudio: {
       import: path.resolve(__dirname, "..", 'src', 'medias', 'webaudio', "webaudio.js"),
-      dependOn: 'nodefony'
+      //dependOn: 'nodefony'
     },
     webrtc: {
       import: path.resolve(__dirname, "..", 'src', 'medias', 'webrtc', "webrtc.js"),
-      dependOn: 'nodefony'
+      //dependOn: 'nodefony'
     },
     sip: {
       import: path.resolve(__dirname, "..", 'src', 'protocols', 'sip', "sip.js"),
-      dependOn: 'nodefony'
-    }
+      //dependOn: 'nodefony'
+    }*/
   },
   target: 'web',
   output: {
@@ -130,7 +136,7 @@ module.exports = {
       }
     }),
     new webpack.ProvidePlugin({
-      nodeofny: 'nodeofny',
+      nodefony: 'nodefony'
     }),
   ],
   /*stats: {

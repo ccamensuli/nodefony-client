@@ -109,38 +109,24 @@ environment = production | development
   // import base library
   import nodefony from "nodefony-client";
   // import chunk medias
-  import media from "nodefony-client/dist/medias";
+  import media from "nodefony-client/src/medias/medias";
   media(nodefony);
   // import chunk webaudio
-  import webaudio from "nodefony-client/dist/webaudio";
+  import webaudio from "nodefony-client/src/webaudio/webaudio";
   webaudio(nodefony);
   // import chunk socket
-  import socket from "nodefony-client/dist/socket";
+  import socket from "nodefony-client/src/transports/socket/socket";
   socket(nodefony);
-  window.nodefony = nodefony;
 ```
 
 ## CommonJS modules
 ```js
 const nodefony = require('nodefony-client')
 //chunk
-const socket = require("nodefony-client/dist/socket");
+const socket = require("nodefony-client/src/transports/socket/socket");
 socket.default(nodefony);
 ```
 
-## Sources
-```js
-const source_dir = path.resolve("<path.to.sources>")
-import Nodefony from `${source_dir}/src/nodefony.js`;
-const nodefony = new Nodefony(process.env.NODE_ENV, process.env.NODE_DEBUG);
-import Media from `${source_dir}/src/medias/medias.js`;
-Media(nodefony);
-import Webaudio from `${source_dir}/src/medias/webaudio/webaudio.js`;
-Webaudio(nodefony);
-import Socket from `${source_dir}/src/transports/socket/socket.js`;
-Socket(nodefony);
-window.nodefony = nodefony;
-```
 
 # Base Library
 ## Events
