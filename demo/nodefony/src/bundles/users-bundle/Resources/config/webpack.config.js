@@ -4,8 +4,6 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const {
   merge
 } = require('webpack-merge');
-const precss = require('precss');
-const autoprefixer = require('autoprefixer');
 
 // Default context <bundle base directory>
 //const context = path.resolve(__dirname, "..", "public");
@@ -18,6 +16,7 @@ const publicPath = `/${bundleName}-bundle/assets/`;
 
 let config = null;
 let dev = true;
+const debug = kernel.debug ? "*" : false;
 if (kernel.environment === "dev") {
   config = require("./webpack/webpack.dev.config.js");
 } else {
@@ -97,16 +96,6 @@ module.exports = merge(config, {
               sourceMap: true
             }
           }, {
-            loader: 'resolve-url-loader',
-            options: {}
-          }, {
-            loader: 'postcss-loader', // Run post css actions
-            options: {
-              postcssOptions: {
-                plugins: [autoprefixer({}), precss({})]
-              }
-            }
-          }, {
             loader: "sass-loader",
             options: {
               sourceMap: true
@@ -115,14 +104,7 @@ module.exports = merge(config, {
         ]
       }, {
         test: /.(ttf|otf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
-        use: [{
-          loader: 'file-loader',
-          options: {
-            name: '[name].[ext]',
-            outputPath: 'fonts/', // where the fonts will go
-            publicPath: `${publicPath}fonts/` // override the default path
-          }
-        }]
+        type: 'asset/inline'
       }, {
         test: /\.svg$/,
         use: [{
@@ -131,14 +113,10 @@ module.exports = merge(config, {
       }, {
         // IMAGES
         test: /\.(gif|png|jpe?g|svg)$/i,
-        use: [{
-          loader: "file-loader",
-          options: {
-            name: "[name].[ext]",
-            publicPath: `${publicPath}/images/`,
-            outputPath: "/images/"
-          }
-          }]
+        type: 'asset/resource',
+        generator: {
+           filename: "images/[name][ext][query]",
+        }
       }
     ]
   },
@@ -147,10 +125,12 @@ module.exports = merge(config, {
       filename: "./css/[name].css"
     }),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
-      'process.env.GRAPHIQL': JSON.stringify(bundleConfig.graphiql),
-      'process.env.SWAGGER': JSON.stringify(bundleConfig.swagger)
+      'process.env': {
+        'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+        "NODE_DEBUG": JSON.stringify(debug),
+        "GRAPHIQL": JSON.stringify(bundleConfig.graphiql),
+        "SWAGGER": JSON.stringify(bundleConfig.swagger)
+      }
     })
   ],
   devServer: {
