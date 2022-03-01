@@ -82,7 +82,7 @@ class userEntity extends nodefony.Entity {
       },
       email: {
         type: DataTypes.STRING,
-        primaryKey: true,
+        //primaryKey: true,
         unique: true,
         allowNull: false,
         validate: {
