@@ -10,8 +10,13 @@ module.exports = {
     outputFileSystem: "file-system", // memory-fs not implemented yet
     stats: {
       colors: true,
-      verbose: true,
-      maxModules: 16 // Infinity
+      preset: 'normal' // normal || minimal || verbose || detailed  || summary
+    },
+    watchOptions: {
+      ignored: /node_modules|assets/,
+      aggregateTimeout: 1000,
+      poll: false,
+      followSymlinks: true
     }
   }
 };

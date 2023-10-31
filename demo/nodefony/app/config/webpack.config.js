@@ -10,7 +10,7 @@ const bundleName = path.basename(path.resolve(__dirname, ".."));
 const publicPath = bundleName + "/assets/";
 
 let config = null;
-const debug = kernel.debug ? "*" : false ;
+const debug = kernel.debug ? "*" : false;
 let dev = true;
 if (kernel.environment === "dev") {
   config = require("./webpack/webpack.dev.config.js");
@@ -35,7 +35,7 @@ module.exports = merge(config, {
     filename: "./js/[name].js",
     library: "[name]",
     libraryExport: "default",
-    assetModuleFilename:'[hash][ext][query]'
+    assetModuleFilename: '[hash][ext][query]'
   },
   externals: {},
   resolve: {
@@ -74,7 +74,7 @@ module.exports = merge(config, {
         exposes: [{
           globalName: '$',
           override: true
-        },{
+        }, {
           globalName: 'jQuery',
           override: true
         }]
@@ -104,7 +104,7 @@ module.exports = merge(config, {
       test: /\.(gif|png|jpe?g|svg)$/i,
       type: 'asset/resource',
       generator: {
-         filename: "images/[name][ext][query]",
+        filename: "images/[name][ext][query]",
       }
       /*use: [{
           loader: 'image-webpack-loader',
@@ -148,6 +148,6 @@ module.exports = merge(config, {
   ],
   devServer: {
     hot: false, // false || true || "only",
-    progress:false
+    progress: false
   }
 });

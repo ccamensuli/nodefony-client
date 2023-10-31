@@ -2,8 +2,7 @@
  *    @Route ("/users")
  */
 class usersController extends nodefony.Controller {
-
-  constructor(container, context) {
+  constructor (container, context) {
     super(container, context);
     // start session
     this.startSession();
@@ -15,12 +14,10 @@ class usersController extends nodefony.Controller {
     this.translation = this.get("translation");
     this.usersService = this.get("users");
 
-    this.on("onError", (error, route, variables) => {
-      return this.onError(error, route, variables);
-    });
+    this.on("onError", (error, route, variables) => this.onError(error, route, variables));
   }
 
-  onError(e, route, variables) {
+  onError (e, route, variables) {
     try {
       if (e.errorType === "csrfError") {
         this.setFlashBag("error", e.message);
@@ -35,7 +32,7 @@ class usersController extends nodefony.Controller {
   /**
    *
    */
-  headerAction() {
+  headerAction () {
     return this.render("users::header.html.twig", {
       langs: this.get("translation").getLangs(),
       locale: this.getLocale(),
@@ -46,30 +43,30 @@ class usersController extends nodefony.Controller {
   /**
    *
    */
-  footerAction() {
-    let version = this.kernel.settings.version;
+  footerAction () {
+    const {version} = this.kernel.settings;
     return this.render("users::footer.html.twig", {
-      version: version,
+      version,
       year: new Date().getFullYear()
     });
   }
 
   /**
    *    @see Route by Annotaion
-   *    @Method ({ "GET"})
+   *    @Method ({ "GET", "POST"})
    *    @Route ("/lang", name="lang")
    */
-  langAction() {
+  langAction () {
     if (this.query.language) {
       if (this.session) {
         this.session.set("lang", this.query.language);
-        let route = this.session.getMetaBag("lastRoute");
+        const route = this.session.getMetaBag("lastRoute");
         if (route) {
           return this.redirect(this.url(route));
         }
       }
     }
-    let referer = this.request.getHeader("referer");
+    const referer = this.request.getHeader("referer");
     if (referer) {
       return this.redirect(referer);
     }
@@ -81,10 +78,11 @@ class usersController extends nodefony.Controller {
    *    @Route ( "/create", name="nodefony-user-create")
    *
    */
-  createAction() {
+  createAction () {
+    const user = this.getUser();
     switch (this.method) {
     case "GET":
-      let size = Object.keys(this.queryGet).length;
+      const size = Object.keys(this.queryGet).length;
       if (size) {
         if (this.queryGet.roles) {
           this.queryGet.roles = this.queryGet.roles.split(",");
@@ -101,10 +99,10 @@ class usersController extends nodefony.Controller {
       // FORM DATA
       let error = null;
       if (!this.query.password || !this.query.confirm) {
-        error = new Error(`Password can't be empty`);
+        error = new Error("Password can't be empty");
       }
       if (this.query.password !== this.query.confirm) {
-        error = new Error(`Bad confirm password`);
+        error = new Error("Bad confirm password");
       }
       if (error) {
         this.setFlashBag("error", error.message);
@@ -119,15 +117,15 @@ class usersController extends nodefony.Controller {
         this.query.roles = [this.query.roles];
       }
       this.checkAuthorisation(null, this.query);
-      return this.usersService.create(this.query)
+      return this.usersService.create(this.query, user)
         .then((user) => {
-          let message = `${this.translate("added", "users")} ${user.username}`;
+          const message = `${this.translate("added", "users")} ${user.username}`;
           this.setFlashBag("info", message);
           this.log(message, "INFO");
           return this.redirectToRoute("home");
         })
         .catch((error) => {
-          //console.log(error)
+          // console.log(error)
           this.log(error, "ERROR");
           this.setFlashBag("error", error.message);
           delete this.query.password;
@@ -145,11 +143,12 @@ class usersController extends nodefony.Controller {
    *    @Method ({"GET","POST"})
    *    @Route ( "/update/{username}", name="nodefony-user-update")
    */
-  updateAction(username) {
+  updateAction (username) {
+    const user = this.getUser();
     this.checkAuthorisation(username, this.query);
     switch (this.method) {
     case "GET":
-      return this.usersService.findOne(username)
+      return this.usersService.findOne(username, user)
         .then((result) => {
           if (result) {
             return this.render("users:users:createUser.html.twig", {
@@ -159,17 +158,18 @@ class usersController extends nodefony.Controller {
             });
           }
           throw new Error(`User ${username} not found`);
-        }).catch(e => {
+        })
+        .catch((e) => {
           throw e;
         });
     case "POST":
-      return this.usersService.findOne(username)
+      return this.usersService.findOne(username, user)
         .then(async (myuser) => {
           if (myuser) {
             if (nodefony.typeOf(this.query.roles) === "string") {
               this.query.roles = [this.query.roles];
             }
-            let value = {
+            const value = {
               username: this.query.username || null,
               email: this.query.email,
               name: this.query.name,
@@ -182,29 +182,27 @@ class usersController extends nodefony.Controller {
             if (this.query.password && this.isGranted("ROLE_ADMIN")) {
               let error = null;
               if (this.query.password && this.query.password !== this.query.confirm) {
-                error = new Error(`Bad confirm password`);
+                error = new Error("Bad confirm password");
               }
               if (error) {
                 throw error;
               }
               value.password = this.query.password;
-            } else {
-              if (this.query.password && this.query["old-passwd"]) {
-                let encoder = this.getNodefonyEntity("user").getEncoder();
-                let check = await encoder.isPasswordValid(this.query["old-passwd"], myuser.password);
-                if (check) {
-                  value.password = this.query.password;
-                } else {
-                  throw new Error(`User ${username} bad passport`);
-                }
+            } else if (this.query.password && this.query["old-passwd"]) {
+              const encoder = this.getNodefonyEntity("user").getEncoder();
+              const check = await encoder.isPasswordValid(this.query["old-passwd"], myuser.password);
+              if (check) {
+                value.password = this.query.password;
+              } else {
+                throw new Error(`User ${username} bad passport`);
               }
             }
-            return this.usersService.update(myuser, value)
+            return this.usersService.update(myuser, value, user)
               .then(() => {
-                let message = `Update User ${this.query.username} OK`;
+                const message = `Update User ${this.query.username} OK`;
                 this.setFlashBag("info", message);
                 this.log(message, "INFO");
-                let currentUser = this.getUser();
+                const currentUser = this.getUser();
                 if (myuser.username === currentUser.username) {
                   if (this.query.username !== myuser.username) {
                     currentUser.username = this.query.username;
@@ -212,11 +210,9 @@ class usersController extends nodefony.Controller {
                   if (this.getLocale() !== this.query.lang) {
                     this.session.set("lang", this.query.lang);
                   }
-                  let token = this.getToken();
+                  const token = this.getToken();
                   return token.refreshToken(this.context)
-                    .then(() => {
-                      return this.redirectToRoute("home");
-                    })
+                    .then(() => this.redirectToRoute("home"))
                     .catch((error) => {
                       throw error;
                     });
@@ -230,7 +226,7 @@ class usersController extends nodefony.Controller {
           this.setFlashBag("error", error.message);
           this.log(error, "ERROR");
           return this.redirectToRoute("nodefony-user-update", {
-            username: username
+            username
           });
         });
     default:
@@ -243,24 +239,26 @@ class usersController extends nodefony.Controller {
    *    @Route ("/delete/{username}", name="nodefony-user-delete")
    *
    */
-  deleteAction(username) {
+  deleteAction (username) {
+    const user = this.getUser();
     this.checkAuthorisation(username);
     if (username) {
-      return this.usersService.delete(username)
+      return this.usersService.delete(username, user)
         .then((result) => {
-          let message = `Delete User ${result.username} OK`;
+          const message = `Delete User ${result.username} OK`;
           this.setFlashBag("info", message);
           if (this.getUser().username === username) {
             this.session.invalidate();
           }
           return this.redirectToRoute("nodefony-user");
-        }).catch(e => {
+        })
+        .catch((e) => {
           this.log(e, "ERROR");
           this.setFlashBag("error", e.message);
           return this.redirectToRoute("nodefony-user");
         });
     }
-    let error = new nodefony.Error(`User ${username} not found`, this.context);
+    const error = new nodefony.Error(`User ${username} not found`, this.context);
     this.setFlashBag("error", error.message);
     this.log(error, "ERROR");
     return this.redirectToRoute("nodefony-user");
@@ -271,7 +269,8 @@ class usersController extends nodefony.Controller {
    *    @Route ( "/{username}",name="nodefony-user",defaults={"username" = ""})
    *
    */
-  userAction(username) {
+  userAction (username) {
+    const user = this.getUser();
     if (username) {
       switch (this.method) {
       case "PUT":
@@ -279,8 +278,8 @@ class usersController extends nodefony.Controller {
       case "DELETE":
         return this.deleteAction(username);
       case "GET":
-        //const user = new User(this);
-        return this.usersService.findOne(username)
+        // const user = new User(this);
+        return this.usersService.findOne(username, user)
           .then((result) => {
             if (result) {
               return this.render("users:users:readUsers.html.twig", {
@@ -288,7 +287,8 @@ class usersController extends nodefony.Controller {
               });
             }
             return this.render("users:users:readUsers.html.twig");
-          }).catch(e => {
+          })
+          .catch((e) => {
             throw e;
           });
       }
@@ -297,21 +297,20 @@ class usersController extends nodefony.Controller {
     case "POST":
       return this.createAction();
     default:
-      return this.usersService.find()
-        .then((result) => {
-          return this.render("users:users:readUsers.html.twig", {
-            users: result.rows
-          });
-        }).catch(e => {
+      return this.usersService.find(this.query, {}, user)
+        .then((result) => this.render("users:users:readUsers.html.twig", {
+          users: result.rows
+        }))
+        .catch((e) => {
           throw e;
         });
     }
   }
 
-  checkAuthorisation(username, query) {
-    let granted = this.is_granted("ROLE_ADMIN");
+  checkAuthorisation (username, query) {
+    const granted = this.is_granted("ROLE_ADMIN");
     if (username) {
-      let user = this.getUser();
+      const user = this.getUser();
       if (!user) {
         throw new nodefony.authorizationError("Unauthorized", 401, this.context);
       }
@@ -322,13 +321,12 @@ class usersController extends nodefony.Controller {
       }
     }
     if (query && query.role && query.role.length) {
-      if (query.role.indexOf("ROLE_ADMIN") >= 0 && (!granted)) {
+      if (query.role.indexOf("ROLE_ADMIN") >= 0 && !granted) {
         throw new nodefony.authorizationError("Unauthorized Role", 401, this.context);
       }
     }
     return true;
   }
-
 }
 
 module.exports = usersController;

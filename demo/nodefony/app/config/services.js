@@ -1,6 +1,6 @@
 module.exports = {
   webrtc: {
-  class: nodefony.services.webrtc,
+    class: nodefony.services.webrtc,
     arguments: ["@container"]
   }
 };

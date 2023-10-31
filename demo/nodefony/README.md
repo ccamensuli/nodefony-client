@@ -1,19 +1,16 @@
 <p align="center">
   <img src="https://github.com/nodefony/nodefony/raw/master/src/nodefony/bundles/framework-bundle/Resources/public/images/nodefony-logo.png"><br>
 </p>
-<h1 align="center">NODEFONY V6</h1>
+<h1 align="center">NODEFONY V7</h1>
 
 [![npm package](https://nodei.co/npm/nodefony.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/nodefony)
 
 [![Issues Status](https://img.shields.io/github/issues/nodefony/nodefony.svg)](https://github.com/nodefony/nodefony/issues) [![Build Status](https://github.com/nodefony/nodefony/workflows/nodefony/badge.svg)](https://github.com/nodefony/nodefony/actions) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/495/badge)](https://bestpractices.coreinfrastructure.org/projects/495)
 
-Nodefony is Node.js full-stack web framework.  
+Nodefony is Node.js full-stack web framework.
 
 Nodefony can be used to develop a complete solution to create a Fullstack Web Application, Secure Api, or Microservices.
 
-The Nodefony project is inspired by the PHP Symfony framework, a developer can find most of the concepts, configurations and patterns of Symfony framework.
-
-Nodefony is not an exhaustive port of symfony !
 
 ## Table of content
 
@@ -67,7 +64,7 @@ Nodefony is not an exhaustive port of symfony !
 -   [Passport](http://passportjs.org/) Simple, unobtrusive authentication for Node.js .
 -   ~~[Angular](https://github.com/angular/angular-cli) Experimental Bundle Generator ( Angular cli no longer allows the ejection of a webpack config)~~
 
-**Nodefony 6  adds the following features** :
+**Nodefony 7  adds the following features** :
 
 -   [React](https://github.com/facebookincubator/create-react-app) Experimental Bundle Generator ( Now an React Project can be merge into a Nodefony Bundle )
 -   [Vue.js](https://vuejs.org) Experimental Bundle Generator ( Now an Vue.js Project can be merge into a Nodefony Bundle )
@@ -77,10 +74,12 @@ Nodefony is not an exhaustive port of symfony !
 
 Evolution priorities for the next version will focus on robustness, unit testing, documentation and security.
 
-
-#### Nodefony is ported with ECMAScript 6 ( Class, Inheritance ).
-
 You can follow Nodefony build with github actions at **<https://github.com/nodefony/nodefony/actions>**
+
+## Nodefony implement modules with CommonJS and ECMAScript 6 ( Class, Inheritance ).
+The development framework will not be ported to typescript, but will wait for the version with type syntax in Emacsript
+
+**[proposal-type-annotations](https://github.com/tc39/proposal-type-annotations)**
 
 ## **Resources for Newcomers**
 
@@ -100,7 +99,7 @@ You can follow Nodefony build with github actions at **<https://github.com/nodef
 
 -   **[Node.js](https://nodejs.org/)** ® is a Platform built on Chrome's JavaScript runtime ( >= 8 )
 
--   **[npm](https://www.npmjs.com/)** or **[yarn](https://yarnpkg.com/lang/en/)**  Packages Manager for javascript application
+-   **[npm](https://www.npmjs.com/)** or **[yarn](https://yarnpkg.com/lang/en/)** or **[pnpm](https://pnpm.io/cli/install)**  Packages Manager for javascript application
 
 -   **[nvm](https://github.com/nvm-sh/nvm/)**  Node Version Manager - POSIX-compliant bash script to manage multiple active node.js versions
 
@@ -128,21 +127,21 @@ You can follow Nodefony build with github actions at **<https://github.com/nodef
 
 -   ~~[ELECTRON](https://github.com/nodefony/nodefony-electron) Experimental Nodefony Electron  ( Now an Electron Context can be use in Nodefony Project )~~
 
--   EMBEDDED SYSTEM ( Very difficult : large memory footprint )  
+-   EMBEDDED SYSTEM ( Very difficult : large memory footprint )
 
-## <a name="install"></a> Linux or OSX Installation (Recommanded)
+## <a name="install"></a> Linux or OSX Installation
 
 **[NVM](https://github.com/nvm-sh/nvm#installation-and-update) Installation (Node Version Manager )** :
  -   [NVM](https://github.com/creationix/nvm) Node Version Manager - Simple bash script to manage multiple active node.js versions
 
   To install or update nvm, you can use the install script:
 ```sh
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 # or
-wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
 $ source ~/.bashrc # or source ~/.bash_profile
-$ nvm ls-remote # show all remote versions  
+$ nvm ls-remote # show all remote versions
 $ nvm ls # show local versions
 ```
 
@@ -198,7 +197,7 @@ C:\Users\myuser\AppData\Roaming\npm\bin
 **Cli command when use Global installation**
 ```bash
 $ nodefony -v
-6.0.0
+7.0.0
 ```
 
 **Cli command when By using yarn or npm in trunk**
@@ -212,7 +211,8 @@ npm run nodefony
 **By using npx**
 ***note: npx is included with npm > v5.2 or can be installed separately.***
 ```bash
-npx nodefony
+npx nodefony -v
+7.0.0-beta.10
 ```
 
 **The long way with the full path**
@@ -245,17 +245,17 @@ YOU CAN USE CLI NO INTERACTIVE (nodefony with args) :
 ```bash
 #  CLI generate project name : myproject
 
-$ nodefony create myproject
+$ npx nodefony create myproject
 $ cd myproject
  ```
 
 **Cli Help** :
 
 ```bash
-$ nodefony -h
+$ npx nodefony -h
 
-nodefony                                                                                              
-    create [-i] name [path]                       Create New Nodefony Project                  
+nodefony
+    create [-i] name [path]                       Create New Nodefony Project
 ```
 
 ## <a name="buildstarter"></a> Build Project with Github Starter :
@@ -264,9 +264,9 @@ nodefony
 
   Clone nodefony starter
  ```bash
- $ git clone https://github.com/nodefony/nodefony.git
+ $ git clone https://github.com/nodefony/nodefony-starter.git
  $ cd nodefony
- $ nodefony build
+ $ npx nodefony build
    ...
    ...
  $ npm start
@@ -275,7 +275,7 @@ nodefony
 
   YOU CAN USE CLI INTERACTIVE MODE TO BUILD PROJECT (nodefony without args)
  ```bash
- $ git clone https://github.com/nodefony/nodefony.git
+ $ git clone https://github.com/nodefony/nodefony-starter.git
  $ cd nodefony
  $ ls -l
  -rw-r--r--     1 cci  staff   21306 27 mar 19:22 README.md
@@ -290,7 +290,7 @@ nodefony
  drwxr-xr-x    12 cci  staff     384 29 mar 11:01 web
  -rw-r--r--     1 cci  staff  542660 27 mar 19:24 yarn.lock
 
- $ nodefony
+ $ npx nodefony
 
 ?  Nodefony CLI :  (Use arrow keys)
 ❯ Build Project
@@ -307,7 +307,7 @@ nodefony
 **Starting Development Servers** :
 
 ```bash
-$ nodefony dev
+$ npx nodefony dev
 
 # TO STOP
 $ <ctrl-c>
@@ -315,7 +315,7 @@ $ <ctrl-c>
 **Starting Development Servers in Debug Mode (-d)** :
 
 ```bash
-$ nodefony -d dev
+$ npx nodefony -d dev
 
 # TO STOP
 $ <ctrl-c>
@@ -326,14 +326,14 @@ OR YOU CAN USE CLI INTERACTIVE MODE (nodefony without args)
  _   _    ___    ____    _____   _____    ___    _   _  __   __
 | \ | |  / _ \  |  _ \  | ____| |  ___|  / _ \  | \ | | \ \ / /
 |  \| | | | | | | | | | |  _|   | |_    | | | | |  \| |  \ V /
-| |\  | | |_| | | |_| | | |___  |  _|   | |_| | | |\  |   | |  
-|_| \_|  \___/  |____/  |_____| |_|      \___/  |_| \_|   |_|  
+| |\  | | |_| | | |_| | | |___  |  _|   | |_| | | |\  |   | |
+|_| \_|  \___/  |____/  |_____| |_|      \___/  |_| \_|   |_|
 
 Version : 4.0.0 Platform : linux  Process : nodefony PID : 31635
 
 Fri Jul 27 2018 17:01:11 INFO nodefony : WELCOME PROJECT : myproject 1.0.0
 
-?  Nodefony CLI :  
+?  Nodefony CLI :
 ❯ Start Servers Development
   Start Servers Pre-Production
   Start Servers Production
@@ -355,6 +355,8 @@ Fri Jul 27 2018 17:01:11 INFO nodefony : WELCOME PROJECT : myproject 1.0.0
 $ npm -g install npx
 
 $ npx --node-arg=--inspect nodefony dev
+// new version npx > 7
+$ npx --node-options=--inspect nodefony dev
 
 # check chrome://inspect in your browser
 ```
@@ -363,23 +365,23 @@ $ npx --node-arg=--inspect nodefony dev
 
 **Starting a Nodefony project with [PM2](http://pm2.keymetrics.io/)** :
 ```bash
-$ nodefony prod
+$ npx nodefony prod
 or
-$ nodefony start
+$ npx nodefony start
 ```
 Tools PM2 You can see PM2 config : config/pm2.config.js
 ```bash
 # To See log
-$ nodefony logs
+$ npx nodefony logs
 
 # To List Status of Production projects
-$ nodefony list
+$ npx nodefony list
 
 # TO KILL PM2 DEAMON
-$ nodefony kill
+$ npx nodefony kill
 
 # TO STOP APPLICATION WITHOUT KILL PM2 DEAMON
-$ nodefony stop
+$ npx nodefony stop
 
 # YOU can use all pm2 command by using
 $ yarn pm2 monit
@@ -391,7 +393,7 @@ $ npm run pm2 logs --lines 200
 
 **Checking a Nodefony Project Pre-Production (Usefull to check Clusters Node)** :
 ```bash
-$ nodefony preprod
+$ npx nodefony preprod
 ```
 
 ## <a name="https"></a>Serving a Nodefony project with HTTPS or WSS
@@ -417,7 +419,7 @@ You can find certificate authority (ca) here:
 #### Access to Secure App with URL : <https://localhost:5152>
 #### Access to App with URL : <http://localhost:5151>
 
-[![nodefony](https://raw.githubusercontent.com/nodefony/nodefony/master/src/nodefony/bundles/documentation-bundle/Resources/public/images/nodefony.png)](https://nodefony.net)
+[![nodefony](https://raw.githubusercontent.com/nodefony/nodefony/master/src/nodefony/bundles/monitoring-bundle/Resources/public/images/nodefony.png)](https://nodefony.net)
 
 ## <a name="configurations"></a>Framework Configurations
 
@@ -592,7 +594,7 @@ class defaultController extends nodefony.Controller {
   indexAction() {
     return this.render("hello-bundle::index.html.twig", {
 			name: this.bundle.name,
-			description: this.bundle.package.description    
+			description: this.bundle.package.description
     });
   }
 }
@@ -714,7 +716,7 @@ module.exports = webpackMerge(config, {
 
 Access to monitoring route with URL : <http://localhost:5151/nodefony>
 
-[![MONITORING](https://raw.githubusercontent.com/nodefony/nodefony/master/src/nodefony/doc/cluster.png)](https://nodefony.net/nodefony)
+[![MONITORING](https://raw.githubusercontent.com/nodefony/nodefony/master/src/nodefony/bundles/monitoring-bundle/Resources/public/images/monitor.png)](https://nodefony.net/nodefony)
 
 Monitoring in progress !!!
 

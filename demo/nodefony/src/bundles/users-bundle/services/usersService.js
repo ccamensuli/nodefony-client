@@ -1,6 +1,5 @@
-class users extends nodefony.Service {
-
-  constructor(container) {
+module.exports = class users extends nodefony.Service {
+  constructor (container) {
     super("users", container);
     this.orm = this.kernel.getORM();
     this.ormName = this.orm.name;
@@ -13,18 +12,11 @@ class users extends nodefony.Service {
     }
   }
 
-  initialize() {
+  initialize () {
     this.entity = this.orm.getEntity("user");
   }
 
-  sanitizeSequelizeError(error) {
-    if (nodefony.Error.isError(error) === "SequelizeError") {
-      return new nodefony.Error(error);
-    }
-    return error;
-  }
-
-  getSchemaAttributes() {
+  getSchemaAttributes () {
     switch (this.ormName) {
     case "sequelize":
       return this.entity.rawAttributes;
@@ -33,11 +25,11 @@ class users extends nodefony.Service {
     }
   }
 
-  checkSchema(query) {
+  checkSchema (query) {
     try {
       if (query) {
         const attr = this.getSchemaAttributes();
-        for (let ele in query) {
+        for (const ele in query) {
           if (ele in attr) {
             continue;
           }
@@ -49,18 +41,93 @@ class users extends nodefony.Service {
     }
   }
 
-  find(query = {}, options = {}) {
+  async sanitizeError (error, transaction = null) {
+    this.log(error, "ERROR");
+    if (transaction && !transaction.finished) {
+      switch (this.ormName) {
+      case "sequelize":
+        if (!transaction.finished) {
+          await transaction.rollback();
+        }
+        break;
+      case "mongoose":
+        await transaction.abortTransaction();
+        break;
+      }
+    }
+    if (nodefony.Error.isError(error) === "SequelizeError") {
+      return new nodefony.Error(error);
+    }
+    return error;
+  }
+
+  checkAuthorisation (action, user = null, query = null) {
+    if (!user) {
+      throw new nodefony.authorizationError("User not authorized", 403);
+    }
+    const obj = {
+      isAdmin: user.hasRole("ROLE_ADMIN"),
+      isUser: user.hasRole("ROLE_USER"),
+      query
+    };
+    switch (action) {
+    case "update":
+      if (!obj.isAdmin) {
+        if (query.where) {
+          if (user.username !== query.where.username) {
+            throw new nodefony.authorizationError("User not authorized", 403);
+          }
+        } else {
+          throw new nodefony.authorizationError("User not authorized", 403);
+        }
+      }
+      break;
+    case "insert":
+    case "delete":
+      if (!obj.isAdmin) {
+        throw new nodefony.authorizationError("User not authorized", 403);
+      }
+      break;
+    case "search":
+    case "list":
+      if (!obj.isAdmin) {
+        if (obj.isUser) {
+
+        } else {
+          throw new nodefony.authorizationError("User not authorized", 403);
+        }
+      } else {
+
+      }
+      break;
+    case "find":
+    case "findAll":
+    case "findOne":
+      if (!obj.isAdmin) {
+        if (!obj.isUser) {
+          throw new nodefony.authorizationError("User not authorized", 403);
+        }
+      }
+      break;
+    default:
+      throw new nodefony.authorizationError("Action not authorized", 403);
+    }
+    return obj;
+  }
+
+  async find (query = {}, options = {}, user) {
     try {
+      const auth = this.checkAuthorisation("find", user, query);
       switch (this.ormName) {
       case "mongoose":
         if (options.limit || options.offset || options.page) {
-          return this.entity.paginate(query, {
-              page: options.page,
-              limit: options.limit,
-              offset: options.offset
-            })
+          return this.entity.paginate(auth.query, {
+            page: options.page,
+            limit: options.limit,
+            offset: options.offset
+          })
             .then((res) => {
-              let tab = [];
+              const tab = [];
               if (!res) {
                 return {
                   page: options.page,
@@ -83,13 +150,14 @@ class users extends nodefony.Service {
                 nextPage: res.nextPage,
                 rows: res.docs
               };
-            }).catch(e => {
-              throw e;
+            })
+            .catch(async (e) => {
+              throw await this.sanitizeError(e);
             });
         }
-        return this.entity.find(query, options)
+        return this.entity.find(auth.query, options)
           .then((res) => {
-            let tab = [];
+            const tab = [];
             if (!res) {
               return {
                 total: tab.length,
@@ -100,15 +168,16 @@ class users extends nodefony.Service {
               total: res.length,
               rows: res
             };
-          }).catch(e => {
-            throw e;
+          })
+          .catch(async (e) => {
+            throw await this.sanitizeError(e);
           });
       case "sequelize":
-        query = nodefony.extend(query, options);
+        // query = nodefony.extend(query, options);
         if (query.limit || query.offset) {
-          return this.entity.findAndCountAll(query)
+          return this.entity.findAndCountAll(auth.query)
             .then((res) => {
-              let tab = [];
+              const tab = [];
               if (!res) {
                 return {
                   page: query.page,
@@ -119,10 +188,10 @@ class users extends nodefony.Service {
                 };
               }
               res.rows.map((el) => {
-                let user = el.get({
+                const userS = el.get({
                   plain: true
                 });
-                tab.push(user);
+                tab.push(userS);
               });
               return {
                 page: query.page,
@@ -131,13 +200,14 @@ class users extends nodefony.Service {
                 total: res.count,
                 rows: tab
               };
-            }).catch(e => {
-              throw this.sanitizeSequelizeError(e);
+            })
+            .catch(async (e) => {
+              throw await this.sanitizeError(e);
             });
         }
-        return this.entity.findAll(query)
+        return this.entity.findAll(auth.query)
           .then((res) => {
-            let tab = [];
+            const tab = [];
             if (!res) {
               return {
                 total: tab.length,
@@ -145,224 +215,201 @@ class users extends nodefony.Service {
               };
             }
             res.map((el) => {
-              let user = el.get({
+              const userS = el.get({
                 plain: true
               });
-              tab.push(user);
+              tab.push(userS);
             });
             return {
               total: tab.length,
               rows: tab
             };
           })
-          .catch(e => {
-            throw this.sanitizeSequelizeError(e);
+          .catch(async (e) => {
+            throw await this.sanitizeError(e);
           });
       }
     } catch (e) {
-      throw e;
+      throw await this.sanitizeError(e);
     }
   }
 
-  findOne(username) {
+  async findOne (username, user) {
     try {
       switch (this.ormName) {
       case "mongoose":
         return this.entity.findOne({
-          username: username
-        });
+          username
+        })
+          .catch(async (e) => {
+            throw await this.sanitizeError(e);
+          });
       case "sequelize":
         return this.entity.findOne({
-            where: {
-              username: username
-            }
-          })
-          .then((el) => {
-            if (!el) {
+          where: {
+            username
+          }
+        })
+          .then((user) => {
+            if (!user) {
               throw new nodefony.Error(`Username ${username} not found`, 404);
             }
-            let user = el.get({
-              plain: true
-            });
             return user;
           })
-          .catch(e => {
-            throw this.sanitizeSequelizeError(e);
+          .catch(async (e) => {
+            throw await this.sanitizeError(e);
           });
       }
     } catch (e) {
-      throw this.sanitizeSequelizeError(e);
+      throw await this.sanitizeError(e);
     }
   }
 
-  async update(user, value) {
+  async update (userentity, value, user, transac = null) {
+    let transaction = transac;
+    if (!transac) {
+      transaction = await this.orm.startTransaction("user");
+    }
     switch (this.ormName) {
     case "mongoose":
-      let session = null;
       try {
-        session = await this.orm.startTransaction("user");
-        return user.updateOne(value)
-          .then((user) => {
-            session.commitTransaction();
-            return user;
-          }).catch(e => {
-            session.abortTransaction();
-            throw e;
+        return userentity.updateOne(value, {
+          //  session: transaction
+        })
+          .then(async (user) =>
+          // await transaction.commitTransaction();
+            user)
+          .catch(async (e) => {
+            throw await this.sanitizeError(e, transaction);
           });
       } catch (e) {
-        if (session) {
-          session.abortTransaction();
-        }
-        throw e;
-      }
+        throw await this.sanitizeError(e, transaction);
+      } finally {}
       break;
     case "sequelize":
-      let transaction = null;
       try {
-        transaction = await this.orm.startTransaction("user");
         const {
           username
-        } = user;
+        } = userentity;
         return this.entity.update(value, {
-            where: {
-              username: username
-            }
-          }, {
-            transaction: transaction
-          })
-          .then((user) => {
-            transaction.commit();
+          where: {
+            username
+          },
+          transaction
+        })
+          .then(async (user) => {
+            await transaction.commit();
             return user;
-          }).catch(e => {
-            transaction.rollback();
-            throw this.sanitizeSequelizeError(e);
+          })
+          .catch(async (e) => {
+            throw await this.sanitizeError(e, transaction);
           });
       } catch (e) {
-        if (transaction) {
-          transaction.rollback();
-        }
-        throw this.sanitizeSequelizeError(e);
+        throw await this.sanitizeError(e, transaction);
       }
     }
   }
 
-  async create(query) {
+  async create (query, user, transac = null) {
+    let transaction = transac;
+    if (!transac) {
+      transaction = await this.orm.startTransaction("user");
+    }
     switch (this.ormName) {
     case "sequelize":
-      let transaction = null;
       try {
-        transaction = await this.orm.startTransaction("user");
         return this.entity.create(query, {
-            transaction: transaction
-          })
-          .then((el) => {
-            transaction.commit();
-            let user = el.get({
-              plain: true
-            });
+          transaction
+        })
+          .then(async (user) => {
+            await transaction.commit();
             return user;
-          }).catch(e => {
-            transaction.rollback();
-            throw this.sanitizeSequelizeError(e);
+          })
+          .catch(async (e) => {
+            throw await this.sanitizeError(e, transaction);
           });
       } catch (e) {
-        if (transaction) {
-          transaction.rollback();
-        }
-        throw this.sanitizeSequelizeError(e);
+        throw await this.sanitizeError(e, transaction);
       }
       break;
     case "mongoose":
-      let session = null;
       try {
-        session = await this.orm.startTransaction("user");
-        return this.entity.create(query)
-          .then((user) => {
-            session.commitTransaction();
-            return user;
-          }).catch(e => {
-            session.abortTransaction();
-            throw e;
+        return this.entity.create([query], {
+          // session: transaction
+        })
+          .then(async (myuser) =>
+          // await transaction.commitTransaction();
+            myuser[0] || myuser)
+          .catch(async (e) => {
+            throw await this.sanitizeError(e, transaction);
           });
       } catch (e) {
-        if (session) {
-          session.abortTransaction();
-        }
-        throw e;
+        throw await this.sanitizeError(e, transaction);
       }
     }
   }
 
-  async delete(username) {
+  async delete (username, user, transac = null) {
+    let transaction = transac;
+    if (!transac) {
+      transaction = await this.orm.startTransaction("user");
+    }
     switch (this.ormName) {
     case "mongoose":
-      let session = null;
       try {
         return this.entity.findOne({
-            username: username
-          })
-          .then(async (user) => {
+          username
+        })
+          .then((user) => {
             if (!user) {
               throw new nodefony.Error(`User ${username} not found`);
             }
-            session = await this.orm.startTransaction("user");
             return user.remove({
-                force: true
-              })
-              .then((user) => {
-                session.commitTransaction();
-                return user;
-              }).catch(e => {
-                session.abortTransaction();
-                throw e;
+              force: true
+              // session: transaction
+            })
+              .then(async (user) =>
+              // await transaction.commitTransaction();
+                user)
+              .catch(async (e) => {
+                throw await this.sanitizeError(e, transaction);
               });
           })
-          .catch(e => {
-            if (session) {
-              session.abortTransaction();
-            }
-            throw e;
+          .catch(async (e) => {
+            throw await this.sanitizeError(e, transaction);
           });
-
       } catch (e) {
-        if (session) {
-          session.abortTransaction();
-        }
-        throw e;
+        throw await this.sanitizeError(e, transaction);
       }
       break;
     case "sequelize":
-      let transaction = null;
       try {
         return this.entity.findOne({
-            where: {
-              username: username
-            }
-          })
-          .then(async (user) => {
+          where: {
+            username
+          }
+        })
+          .then((user) => {
             if (!user) {
               throw new nodefony.Error(`User ${username} not found`);
             }
-            transaction = await this.orm.startTransaction("user");
             return user.destroy({
-                transaction: transaction
-              })
-              .then((user) => {
-                transaction.commit();
+              transaction
+            })
+              .then(async (user) => {
+                await transaction.commit();
                 return user;
-              }).catch(e => {
-                transaction.rollback();
-                throw this.sanitizeSequelizeError(e);
+              })
+              .catch(async (e) => {
+                throw await this.sanitizeError(e, transaction);
               });
+          })
+          .catch(async (e) => {
+            throw await this.sanitizeError(e, transaction);
           });
       } catch (e) {
-        if (transaction) {
-          transaction.rollback();
-        }
-        throw this.sanitizeSequelizeError(e);
+        throw await this.sanitizeError(e, transaction);
       }
     }
   }
-}
-
-module.exports = users;
+};

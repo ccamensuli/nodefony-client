@@ -13,6 +13,7 @@ const cors = {
 
 module.exports = {
   security: {
+
     /**
      *  FIREWALL  PROVIDER
      */
@@ -39,19 +40,12 @@ module.exports = {
     /**
      *  FIREWALL  Authorization
      */
-    access_control: [{
-      path: /^\/nodefony/,
-      roles: ["ROLE_MONITORING"],
-      requires_channel: "https",
-      /*allow_if: {
-        roles: ["ROLE_ADMIN", "ROLE_USER"]
-      }*/
-    }],
+    access_control: [],
 
     firewalls: {
       // SECURITY AREA  <passport-local>
       nodefony_area: {
-        pattern: /^\/secure/,
+        pattern: /^\/secure/u,
         provider: "nodefony",
         form_login: {
           login_path: "/login/secure",
@@ -59,8 +53,8 @@ module.exports = {
           default_target_path: "/users"
         },
         "passport-local": {
-          usernameField: 'username',
-          passwordField: 'passwd'
+          usernameField: "username",
+          passwordField: "passwd"
         },
         logout: "/logout",
         context: null,
@@ -68,24 +62,24 @@ module.exports = {
       },
       // SECURITY AREA LOGIN API  <passport-local>
       login_api_area: {
-        pattern: /^\/api\/jwt\/login/,
+        pattern: /^\/api\/jwt\/login/u,
         provider: "nodefony",
         "passport-local": {
-          usernameField: 'username',
-          passwordField: 'passwd'
+          usernameField: "username",
+          passwordField: "passwd"
         },
-        stateless: true,
+        stateless: false,
         redirectHttps: true,
         crossDomain: cors
       },
       // SECURITY AREA  API  <passport-jwt>
       api_area: {
-        pattern: /^\/api/,
+        pattern: /^\/api/u,
         redirectHttps: true,
         stateless: true,
         "passport-jwt": {
           algorithms: "RS256",
-          //secretOrKey:"Les sanglots longs Des violons De l’automne Blessent mon cœur D’une langueur Monotone."
+          // secretOrKey:"Les sanglots longs Des violons De l’automne Blessent mon cœur D’une langueur Monotone."
           certificats: {
             private: path.resolve("config", "certificates", "ca", "private", "ca.key.pem"),
             public: path.resolve("config", "certificates", "ca", "public", "public.key.pem")
